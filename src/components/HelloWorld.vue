@@ -20,7 +20,7 @@ export default {
     methods: {
         async showHelloWorld() {
             try {
-                const res = await fetch('http://194.152.37.7:8812/api/hello');
+                const res = await fetch('http://194.152.37.7:8812/');
                 if (res.ok) {
                     this.responseText = await res.text();
                     this.textVisible = true;
