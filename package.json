@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "nohup": "nohup vite dev &"
+    "nohup": "nohup vite --host --port 8811 &"
   },
   "dependencies": {
     "@mdi/font": "7.0.96",
