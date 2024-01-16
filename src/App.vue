@@ -11,19 +11,27 @@
 </template>
 
 <script>
+
   import Navbar from './components/Navbar.vue'
+  import HelloWorld from './components/HelloWorld.vue'
 
   export default {
+    name: 'App',
     components: {
+      HelloWorld,
       Navbar
     }
   }
+
 </script>
 
 <style>
-nav a {
-  margin: 10px;
-  text-decoration: none;
-  color: #42b983;
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
 }
 </style>

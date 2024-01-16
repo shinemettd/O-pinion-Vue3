@@ -22,8 +22,8 @@
       } else {
         secondTextVisible.value = true;
         secondResponseText.value = await response.text();
-      } 
-    } 
+      }
+    }
   }
 </script>
 
