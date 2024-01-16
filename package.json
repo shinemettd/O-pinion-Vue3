@@ -5,12 +5,14 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "nohup": "nohup vite dev &"
+    "nohup": "nohup vite --host --port 8811 &"
   },
   "dependencies": {
     "@mdi/font": "7.0.96",
+    "axios": "^1.6.5",
     "roboto-fontface": "*",
     "vue": "^3.3.0",
+    "vue-router": "^4.2.5",
     "vuetify": "^3.0.0"
   },
   "devDependencies": {
