@@ -2,6 +2,13 @@ import {createRouter, createWebHistory} from 'vue-router';
 import HelloWorldPage from "@/pages/HelloWorldPage.vue";
 import MainPage from "@/pages/MainPage.vue";
 import TestArticle from "@/pages/TestArticle.vue";
+import Technology from '@/components/Technology.vue';
+import About from '@/components/About.vue';
+import Person from '@/components/Person.vue';
+import ArticleCreate from "@/components/ArticleCreate.vue";
+import Notification from "@/components/Notification.vue";
+import Science from "@/components/Science.vue";
+import Popular from "@/components/Popular.vue";
 
 export default createRouter({
   history: createWebHistory(),
@@ -11,12 +18,48 @@ export default createRouter({
       component: MainPage
     },
     {
-      path: '/HelloWorld',
+      path: '/hello-world',
       component: HelloWorldPage
     },
     {
-      path: '/TestArticle',
+      path: '/test-article',
       component: TestArticle
+    },
+
+    {
+      path: '/technology',
+      name: 'Technology',
+      component: Technology
+    },
+    {
+      path: '/about',
+      name: 'About',
+      component: About
+    },
+    {
+      path: '/person',
+      name: 'Person',
+      component: Person
+    },
+    {
+      path: '/create-Article',
+      name: 'ArticleCreate',
+      component: ArticleCreate
+    },
+    {
+      path: '/notification',
+      name: 'Notification',
+      component: Notification
+    },
+    {
+      path: '/science',
+      name: 'Science',
+      component: Science
+    },
+    {
+      path: '/popular',
+      name: 'Popular',
+      component: Popular
     }
   ]
 })
