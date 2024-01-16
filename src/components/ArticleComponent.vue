@@ -19,9 +19,11 @@
             </a>
           </div>
         </div>
-        <div class = "article-header-options">
-           <p @mouseenter="showMsg" @mouseleave=""> Еще </p>
-            <!--          <p> Еще </p>-->
+        <div class = "article-header-report">
+          <div class = "article-header-report-icon">
+            <img src="/icons/alert_circle_icon.svg" @click="showMsg" alt = "Report Icon">
+            <!-- instead of showMsg on click should be a method call to show a window with report -->
+          </div>
         </div>
       </div>
       <div class = "article-data">
@@ -31,38 +33,49 @@
           </a>
         </div>
         <div v-if = "articleMainPictureUrl !== ''" class = "article-picture">
-          <img :src = "articleMainPictureUrl" alt = "main picture of article preview">
+          <img :src = "articleMainPictureUrl" alt = "Main picture of article preview">
         </div>
         <div class = "article-description">
           <p> {{ articleShortDescription }} </p>
         </div>
         <div class = "article-read-more">
-          <a :href="'/' + articleId"> <!--  here is described a path to localhost:8811/articleId  -->
+          <a :href="basePath + '/' + articleId"> <!--  here is described a path to localhost:8811/articleId  -->
             <v-btn style="margin-top: 10px; margin-bottom: 10px;">Читать далее</v-btn>
           </a>
         </div>
-        <div class = "article-actions-bar">
-          <div class = "article-actions">
+        <div class = "article-footer-bar">
+          <div class = "article-footer">
             <div class = "article-rating">
-              <p>Рейтинг: {{ articleRating }}</p>
+              <div class = "article-rating-icon">
+                <img src="/icons/zap_icon.svg" alt="Rating Icon">
+              </div>
+              <b>{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
-              <a href="/">
-                <p>Избранное: {{ articleTotalFavourites }}</p>
-              </a>
+                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="changeFavouriteStatus">
+                  <img src="/icons/star_icon.svg" alt = "Favourites Icon">
+                </div>
+                <div v-else class = article-not-in-favourites-icon @click="changeFavouriteStatus">
+                  <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
+                </div>
+                <b> {{ articleTotalFavourites }}</b>
             </div>
             <div class = "article-share">
-              <a href="/">
-                <p>Поделиться </p>
-              </a>
+                <div class = "article-share-icon">
+                  <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon">
+                </div>
             </div>
             <div class = "article-comments">
-              <a :href="'/comments/'+ articleId">
-                <p>Комментариев: {{ articleTotalComments }}</p>
-              </a>
+                <div class = "article-comments-icon">
+                  <img src="/icons/message_square_icon.svg" alt="Comments Icon">
+                </div>
+                <b>{{ articleTotalComments }}</b>
             </div>
             <div class = "article-views-count">
-              <p>Просмотров: {{ articleTotalViews }}</p>
+              <div class = "article-views-icon">
+                <img src ="/icons/eye_icon.svg" alt="Image Icon">
+              </div>
+              <b>{{ articleTotalViews }}</b>
             </div>
           </div>
         </div>
@@ -72,11 +85,11 @@
 </template>
 
 <script setup>
+const basePath = 'http://localhost:8811';
 const showMsg = () => {
-  alert('?')
   console.log('навелись')
 }
-defineProps({
+const props = defineProps({
   authorsNickname: String,
   authorsAvatarUrl: String,
   postedTimeAgo: String,
@@ -86,9 +99,18 @@ defineProps({
   articleShortDescription: String,
   articleRating: Number,
   articleTotalFavourites: Number,
+  articleInFavourites: {
+    type: Boolean,
+    default: false
+  },
   articleTotalComments: Number,
-  articleTotalViews: Number
+  articleTotalViews: Number,
 })
+
+function changeFavouriteStatus() {
+  console.log(props.articleInFavourites);
+  alert('after');
+}
 </script>
 
 <style scoped>
@@ -128,7 +150,6 @@ article {
 .article-authors-nickname a:hover,
 .article-title a:hover {
   color: rgb(120, 194, 255);
-  transition: all 0.35s ease;
 }
 
 .article-authors-avatar img {
@@ -142,9 +163,23 @@ article {
   margin-left: 0.75em;
 }
 
-.article-header-options {
+.article-header-report {
   float: right;
   vertical-align: middle;
+  cursor: pointer;
+}
+
+.article-header-report-icon {
+  opacity: 25%;
+  transition: all 0.35s ease;
+}
+
+.article-header-report-icon:hover {
+  opacity: 100%;
+}
+
+.article-title {
+  max-width: 90%;
 }
 
 .article-title p {
@@ -160,18 +195,56 @@ article {
   padding-bottom: 10px;
 }
 
-.article-actions div {
+.article-footer div {
   display: inline-block;
   vertical-align: middle;
-  margin-right: 15px;
+  margin-right: 10px;
 }
 
-.article-favourites a {
-  color: black;
+.article-footer div img {
+  vertical-align: middle;
 }
 
-.article-favourites a:hover {
-  color: blue;
+.article-footer > div:not(:last-child) {
+  margin-right: 50px;
+}
+
+.article-not-in-favourites-icon {
+  opacity: 50%;
+}
+
+.article-not-in-favourites-icon:hover {
+  cursor: pointer;
+  opacity: 100%;
+}
+
+.article-in-favourites-icon {
+  opacity: 100%;
+}
+
+.article-in-favourites-icon:hover {
+  opacity: 50%;
+}
+
+.article-comments,
+.article-rating,
+.article-favourites {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.article-comments p {
+  font-size: 20px;
+}
+
+.article-comments-icon {
+  vertical-align: middle;
+}
+
+.article-share-icon {
+  vertical-align: center;
 }
 
 .article-share a,
@@ -179,6 +252,12 @@ article {
 .article-comments a {
   text-decoration: none;
   color: black;
+  display: flex;
+}
+
+.article-views-count {
+  float: right;
+  vertical-align: middle;
 }
 
 .article-views-count p {
