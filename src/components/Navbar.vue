@@ -2,20 +2,28 @@
   <nav class="navbar-head">
     <router-link to="/" class="navbar-brand">O!Opinion</router-link>
   </nav>
-    <nav class="navbar">
+    <nav :class="['navbar', { 'sticky': isSticky }]">
       <div class="container">
+        <!--navbar element-->
         <div class="navbar-menu">
           <router-link to="/hello-world" class="navbar-item">Hello World</router-link>
           <router-link to="/test-article" class="navbar-item">Test Article</router-link>
-          <router-link to="/technology" class="navbar-item">Технологии</router-link>
-          <router-link to="/science" class="navbar-item">Наука</router-link>
-          <router-link to="/popular" class="navbar-item">Популярное</router-link>
           <!-- Other link in navbar -->
         </div>
+        <!--Search button-->
+        <div class="search-container">
+          <!--Filter button-->
+          <button @click="toggleFilter" class="filter-button"><i class="fas fa-filter"></i></button>
+          <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery">
+          <button @click="search" class="search-button"><i class="fas fa-search"></i></button>
+        </div>
+
         <div>
           <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
           <router-link to="/create-Article" class="burger-button"><i class="fas fa-plus"></i></router-link>
+
           <button @click="toggleMenu" class="burger-button">☰</button>
+
           <div :class="['menu', { 'is-open': isMenuOpen }]">
             <router-link to="/person" class="menu-item"><i class="fas fa-user"></i>Личный кабинет</router-link>
             <router-link to="/" class="menu-item"><i class="fas fa-home"></i> Главная</router-link>
@@ -37,26 +45,59 @@
     data() {
       return {
         isMenuOpen: false,
+        searchQuery: '', // variable to save request
+        isSticky: false
+
       };
+    },mounted() {
+      window.addEventListener('scroll', this.handleScroll);
     },
+    destroyed() {
+      window.removeEventListener('scroll', this.handleScroll);
+    },
+
     methods: {
       toggleMenu() {
         this.isMenuOpen = !this.isMenuOpen;
       },
+      search() {
+        console.log('Поиск по запросу:', this.searchQuery);
+        // Logic how to search
+      },
+      toggleFilter() {
+        // Logic how to filter search
+        console.log('Переключение фильтра');
+      },
+      handleScroll() {
+        this.isSticky = window.scrollY > 0;
+      }
     },
   };
   </script>
 
   <style scoped>
   .navbar {
+    transition: top 30ms;
+    width: 100%;
+    z-index: 1000;
     background-color: #350454;
     color: white;
-    padding: 15px 20px;
+    padding: 5px 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
   .navbar-head {
     background-color: #22031e;
     color: white;
     padding: 15px 20px;
+  }
+  .sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #350454;
+    color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
   .container {
     display: flex;
@@ -84,9 +125,9 @@
 
   .menu {
     position: fixed;
-    top: 15%;
+    padding: 10px 10px;
     right: -250px;
-    width: 200px;
+    width: 250px;
     height: 50%;
     background-color: #1e066e;
     transition: right 0.3s;
@@ -108,4 +149,31 @@
   .menu-item i {
     margin-right: 8px;
   }
+  .search-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 5px;
+    margin-right: 5px;
+  }
+
+  .search-button {
+    padding: 5px 10px;
+  }
+
+  .search-button i {
+    margin-right: 0;
+  }
+  .filter-button {
+    padding: 3px 3px;
+  }
+
+  .filter-button i {
+    margin-right: 5px;
+  }
+
   </style>
