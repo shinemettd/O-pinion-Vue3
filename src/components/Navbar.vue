@@ -69,7 +69,8 @@ export default {
       // Logic how to filter search
       console.log('Переключение фильтра');
     },
-  };
+  },
+}
   </script>
 
   <style scoped>
