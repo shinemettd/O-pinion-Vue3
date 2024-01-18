@@ -138,7 +138,7 @@ async function getNewArticles() {
 <style scoped>
 article {
   width: 95%;
-  border: solid 1px black;
+  border: solid 1px #350454FF;
   border-radius: 20px;
   box-sizing: border-box;
   margin: 0 auto;

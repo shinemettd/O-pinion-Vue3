@@ -1,13 +1,14 @@
 <template>
-  <nav class="navbar-head">
-    <router-link to="/" class="navbar-brand">O!Opinion</router-link>
-  </nav>
     <nav :class="['navbar', { 'sticky': isSticky }]">
       <div class="container">
         <!--navbar element-->
         <div class="navbar-menu">
-          <router-link to="/hello-world" class="navbar-item">Hello World</router-link>
-          <router-link to="/test-article" class="navbar-item">Test Article</router-link>
+          <router-link to="/" class="navbar-brand" style = "font-size: 25px">O!pinion</router-link>
+          <div class = "navbar-tabs">
+            <router-link to="/hello-world" class="navbar-item">Hello World</router-link>
+            <router-link to="/test-article" class="navbar-item">Test Article</router-link>
+          </div>
+
           <!-- Other link in navbar -->
         </div>
         <!--Search button-->
@@ -85,11 +86,6 @@
     padding: 5px 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
-  .navbar-head {
-    background-color: #22031e;
-    color: white;
-    padding: 15px 20px;
-  }
   .sticky {
     position: fixed;
     top: 0;
@@ -111,12 +107,22 @@
   }
   .navbar-menu {
     display: flex;
+    flex-direction: row;
+    align-items: center;
   }
+
+  .navbar-tabs {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+  }
+
   .navbar-item {
     margin-left: 20px;
     color: white;
     text-decoration: none;
   }
+
   .burger-button {
     margin-left: 20px;
     color: white;
