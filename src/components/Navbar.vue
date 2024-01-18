@@ -1,22 +1,23 @@
 <template>
-  <nav class="navbar-head">
-    <router-link to="/" class="navbar-brand">O!Opinion</router-link>
-  </nav>
-  <nav :class="['navbar', { 'sticky': isSticky }]">
-    <div class="container">
-      <!--navbar element-->
-      <div class="navbar-menu">
-        <router-link to="/hello-world" class="navbar-item">Hello World</router-link>
-        <router-link to="/test-article" class="navbar-item">Test Article</router-link>
-        <!-- Other link in navbar -->
-      </div>
-      <!--Search button-->
-      <div class="search-container">
-        <!--Filter button-->
-        <button @click="toggleFilter" class="filter-button"><i class="fas fa-filter"></i></button>
-        <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery">
-        <button @click="search" class="search-button"><i class="fas fa-search"></i></button>
-      </div>
+    <nav :class="['navbar', { 'sticky': isSticky }]">
+      <div class="container">
+        <!--navbar element-->
+        <div class="navbar-menu">
+          <router-link to="/" class="navbar-brand" style = "font-size: 25px">O!pinion</router-link>
+          <div class = "navbar-tabs">
+            <router-link to="/hello-world" class="navbar-item">Hello World</router-link>
+            <router-link to="/test-article" class="navbar-item">Test Article</router-link>
+          </div>
+
+          <!-- Other link in navbar -->
+        </div>
+        <!--Search button-->
+        <div class="search-container">
+          <!--Filter button-->
+          <button @click="toggleFilter" class="filter-button"><i class="fas fa-filter"></i></button>
+          <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery">
+          <button @click="search" class="search-button"><i class="fas fa-search"></i></button>
+        </div>
 
       <div>
         <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
@@ -68,121 +69,113 @@ export default {
       // Logic how to filter search
       console.log('Переключение фильтра');
     },
-    handleScroll() {
-      this.isSticky = window.scrollY > 0;
-    }
-  },
-};
-</script>
+  };
+  </script>
 
-<style scoped>
-.navbar {
-  transition: top 30ms;
-  width: 100%;
-  z-index: 1000;
-  background-color: #350454;
-  color: white;
-  padding: 5px 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+  <style scoped>
+  .navbar {
+    transition: top 30ms;
+    width: 100%;
+    z-index: 1000;
+    background-color: #350454;
+    color: white;
+    padding: 5px 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #350454;
+    color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .navbar-brand {
+    margin-left: 20px;
+    font-weight: bold;
+    color: white;
+  }
+  .navbar-menu {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 
-.navbar-head {
-  background-color: #22031e;
-  color: white;
-  padding: 15px 20px;
-}
+  .navbar-tabs {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+  }
 
-.sticky {
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: #350454;
-  color: white;
-  z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+  .navbar-item {
+    margin-left: 20px;
+    color: white;
+    text-decoration: none;
+  }
 
-.container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  .burger-button {
+    margin-left: 20px;
+    color: white;
+    text-decoration: none;
+  }
 
-.navbar-brand {
-  margin-left: 20px;
-  font-weight: bold;
-  color: white;
-}
+  .menu {
+    position: fixed;
+    padding: 10px 10px;
+    right: -250px;
+    width: 250px;
+    height: 50%;
+    background-color: #1e066e;
+    transition: right 0.3s;
+    z-index: 1000;
+  }
 
-.navbar-menu {
-  display: flex;
-}
+  .menu.is-open {
+    right: 20px;
+  }
 
-.navbar-item {
-  margin-left: 20px;
-  color: white;
-  text-decoration: none;
-}
+  .menu-item {
+    display: block;
+    padding: 10px;
+    margin-left: 20px;
+    color: white;
+    text-decoration: none;
+  }
 
-.burger-button {
-  margin-left: 20px;
-  color: white;
-  text-decoration: none;
-}
+  .menu-item i {
+    margin-right: 8px;
+  }
+  .search-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+  }
 
-.menu {
-  position: fixed;
-  padding: 10px 10px;
-  right: -250px;
-  width: 250px;
-  height: 50%;
-  background-color: #1e066e;
-  transition: right 0.3s;
-  z-index: 1000;
-}
+  .search-input {
+    flex: 1;
+    padding: 5px;
+    margin-right: 5px;
+  }
 
-.menu.is-open {
-  right: 20px;
-}
+  .search-button {
+    padding: 5px 10px;
+  }
 
-.menu-item {
-  display: block;
-  padding: 10px;
-  margin-left: 20px;
-  color: white;
-  text-decoration: none;
-}
+  .search-button i {
+    margin-right: 0;
+  }
+  .filter-button {
+    padding: 3px 3px;
+  }
 
-.menu-item i {
-  margin-right: 8px;
-}
+  .filter-button i {
+    margin-right: 5px;
+  }
 
-.search-container {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-}
-
-.search-input {
-  flex: 1;
-  padding: 5px;
-  margin-right: 5px;
-}
-
-.search-button {
-  padding: 5px 10px;
-}
-
-.search-button i {
-  margin-right: 0;
-}
-
-.filter-button {
-  padding: 3px 3px;
-}
-
-.filter-button i {
-  margin-right: 5px;
-}
-
-</style>
+  </style>
