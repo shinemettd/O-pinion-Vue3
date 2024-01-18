@@ -4,19 +4,19 @@
       <div class = "article-header">
         <div class = "article-header-data">
           <div class = "article-authors-avatar">
-            <a :href="authorsNickname"> <!--  here is described a path to localhost:8811/nickname  -->
-              <img :src="authorsAvatarUrl" alt = "users avatar picture">
-            </a>
+            <router-link :to="'/user/' + authorsNickname">
+              <img :src="authorsAvatarUrl" alt = "Users avatar picture">
+            </router-link>
           </div>
           <div class = "article-authors-nickname">
-            <a :href="authorsNickname"> <!--  here is described a path to localhost:8811/nickname  -->
+            <router-link :to="'/user/' + authorsNickname">
               <p> {{ authorsNickname }}</p>
-            </a>
+            </router-link>
           </div>
           <div class = "article-recently-date">
-            <a :href="articleId"> <!--  here is described a path to localhost:8811/articleId  -->
+            <router-link :to="'/article/' + articleId">
               <p> {{ postedTimeAgo }} </p>
-            </a>
+            </router-link>
           </div>
         </div>
         <div class = "article-header-report">
@@ -28,20 +28,22 @@
       </div>
       <div class = "article-data">
         <div class = "article-title">
-          <a :href="articleId">
+          <router-link :to="'/article/' + articleId">
             <p> {{ articleTitle }} </p>
-          </a>
+          </router-link>
         </div>
         <div v-if = "articleMainPictureUrl !== ''" class = "article-picture">
-          <img :src = "articleMainPictureUrl" alt = "Main picture of article preview">
+          <router-link :to="'/article/' + articleId">
+            <img :src = "articleMainPictureUrl" alt = "Main picture of article preview">
+          </router-link>
         </div>
         <div class = "article-description">
           <p> {{ articleShortDescription }} </p>
         </div>
         <div class = "article-read-more">
-          <a :href="basePath + '/' + articleId"> <!--  here is described a path to localhost:8811/articleId  -->
+          <router-link :to="'/article/' + articleId" class="navbar-item">
             <v-btn style="margin-top: 10px; margin-bottom: 10px;">Читать далее</v-btn>
-          </a>
+          </router-link>
         </div>
         <div class = "article-footer-bar">
           <div class = "article-footer">
@@ -67,7 +69,9 @@
             </div>
             <div class = "article-comments">
                 <div class = "article-comments-icon">
-                  <img src="/icons/message_square_icon.svg" alt="Comments Icon">
+                  <router-link :to="'/article/' + articleId" class="navbar-item">
+                    <img src="/icons/message_square_icon.svg" alt="Comments Icon">
+                  </router-link>
                 </div>
                 <b>{{ articleTotalComments }}</b>
             </div>
@@ -85,7 +89,6 @@
 </template>
 
 <script setup>
-const basePath = 'http://localhost:8811';
 const showMsg = () => {
   console.log('навелись')
 }
@@ -109,7 +112,6 @@ const props = defineProps({
 
 function changeFavouriteStatus() {
   console.log(props.articleInFavourites);
-  alert('after');
 }
 </script>
 
@@ -206,7 +208,7 @@ article {
 }
 
 .article-footer > div:not(:last-child) {
-  margin-right: 50px;
+  margin-right: 35px;
 }
 
 .article-not-in-favourites-icon {
@@ -245,14 +247,6 @@ article {
 
 .article-share-icon {
   vertical-align: center;
-}
-
-.article-share a,
-.article-favourites a,
-.article-comments a {
-  text-decoration: none;
-  color: black;
-  display: flex;
 }
 
 .article-views-count {
