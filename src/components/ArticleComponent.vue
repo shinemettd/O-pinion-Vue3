@@ -10,7 +10,7 @@
           </div>
           <div class = "article-authors-nickname">
             <router-link :to="'/user/' + authorsNickname">
-              <p> {{ authorsNickname }}</p>
+              <p style = "font-weight: 700;"> {{ authorsNickname }}</p>
             </router-link>
           </div>
           <div class = "article-recently-date">
@@ -21,8 +21,8 @@
         </div>
         <div class = "article-header-report">
           <div class = "article-header-report-icon">
-            <img src="/icons/alert_circle_icon.svg" @click="showMsg" alt = "Report Icon">
-            <!-- instead of showMsg on click should be a method call to show a window with report -->
+            <img src="/icons/alert_circle_icon.svg" @click="getNewArticles" alt = "Report Icon">
+            <!-- instead of showMsg on click should be a method calling to show a window with report -->
           </div>
         </div>
       </div>
@@ -32,7 +32,7 @@
             <p> {{ articleTitle }} </p>
           </router-link>
         </div>
-        <div v-if = "articleMainPictureUrl !== ''" class = "article-picture">
+        <div v-if = "articleMainPictureUrl !== '' && articleMainPictureUrl !== null" class = "article-picture">
           <router-link :to="'/article/' + articleId">
             <img :src = "articleMainPictureUrl" alt = "Main picture of article preview">
           </router-link>
@@ -51,13 +51,15 @@
               <div class = "article-rating-icon">
                 <img src="/icons/zap_icon.svg" alt="Rating Icon">
               </div>
-              <b>{{ articleRating }}</b>
+              <b v-if = "articleRating>0" style="color: green">{{ articleRating }}</b>
+              <b v-else-if="articleRating<0" if = "articleRating>0" style="color: red">{{ articleRating }}</b>
+              <b v-else style="color: black">{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
-                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="changeFavouriteStatus">
+                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="articleInFavourites = !articleInFavourites">
                   <img src="/icons/star_icon.svg" alt = "Favourites Icon">
                 </div>
-                <div v-else class = article-not-in-favourites-icon @click="changeFavouriteStatus">
+                <div v-else class = article-not-in-favourites-icon @click="articleInFavourites = !articleInFavourites">
                   <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
                 </div>
                 <b> {{ articleTotalFavourites }}</b>
@@ -89,22 +91,29 @@
 </template>
 
 <script setup>
-const showMsg = () => {
-  console.log('навелись')
-}
 const props = defineProps({
   authorsNickname: String,
-  authorsAvatarUrl: String,
+  authorsAvatarUrl: {
+    type: String,
+    default: 'https://cdn-icons-png.flaticon.com/512/10/10938.png'
+  },
   postedTimeAgo: String,
   articleId: Number,
   articleTitle: String,
-  articleMainPictureUrl: String,
+  articleMainPictureUrl: {
+    type: String,
+  },
   articleShortDescription: String,
   articleRating: Number,
   articleTotalFavourites: Number,
   articleInFavourites: {
     type: Boolean,
-    default: false
+    default: false,
+    methods: {
+      changeFavouriteStatus() {
+        this.articleInFavourites = !this.articleInFavourites;
+      }
+    }
   },
   articleTotalComments: Number,
   articleTotalViews: Number,
@@ -113,11 +122,22 @@ const props = defineProps({
 function changeFavouriteStatus() {
   console.log(props.articleInFavourites);
 }
+import axios from 'axios';
+import {onMounted, ref} from "vue";
+
+// const articlesArray = ref([]);
+async function getNewArticles() {
+  let articles = await axios.get('http://194.152.37.7:8812/api/articles');
+  let articlesArray = articles.data.content;
+  console.log(articlesArray[0].author.id);
+}
+
+// onMounted(getNewArticles);
 </script>
 
 <style scoped>
 article {
-  width: 45%;
+  width: 95%;
   border: solid 1px black;
   border-radius: 20px;
   box-sizing: border-box;
@@ -163,6 +183,12 @@ article {
 
 .article-recently-date {
   margin-left: 0.75em;
+  opacity: 75%;
+}
+
+.article-recently-date:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .article-header-report {
@@ -182,6 +208,10 @@ article {
 
 .article-title {
   max-width: 90%;
+}
+
+.article-data div:not(:last-child) {
+  margin-bottom: 5px;
 }
 
 .article-title p {
@@ -225,6 +255,7 @@ article {
 }
 
 .article-in-favourites-icon:hover {
+  cursor: pointer;
   opacity: 50%;
 }
 
