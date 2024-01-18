@@ -1,3 +1,5 @@
+import './index.css'
+
 import { registerPlugins } from '@/plugins';
 
 import App from './App.vue';
