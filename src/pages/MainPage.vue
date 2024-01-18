@@ -29,7 +29,7 @@
       <div v-for="article in articles" :key="article.id" class = "scroll-content my-7">
         <ArticleComponent
                           :authors-nickname = "article.author.nickname"
-                          postedTimeAgo = "3 часа назад"
+                          :postedTimeAgo = "article.date_time"
                           :article-id = "article.id"
                           :article-title = "article.title"
                           :article-main-picture-url = "article.cover_image"
