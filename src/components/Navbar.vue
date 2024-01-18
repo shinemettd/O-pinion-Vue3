@@ -19,59 +19,55 @@
           <button @click="search" class="search-button"><i class="fas fa-search"></i></button>
         </div>
 
-        <div>
-          <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
-          <router-link to="/create-Article" class="burger-button"><i class="fas fa-plus"></i></router-link>
+      <div>
+        <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
+        <router-link to="/create-Article" class="burger-button"><i class="fas fa-plus"></i></router-link>
 
-          <button @click="toggleMenu" class="burger-button">☰</button>
+        <button @click="toggleMenu" class="burger-button">☰</button>
 
-          <div :class="['menu', { 'is-open': isMenuOpen }]">
-            <router-link to="/person" class="menu-item"><i class="fas fa-user"></i>Личный кабинет</router-link>
-            <router-link to="/" class="menu-item"><i class="fas fa-home"></i> Главная</router-link>
-            <router-link to="/about" class="menu-item"><i class="fas fa-info-circle"></i> О нас</router-link>
-            <router-link to="/notification" class="menu-item"><i class="fas fa-bell"></i> Уведомление</router-link>
-            <router-link to="/create-Article" class="menu-item"><i class="fas fa-plus"></i> Создать статью</router-link>
-            <!-- Other link into menu -->
-          </div>
+        <div :class="['menu', { 'is-open': isMenuOpen }]">
+          <router-link to="/person" class="menu-item"><i class="fas fa-user"></i>Личный кабинет</router-link>
+          <router-link to="/auth" class="menu-item"><i class="fas fa-sign-in-alt"></i>войти</router-link>
+          <router-link to="/" class="menu-item"><i class="fas fa-home"></i> Главная</router-link>
+          <router-link to="/about" class="menu-item"><i class="fas fa-info-circle"></i> О нас</router-link>
+          <router-link to="/notification" class="menu-item"><i class="fas fa-bell"></i> Уведомление</router-link>
+          <router-link to="/create-Article" class="menu-item"><i class="fas fa-plus"></i> Создать статью</router-link>
+          <!-- Other link into menu -->
         </div>
       </div>
-    </nav>
-  </template>
+    </div>
+  </nav>
+</template>
 
 
+<script>
+export default {
+  name: 'Navbar',
+  data() {
+    return {
+      isMenuOpen: false,
+      searchQuery: '', // variable to save request
+      isSticky: false
 
-  <script>
-  export default {
-    name: 'Navbar',
-    data() {
-      return {
-        isMenuOpen: false,
-        searchQuery: '', // variable to save request
-        isSticky: false
+    };
+  }, mounted() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  destroyed() {
+    window.removeEventListener('scroll', this.handleScroll);
+  },
 
-      };
-    },mounted() {
-      window.addEventListener('scroll', this.handleScroll);
+  methods: {
+    toggleMenu() {
+      this.isMenuOpen = !this.isMenuOpen;
     },
-    destroyed() {
-      window.removeEventListener('scroll', this.handleScroll);
+    search() {
+      console.log('Поиск по запросу:', this.searchQuery);
+      // Logic how to search
     },
-
-    methods: {
-      toggleMenu() {
-        this.isMenuOpen = !this.isMenuOpen;
-      },
-      search() {
-        console.log('Поиск по запросу:', this.searchQuery);
-        // Logic how to search
-      },
-      toggleFilter() {
-        // Logic how to filter search
-        console.log('Переключение фильтра');
-      },
-      handleScroll() {
-        this.isSticky = window.scrollY > 0;
-      }
+    toggleFilter() {
+      // Logic how to filter search
+      console.log('Переключение фильтра');
     },
   };
   </script>

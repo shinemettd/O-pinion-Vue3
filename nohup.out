@@ -1,0 +1,796 @@
+10:38:07 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:39:12 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:40:41 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:44:14 PM [vite] page reload src/plugins/router.js
+10:44:14 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:45:50 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+(node:21982) ExperimentalWarning: Importing JSON modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+  VITE v5.0.11  ready in 211 ms
+
+  ➜  Local:   http://localhost:8811/
+  ➜  Network: http://192.168.0.104:8811/
+
+warn - The `content` option in your Tailwind CSS configuration is missing or empty.
+warn - Configure your content sources or your generated CSS will be missing styles.
+warn - https://tailwindcss.com/docs/content-configuration
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:46:46 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:49:56 PM [vite] hmr update /src/components/Register.vue
+10:49:56 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:50:28 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:50:40 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:51:01 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:51:24 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:51:39 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:52:22 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:53:04 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:53:25 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:53:58 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:54:18 PM [vite] hmr update /src/components/Register.vue
+10:54:18 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:54:33 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:55:28 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:56:51 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:57:05 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:58:38 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+10:59:47 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+11:00:11 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+346|    background-position: 12px 11px;
+347|  
+348|    &:hover {
+   |    ^^^^^^^^^
+349|  
+   |  ^
+350|    }
+   |  ^^^
+11:01:36 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+346|    background-position: 12px 11px;
+347|  
+348|    &:hover {
+   |    ^^^^^^^^^
+349|  
+   |  ^
+350|    }
+   |  ^^^
+11:02:16 PM [vite] hmr update /src/components/Register.vue, /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+346|    background-position: 12px 11px;
+347|  
+348|    &:hover {
+   |    ^^^^^^^^^
+349|  
+   |  ^
+350|    }
+   |  ^^^
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+346|    background-position: 12px 11px;
+347|  
+348|    &:hover {
+   |    ^^^^^^^^^
+349|  
+   |  ^
+350|    }
+   |  ^^^
+11:02:39 PM [vite] hmr update /src/components/Register.vue, /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+11:05:52 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+11:06:24 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+11:08:00 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+11:08:23 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+11:08:34 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:08:57 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:09:41 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:09:47 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:09:54 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:10:00 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:10:12 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:10:21 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:10:30 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:10:39 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+348|    background-position: 12px 11px;
+349|  
+350|    &:hover {
+   |    ^^^^^^^^^
+351|  
+   |  ^
+352|    }
+   |  ^^^
+11:11:20 PM [vite] hmr update /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+349|    background-position: 12px 11px;
+350|  
+351|    &:hover {
+   |    ^^^^^^^^^
+352|  
+   |  ^
+353|    }
+   |  ^^^
+11:17:09 PM [vite] hmr update /src/components/Register.vue, /src/components/Register.vue?vue&type=style&index=0&scoped=6200fa47&lang.css
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:18:10 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+11:18:39 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:19:46 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:23:04 PM [vite] hmr update /src/components/Register.vue
+11:23:04 PM [vite] hmr update /src/components/Auth.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:23:50 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:24:03 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:26:42 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:26:56 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:31:57 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:33:04 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:37:29 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:40:35 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:41:57 PM [vite] hmr update /src/components/Register.vue
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:43:19 PM [vite] hmr update /src/components/Navbar.vue, /src/components/Navbar.vue?vue&type=style&index=0&scoped=4d808a77&lang.css
+11:44:03 PM [vite] hmr update /src/components/Navbar.vue
+11:44:59 PM [vite] hmr update /src/components/Navbar.vue
+11:47:37 PM [vite] hmr update /src/components/Navbar.vue
+11:49:08 PM [vite] hmr update /src/components/Navbar.vue
+11:51:35 PM [vite] hmr update /src/components/Navbar.vue
+11:52:10 PM [vite] hmr update /src/components/Navbar.vue
+(node:23137) ExperimentalWarning: Importing JSON modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+  VITE v5.0.11  ready in 279 ms
+
+  ➜  Local:   http://localhost:8811/
+  ➜  Network: http://192.168.0.104:8811/
+
+warn - The `content` option in your Tailwind CSS configuration is missing or empty.
+warn - Configure your content sources or your generated CSS will be missing styles.
+warn - https://tailwindcss.com/docs/content-configuration
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+333|    background-position: 12px 11px;
+334|  
+335|    &:hover {
+   |    ^^^^^^^^^
+336|  
+   |  ^
+337|    }
+   |  ^^^
+[vite:css] Nested CSS was detected, but CSS nesting has not been configured correctly.
+Please enable a CSS nesting plugin *before* Tailwind in your configuration.
+See how here: https://tailwindcss.com/docs/using-with-preprocessors#nesting
+350|    background-position: 12px 11px;
+351|  
+352|    &:hover {
+   |    ^^^^^^^^^
+353|  
+   |  ^
+354|    }
+   |  ^^^
+11:54:39 PM [vite] hmr update /src/components/Navbar.vue
+11:55:04 PM [vite] hmr update /src/components/Navbar.vue
+11:56:14 PM [vite] hmr update /src/components/Navbar.vue

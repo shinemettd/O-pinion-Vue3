@@ -6,6 +6,8 @@ import About from '@/components/About.vue';
 import Person from '@/components/Person.vue';
 import ArticleCreate from "@/components/ArticleCreate.vue";
 import Notification from "@/components/Notification.vue";
+import Register from "@/components/Register.vue";
+import Auth from "@/components/Auth.vue";
 
 export default createRouter({
   history: createWebHistory(),
@@ -41,6 +43,21 @@ export default createRouter({
       path: '/notification',
       name: 'Notification',
       component: Notification
+    },
+    {
+      component: Auth,
+      name: 'Auth',
+      path: '/auth'
+    },
+    {
+      component: Auth,
+      name: 'Auth',
+      path: '/auth'
+    },
+    {
+      component:Register,
+      name: 'Register',
+      path: '/register'
     }
   ]
 })
