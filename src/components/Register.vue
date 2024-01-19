@@ -1,19 +1,17 @@
 <template>
   <div class="wrapper fadeInDown">
     <div id="formContent">
-
-      <h2 class="inactive underlineHover">Зарегистрироваться</h2>
-      <a href="/auth"><h2 class="inactive underlineHover">Войти</h2></a>
-
-
+<!--      <a href="/auth"><h2 class="inactive underlineHover">Войти</h2></a>-->
+      <router-link to="/auth"><h2 class="inactive underlineHover">Войти</h2></router-link>
+      <h2 class="inactive text-black">Зарегистрироваться</h2>
       <div class="fadeIn first">
       </div>
 
       <form @submit.prevent="register">
-        <input type="text" v-model="firstName" id="firstName" class="fadeIn second" name="firstName" placeholder="имя">
-        <input type="text" v-model="lastName" id="lastName" class="fadeIn second" name="lastName" placeholder="фамилия">
-        <input type="text" v-model="surname" id="surname" class="fadeIn second" name="surname" placeholder="username">
-        <input type="text" v-model="email" id="email" class="fadeIn second" name="email" placeholder="email">
+        <input type="text" v-model="firstName" id="firstName" class="fadeIn second" name="firstName" placeholder="Имя">
+        <input type="text" v-model="lastName" id="lastName" class="fadeIn second" name="lastName" placeholder="Фамилия">
+        <input type="text" v-model="surname" id="surname" class="fadeIn second" name="surname" placeholder="Username">
+        <input type="text" v-model="email" id="email" class="fadeIn second" name="email" placeholder="Email">
         <div class="password-wrapper">
           <input
             :type="showPassword ? 'text' : 'password'"
@@ -21,7 +19,7 @@
             id="password"
             class="fadeIn third"
             name="пароль"
-            placeholder="пароль"
+            placeholder="Пароль"
           />
           <button type="button" @click="togglePasswordVisibility" class="password-toggle">
             {{ showPassword ? 'Скрыть' : 'Показать' }}
@@ -34,13 +32,13 @@
           id="confirmPassword"
           class="fadeIn third"
           name="confirmPassword"
-          placeholder="подтвердите пароль"
+          placeholder="Подтвердите пароль"
         />
         <input type="submit" class="fadeIn fourth" value="Зарегистрироваться">
       </form>
 
       <button type="button" class="login-with-google-btn" style="margin-bottom: 20px">
-        регистрация через google
+        Регистрация через Google
       </button>
 
     </div>
