@@ -45,8 +45,8 @@ export default {
             email: email.value,
             password: password.value,
           });
-
-          console.log(response.data);
+          const accessToken = response.data.access_token;
+          localStorage.setItem('accessToken', accessToken);
 
           // Перенаправление на другую страницу после успешного входа
           router.push('/');

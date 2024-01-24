@@ -50,8 +50,14 @@ const submitArticle = async () => {
     formData.append('title', title.value);
     formData.append('short_description', shortDescription.value);
     formData.append('cover-image', coverImage.value);
+    const accessToken = localStorage.getItem('accessToken');
 
-    const response = await axios.post('http://194.152.37.7:8812/api/articles', formData);
+    const response = await axios.post('http://194.152.37.7:8812/api/articles', formData, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
     articleId.value = response.data.id;
   } catch (error) {
     console.error('Error submitting article:', error);
