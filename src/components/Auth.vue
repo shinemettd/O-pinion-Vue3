@@ -67,13 +67,6 @@ export default {
         alert('Пожалуйста, введите корректный email.');
         return false;
       }
-
-      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,100}$/;
-      if (!passwordRegex.test(password.value)) {
-        alert('Пожалуйста, введите корректный пароль (минимум 8 символов, 1 заглавная буква, 1 цифра).');
-        return false;
-      }
-
       return true;
     };
 
