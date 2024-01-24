@@ -8,6 +8,7 @@ import ArticleCreate from "@/components/ArticleCreate.vue";
 import Notification from "@/components/Notification.vue";
 import Register from "@/components/Register.vue";
 import Auth from "@/components/Auth.vue";
+import ArticlePage from "@/pages/ArticlePage.vue";
 
 export default createRouter({
   history: createWebHistory(),
@@ -23,6 +24,10 @@ export default createRouter({
     {
       path: '/test-article',
       component: TestArticle
+    },
+    {
+      path: '/article/:articleId',
+      component: ArticlePage
     },
     {
       path: '/about',
