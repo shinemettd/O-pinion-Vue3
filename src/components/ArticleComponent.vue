@@ -91,6 +91,8 @@
 </template>
 
 <script setup>
+import ArticleComponent from "@/components/ArticleComponent.vue";
+
 const props = defineProps({
   authorsNickname: String,
   authorsAvatarUrl: {
@@ -116,7 +118,7 @@ const props = defineProps({
     }
   },
   articleTotalComments: Number,
-  articleTotalViews: Number,
+  articleTotalViews: Number
 })
 
 function changeFavouriteStatus() {
