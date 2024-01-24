@@ -5,7 +5,11 @@
     components: {ArticleComponent},
     data() {
       return {
-        articles: []
+        articles: [],
+        sortToggle: 0,
+        showToggle: 0,
+        sortBy: 'Popularity',
+        showContent: 'All'
       }
     },
     methods: {
@@ -23,8 +27,22 @@
 <template>
   <main class = "container mx-auto">
     <div class = "scroll mx-auto border w-50 h-100">
-      <div class = "sorter border w-20 h-20 text-center py-5">
-        Сортировка будет здесь
+      <div class = "sorter w-20 h-20 my-5">
+        <div class = "w-100 justify-between mb-5 text-center">
+          Отображать:
+          <v-btn-toggle v-model="showToggle" color="#350454" class = "ml-5">
+            <v-btn @click="this.showContent = 'All'">Всё</v-btn>
+            <v-btn @click="this.showContent = 'Articles'">Статьи</v-btn>
+            <v-btn @click="this.showContent = 'Announcements'">Объявления</v-btn>
+          </v-btn-toggle>
+        </div>
+        <div class = "text-center">
+          Сортировка:
+          <v-btn-toggle v-model="sortToggle" color="#350454"  class = "ml-5">
+            <v-btn @click="this.sortBy = 'Popularity'">По популярности</v-btn>
+            <v-btn @click="this.sortBy = 'Date'">По дате</v-btn>
+          </v-btn-toggle>
+        </div>
       </div>
       <div v-for="article in articles" :key="article.id" class = "scroll-content my-7">
         <ArticleComponent

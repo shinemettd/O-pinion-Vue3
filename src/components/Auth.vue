@@ -2,24 +2,25 @@
   <div class="wrapper fadeInDown">
     <div id="formContent">
 
-      <h2 class="inactive underlineHover">Войти</h2>
-      <a href="/register"><h2 class="inactive underlineHover">Зарегистрироваться</h2></a>
+      <h2 class="inactive text-black cursor-default">Войти</h2>
+      <router-link to="/register"><h2 class="inactive underlineHover">Зарегистрироваться</h2></router-link>
+<!--      <a href="/register"><h2 class="inactive underlineHover">Зарегистрироваться</h2></a>-->
 
       <div class="fadeIn first"></div>
 
       <form @submit.prevent="login">
-        <input type="text" v-model="email" id="email" class="fadeIn second" name="email" placeholder="email">
+        <input type="text" v-model="email" id="email" class="fadeIn second" name="email" placeholder="Email">
         <input type="password" v-model="password" id="password" class="fadeIn third" name="password"
-               placeholder="пароль">
+               placeholder="Пароль">
         <input type="submit" class="fadeIn fourth" value="Войти">
       </form>
 
       <button type="button" class="bbbd-btn" style="margin-bottom: 20px">
-        забыли пароль
+        Забыли пароль?
       </button>
 
       <button type="button" class="login-with-google-btn" style="margin-bottom: 20px">
-        через google
+        Войти через Google
       </button>
 
     </div>
