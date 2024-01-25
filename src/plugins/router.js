@@ -1,7 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import HelloWorldPage from "@/pages/HelloWorldPage.vue";
 import MainPage from "@/pages/MainPage.vue";
-import TestArticle from "@/pages/TestArticle.vue";
 import About from '@/components/About.vue';
 import Person from '@/components/Person.vue';
 import ArticleCreate from "@/components/ArticleCreate.vue";
@@ -21,10 +20,6 @@ export default createRouter({
     {
       path: '/hello-world',
       component: HelloWorldPage
-    },
-    {
-      path: '/test-article',
-      component: TestArticle
     },
     {
       path: '/article/:articleId',
