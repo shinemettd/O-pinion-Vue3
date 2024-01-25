@@ -1,40 +1,34 @@
 <script setup>
-
-import CommentComponent from "@/components/CommentComponent.vue";
 import axios from "axios";
-import {onMounted} from "vue";
+import {onBeforeMount, ref} from "vue";
+import { useRoute } from 'vue-router';
+import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
 
-const props = defineProps({
-  articleId: Number
-})
+const currentArticle = ref('');
 
-const articles = async () => {
-  onMounted(await axios.get('http://194.152.37.7:8812/api/articles').data.content);
+const getArticle = async () => {
+  const route = useRoute();
+  const articleId = route.params.articleId;
+
+  currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
 }
 
-
+onBeforeMount(() => getArticle());
 </script>
 
 <template>
-  <main class = "container mx-auto">
-    <div class = "scroll mx-auto border w-50 h-100">
-      <div>
-        <!--   article content     -->
-      </div>
-      <div>
-        <!--  tags  reactions etc    -->
-      </div>
-      <div>
-        <CommentComponent/>
-      </div>
-    </div>
+  <ArticlePageComponent
+    :authors-avatar-url = "currentArticle.data.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
+    :authors-nickname = "currentArticle.data.author.nickname"
+    :posted-time-ago = "currentArticle.data.date_time"
+    :article-id = "currentArticle.data.id"
+    :article-title = "currentArticle.data.title"
+    :article-rating = "currentArticle.data.rating"
+    :article-in-favourites = "currentArticle.data.in_favourites"
+    :article-total-favourites = "currentArticle.data.total_favourites"
+    :article-total-comments = "currentArticle.data.total_comments"
+    :article-total-views = "currentArticle.data.total_views" />
 
-    <div>
-
-      <!-- aside panel -->
-
-    </div>
-  </main>
 </template>
 
 <style scoped>
