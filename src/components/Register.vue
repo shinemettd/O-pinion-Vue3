@@ -1,18 +1,44 @@
 <template>
   <div class="wrapper fadeInDown">
     <div id="formContent">
-<!--      <a href="/auth"><h2 class="inactive underlineHover">Войти</h2></a>-->
       <router-link to="/auth"><h2 class="inactive underlineHover">Войти</h2></router-link>
       <h2 class="inactive text-black">Зарегистрироваться</h2>
-      <div class="fadeIn first">
-      </div>
+      <div class="fadeIn first"></div>
 
       <form @submit.prevent="register">
-        <input type="text" v-model="firstName" id="firstName" class="fadeIn second" name="firstName" placeholder="Имя">
-        <input type="text" v-model="lastName" id="lastName" class="fadeIn second" name="lastName" placeholder="Фамилия">
-        <input type="text" v-model="surname" id="surname" class="fadeIn second" name="surname" placeholder="Username">
-        <input type="text" v-model="email" id="email" class="fadeIn second" name="email" placeholder="Email">
-        <div class="password-wrapper">
+        <div class="form-group">
+          <input type="text" v-model="firstName" id="firstName" class="fadeIn second" name="firstName"
+                 placeholder="Имя">
+          <div v-if="errors.firstName" class="error-message">{{ errors.firstName }}</div>
+        </div>
+
+        <div class="form-group">
+          <input type="text" v-model="lastName" id="lastName" class="fadeIn second" name="lastName"
+                 placeholder="Фамилия">
+          <div v-if="errors.lastName" class="error-message">{{ errors.lastName }}</div>
+        </div>
+
+        <div class="form-group">
+          <input type="text" v-model="surname" id="surname" class="fadeIn second" name="surname" placeholder="Username">
+          <div v-if="errors.surname" class="error-message">{{ errors.surname }}</div>
+        </div>
+
+        <div class="form-group">
+          <input type="text" v-model="email" id="email" class="fadeIn second" name="email" placeholder="Email">
+          <div v-if="errors.email" class="error-message">{{ errors.email }}</div>
+        </div>
+
+
+
+        <label for="dateOfBirth" class="fadeIn second-label qwe">дата рождения</label>
+        <div class="form-group date-group">
+          <div class="center-input">
+            <input type="date" v-model="dateOfBirth" id="dateOfBirth" class="fadeIn second small-label" name="dateOfBirth">
+          </div>
+          <div v-if="errors.dateOfBirth" class="error-message">{{ errors.dateOfBirth }}</div>
+        </div>
+
+        <div class="form-group password-wrapper">
           <input
             :type="showPassword ? 'text' : 'password'"
             v-model="password"
@@ -24,16 +50,21 @@
           <button type="button" @click="togglePasswordVisibility" class="password-toggle">
             {{ showPassword ? 'Скрыть' : 'Показать' }}
           </button>
+          <div v-if="errors.password" class="error-message">{{ errors.password }}</div>
         </div>
 
-        <input
-          :type="showPassword ? 'text' : 'password'"
-          v-model="confirmPassword"
-          id="confirmPassword"
-          class="fadeIn third"
-          name="confirmPassword"
-          placeholder="Подтвердите пароль"
-        />
+        <div class="form-group">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            v-model="confirmPassword"
+            id="confirmPassword"
+            class="fadeIn third"
+            name="confirmPassword"
+            placeholder="Подтвердите пароль"
+          />
+          <div v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</div>
+        </div>
+
         <input type="submit" class="fadeIn fourth" value="Зарегистрироваться">
       </form>
 
@@ -56,62 +87,80 @@ export default {
     const surname = ref('');
     const email = ref('');
     const password = ref('');
+    const dateOfBirth = ref('');
     const confirmPassword = ref('');
     const showPassword = ref(false);
+    const errors = ref({});
 
     const register = async () => {
+      errors.value = {}; // Reset errors on each submit
+
       if (validateInputs()) {
         try {
-          const response = await axios.post('http://194.152.37.7:8812/api/auth', {
+          const response = await axios.post('http://194.152.37.7:8812/api/auth/sign-up', {
             firstName: firstName.value,
             lastName: lastName.value,
             surname: surname.value,
             email: email.value,
             password: password.value,
+            dateOfBirth: dateOfBirth.value,
           });
 
           console.log(response.data);
 
-          // Перенаправление на другую страницу после успешного входа
-           this.$router.push('/auth');
+          this.$router.push('/auth');
         } catch (error) {
-
-          console.error('Ошибка при входе:', error);
+          console.error('Ошибка при регистрации:', error);
         }
       }
     };
 
     const validateInputs = () => {
-      if (!email.value.trim() || !password.value.trim()) {
-        alert('Пожалуйста, заполните все поля.');
-        return false;
+      let isValid = true;
+
+      if (!firstName.value.trim()) {
+        errors.value.firstName = 'Пожалуйста, введите имя.';
+        isValid = false;
       }
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email.value)) {
-        alert('Пожалуйста, введите корректный email.');
-        return false;
+      if (!lastName.value.trim()) {
+        errors.value.lastName = 'Пожалуйста, введите фамилию.';
+        isValid = false;
+      }
+
+      if (!surname.value.trim()) {
+        errors.value.surname = 'Пожалуйста, введите username.';
+        isValid = false;
+      }
+
+      if (!email.value.trim()) {
+        errors.value.email = 'Пожалуйста, введите email.';
+        isValid = false;
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.value)) {
+          errors.value.email = 'Пожалуйста, введите корректный email.';
+          isValid = false;
+        }
+      }
+
+      if (!dateOfBirth.value.trim()) {
+        errors.value.dateOfBirth = 'Пожалуйста, введите дату рождения.';
+        isValid = false;
       }
 
       const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,100}$/;
       if (!passwordRegex.test(password.value)) {
-        alert('Пожалуйста, введите корректный пароль (минимум 8 символов, 1 заглавная буква, 1 цифра).');
-        return false;
+        // errors.value.password = 'Пожалуйста, введите корректный пароль (минимум 8 символов, 1 заглавная буква, 1 цифра).';
+        isValid = false;
       }
 
-      return true;
-
-      const nameRegex = /^[а-яА-Я-]+$/; // Только кириллица и дефис
-      if (!nameRegex.test(firstName.value)) {
-        alert('Пожалуйста, введите корректно имя');
-        return false;
-      }
-      if (!nameRegex.test(lastName.value)) {
-        alert('Пожалуйста, введите корректно фамилию');
-        return false;
+      if (password.value !== confirmPassword.value) {
+        errors.value.confirmPassword = 'Пароли не совпадают.';
+        isValid = false;
       }
 
-      return true;
+      return isValid;
     };
 
     const togglePasswordVisibility = () => {
@@ -129,6 +178,8 @@ export default {
       register,
       validateInputs,
       togglePasswordVisibility,
+      dateOfBirth,
+      errors,
     };
   },
 };
@@ -165,6 +216,11 @@ html {
   background-color: #56baed;
 }
 
+.small-label {
+  font-size: 17px;
+  color: #cccccc;
+}
+
 body {
   font-family: "Poppins", sans-serif;
   height: 100vh;
@@ -185,6 +241,39 @@ h2 {
   display: inline-block;
   margin: 40px 8px 10px 8px;
   color: #cccccc;
+}
+
+.date-group {
+  background-color: #f6f6f6;
+  border: none;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 5px;
+  width: 85%;
+  border: 2px solid #f6f6f6;
+  transition: all 0.5s ease-in-out;
+  border-radius: 5px;
+}
+.qwe{
+  font-weight: bold;
+  color: #383d4b;
+  font-size: 12px;
+  margin-right: 2px;
+}
+
+.date-group input {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.date-group input:focus {
+  background-color: #fff;
+  border-bottom: 2px solid #5fbae9;
 }
 
 .password-wrapper {
@@ -215,6 +304,14 @@ h2 {
   width: 100%;
   min-height: 100%;
   padding: 20px;
+}
+
+.date-group {
+  text-align: center;
+}
+
+.center-input {
+  display: inline-block;
 }
 
 #formFooter a {
@@ -555,6 +652,12 @@ body {
 body {
   text-align: center;
   padding-top: 2rem;
+}
+
+.error-message {
+  color: red;
+  margin-top: 5px;
+  font-size: 12px;
 }
 
 
