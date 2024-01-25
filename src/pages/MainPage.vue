@@ -8,7 +8,7 @@
         articles: [],
         sortToggle: 0,
         showToggle: 0,
-        sortBy: 'Popularity',
+        sortBy: 'Newness',
         showContent: 'All'
       }
     },
@@ -40,7 +40,7 @@
           Сортировка:
           <v-btn-toggle v-model="sortToggle" color="#350454"  class = "ml-5">
             <v-btn @click="this.sortBy = 'Popularity'">По популярности</v-btn>
-            <v-btn @click="this.sortBy = 'Date'">По дате</v-btn>
+            <v-btn @click="this.sortBy = 'Newness'">По новизне</v-btn>
           </v-btn-toggle>
         </div>
       </div>

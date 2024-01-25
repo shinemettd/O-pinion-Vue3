@@ -1,19 +1,27 @@
 <script setup>
 import axios from "axios";
-import {onBeforeMount, ref} from "vue";
+import { onBeforeMount, ref } from "vue";
 import { useRoute } from 'vue-router';
 import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
+import CommentComponent from "@/components/CommentComponent.vue";
+import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
 
 const currentArticle = ref('');
+const currentArticleComments = ref('');
+
+const route = useRoute();
+const articleId = route.params.articleId;
 
 const getArticle = async () => {
-  const route = useRoute();
-  const articleId = route.params.articleId;
-
   currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
 }
 
-onBeforeMount(() => getArticle());
+const getComments = async () => {
+  currentArticleComments.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId}`);
+  await console.log(currentArticleComments.value.data);
+}
+
+onBeforeMount(() => { getArticle(); getComments()});
 </script>
 
 <template>
@@ -27,7 +35,9 @@ onBeforeMount(() => getArticle());
     :article-in-favourites = "currentArticle.data.in_favourites"
     :article-total-favourites = "currentArticle.data.total_favourites"
     :article-total-comments = "currentArticle.data.total_comments"
-    :article-total-views = "currentArticle.data.total_views" />
+    :article-total-views = "currentArticle.data.total_views"
+    :article-comments = "currentArticleComments.value"
+  />
 
 </template>
 

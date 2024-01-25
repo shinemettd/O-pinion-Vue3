@@ -8,43 +8,36 @@ const props = defineProps({
       default: 'https://cdn-icons-png.flaticon.com/512/10/10938.png'
     },
     postedTimeAgo: String,
-    articleId: Number,
-    articleTitle: String,
-    articleMainPictureUrl: {
-      type: String,
-    },
-    articleShortDescription: String,
-    articleRating: Number,
-    articleTotalFavourites: Number,
-    articleInFavourites: {
-      type: Boolean,
-      default: false,
-      methods: {
-        changeFavouriteStatus() {
-          this.articleInFavourites = !this.articleInFavourites;
-        }
-      }
-    },
-    articleTotalComments: Number,
-    articleTotalViews: Number
+    commentId: Number,
+    commentText: String
   })
+
+function formatDateTime(timeString) {
+  const dateTime = new Date(timeString);
+  const formattedDateTime = dateTime.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  return formattedDateTime;
+}
 </script>
 
 <template>
   <div class = "border">
     <div class = "flex justify-between border">
-      <div>
-        Ава
+      <div class="authors-avatar" alt = "avatar">
+        <img :src="authorsAvatarUrl">
       </div>
       <div>
-        Никнейм
+        {{ authorsNickname }}
       </div>
       <div>
-        Давность коммента
+        {{ formatDateTime(postedTimeAgo) }}
       </div>
     </div>
     <div>
-      Текст комментария
+      {{ commentText }}
     </div>
     <div class = "border">
       <div>
@@ -58,5 +51,10 @@ const props = defineProps({
 </template>
 
 <style scoped>
-
+.authors-avatar img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
 </style>
