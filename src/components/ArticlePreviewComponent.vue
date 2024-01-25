@@ -15,14 +15,14 @@
           </div>
           <div class = "article-recently-date">
             <router-link :to="'/article/' + articleId">
-              <p> {{ postedTimeAgo }} </p>
+              <p> {{ formatDateTime(postedTimeAgo) }} </p>
             </router-link>
           </div>
         </div>
         <div class = "article-header-report">
           <div class = "article-header-report-icon">
             <img src="/icons/alert_circle_icon.svg" @click="getNewArticles" alt = "Report Icon">
-            <!-- instead of showMsg on click should be a method calling to show a window with report -->
+            <!-- instead of getNewArticles on click should be a method calling to show a window with report -->
           </div>
         </div>
       </div>
@@ -56,10 +56,10 @@
               <b v-else style="color: black">{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
-                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="articleInFavourites = !articleInFavourites">
+                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
                   <img src="/icons/star_icon.svg" alt = "Favourites Icon">
                 </div>
-                <div v-else class = article-not-in-favourites-icon @click="articleInFavourites = !articleInFavourites">
+                <div v-else class = article-not-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
                   <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
                 </div>
                 <b> {{ articleTotalFavourites }}</b>
@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import ArticleComponent from "@/components/ArticleComponent.vue";
+import axios from 'axios';
 
 const props = defineProps({
   authorsNickname: String,
@@ -111,30 +111,25 @@ const props = defineProps({
   articleInFavourites: {
     type: Boolean,
     default: false,
-    methods: {
-      changeFavouriteStatus() {
-        this.articleInFavourites = !this.articleInFavourites;
-      }
-    }
   },
   articleTotalComments: Number,
   articleTotalViews: Number
 })
 
-function changeFavouriteStatus() {
-  console.log(props.articleInFavourites);
-}
-import axios from 'axios';
-import {onMounted, ref} from "vue";
-
-// const articlesArray = ref([]);
 async function getNewArticles() {
   let articles = await axios.get('http://194.152.37.7:8812/api/articles');
   let articlesArray = articles.data.content;
   console.log(articlesArray[0].author.id);
 }
-
-// onMounted(getNewArticles);
+function formatDateTime(timeString) {
+  const dateTime = new Date(timeString);
+  const formattedDateTime = dateTime.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  return formattedDateTime;
+}
 </script>
 
 <style scoped>

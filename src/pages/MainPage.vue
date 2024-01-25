@@ -1,14 +1,14 @@
 <script>
   import axios from 'axios';
-  import ArticleComponent from "@/components/ArticleComponent.vue";
+  import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
   export default {
-    components: {ArticleComponent},
+    components: {ArticlePreviewComponent},
     data() {
       return {
         articles: [],
         sortToggle: 0,
         showToggle: 0,
-        sortBy: 'Popularity',
+        sortBy: 'Newness',
         showContent: 'All'
       }
     },
@@ -40,13 +40,14 @@
           Сортировка:
           <v-btn-toggle v-model="sortToggle" color="#350454"  class = "ml-5">
             <v-btn @click="this.sortBy = 'Popularity'">По популярности</v-btn>
-            <v-btn @click="this.sortBy = 'Date'">По дате</v-btn>
+            <v-btn @click="this.sortBy = 'Newness'">По новизне</v-btn>
           </v-btn-toggle>
         </div>
       </div>
       <div v-for="article in articles" :key="article.id" class = "scroll-content my-7">
-        <ArticleComponent
+        <ArticlePreviewComponent
                           :authors-nickname = "article.author.nickname"
+                          :authors-avatar-url = "article.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
                           :postedTimeAgo = "article.date_time"
                           :article-id = "article.id"
                           :article-title = "article.title"
