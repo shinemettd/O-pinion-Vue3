@@ -15,7 +15,7 @@
           </div>
           <div class = "article-recently-date">
             <router-link :to="'/article/' + articleId">
-              <p> {{ postedTimeAgo }} </p>
+              <p> {{ formatDateTime(postedTimeAgo) }} </p>
             </router-link>
           </div>
         </div>
@@ -56,10 +56,10 @@
               <b v-else style="color: black">{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
-                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
+                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
                   <img src="/icons/star_icon.svg" alt = "Favourites Icon">
                 </div>
-                <div v-else class = article-not-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
+                <div v-else class = article-not-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
                   <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
                 </div>
                 <b> {{ articleTotalFavourites }}</b>
@@ -111,30 +111,25 @@ const props = defineProps({
   articleInFavourites: {
     type: Boolean,
     default: false,
-    methods: {
-      changeFavouriteStatus() {
-        this.articleInFavourites = !this.articleInFavourites;
-        console.log('smth');
-        if (this.articleInFavourites) {
-          this.articleTotalFavourites.value += 1;
-        } else {
-          this.articleTotalFavourites.value -= 1;
-        }
-      }
-    }
   },
   articleTotalComments: Number,
   articleTotalViews: Number
 })
 
-// const articlesArray = ref([]);
 async function getNewArticles() {
   let articles = await axios.get('http://194.152.37.7:8812/api/articles');
   let articlesArray = articles.data.content;
   console.log(articlesArray[0].author.id);
 }
-
-// onMounted(getNewArticles);
+function formatDateTime(timeString) {
+  const dateTime = new Date(timeString);
+  const formattedDateTime = dateTime.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  return formattedDateTime;
+}
 </script>
 
 <style scoped>

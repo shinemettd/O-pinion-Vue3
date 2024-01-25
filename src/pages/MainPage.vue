@@ -1,8 +1,8 @@
 <script>
   import axios from 'axios';
-  import ArticleComponent from "@/components/ArticleComponent.vue";
+  import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
   export default {
-    components: {ArticleComponent},
+    components: {ArticlePreviewComponent},
     data() {
       return {
         articles: [],
@@ -45,8 +45,9 @@
         </div>
       </div>
       <div v-for="article in articles" :key="article.id" class = "scroll-content my-7">
-        <ArticleComponent
+        <ArticlePreviewComponent
                           :authors-nickname = "article.author.nickname"
+                          :authors-avatar-url = "article.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
                           :postedTimeAgo = "article.date_time"
                           :article-id = "article.id"
                           :article-title = "article.title"
