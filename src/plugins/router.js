@@ -26,14 +26,13 @@ export default createRouter({
       component: ArticlePage
     },
     {
+      path: '/user/:userId',
+      component: Person
+    },
+    {
       path: '/about',
       name: 'About',
       component: About
-    },
-    {
-      path: '/person',
-      name: 'Person',
-      component: Person
     },
     {
       path: '/create-Article',

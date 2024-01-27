@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "nohup": "nohup vite --host --port 8811 &"
+    "nohup": "echo \"\" > nohup.out && nohup vite --host --port 8811 &"
   },
   "dependencies": {
     "-": "^0.0.1",

@@ -6,7 +6,6 @@
           <router-link to="/" class="navbar-brand" style = "font-size: 25px">O!pinion</router-link>
           <div class = "navbar-tabs">
             <router-link to="/hello-world" class="navbar-item">Hello World</router-link>
-            <router-link to="/test-article" class="navbar-item">Test Article</router-link>
           </div>
 
           <!-- Other link in navbar -->

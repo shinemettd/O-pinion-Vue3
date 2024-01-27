@@ -36,7 +36,7 @@ onBeforeMount(() => { getArticle(); getComments()});
     :article-total-favourites = "currentArticle.data.total_favourites"
     :article-total-comments = "currentArticle.data.total_comments"
     :article-total-views = "currentArticle.data.total_views"
-    :article-comments = "currentArticleComments.value"
+    :article-comments = "currentArticleComments.data"
   />
 
 </template>

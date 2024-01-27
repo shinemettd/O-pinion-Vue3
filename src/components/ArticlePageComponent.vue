@@ -25,7 +25,7 @@ const props = defineProps({
   articleTotalDislikes: Number,
   articleTotalComments: Number,
   articleTotalViews: Number,
-  articleComments: CommentComponent
+  articleComments: String
 })
 
 function formatDateTime(timeString) {
@@ -45,7 +45,7 @@ function formatDateTime(timeString) {
       <div class="">
         <div class = "article-header border">
           <p style = "font-size: 2em"> {{ articleTitle }} </p>
-          <div class = "article-header-authors-avatar">
+          <div class = "user-avatar">
             <img :src = "authorsAvatarUrl" class = "my-1">
           </div>
           <div class = "">
@@ -101,9 +101,27 @@ function formatDateTime(timeString) {
       </div>
 
       <div class="my-3">
-        <p  style="font-size: 1.5em"> {{articleTotalComments}} комментариев</p>
-        <div class = "comments-list my-3">
-<!--          <CommentComponent/>-->
+        <p style="font-size: 1.5em"> {{articleTotalComments}} комментариев</p>
+        <div class = "comments-list my-3 border" v-for = "comment in articleComments.content" :key="comment.id">
+          <div>
+            <div class = "user-avatar">
+              <img :src = comment.user.avatar>
+            </div>
+            <div>
+              {{ comment.user.nickname }}
+            </div>
+            <div>
+              {{ comment.date }}
+            </div>
+          </div>
+          <div>
+            {{ comment.text }}
+          </div>
+          <div>
+            <div>
+              Ответить
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -111,7 +129,7 @@ function formatDateTime(timeString) {
 </template>
 
 <style scoped>
-.article-header-authors-avatar img {
+.user-avatar img {
   width: 32px;
   height: 32px;
   border-radius: 50%;
