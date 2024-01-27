@@ -48,21 +48,23 @@
             placeholder="Пароль"
           />
           <button type="button" @click="togglePasswordVisibility" class="password-toggle">
-            <!-- Используйте иконку глаза (или другую) вместо текста -->
-            <i :class="showPassword ? 'fa fa-eye' :   'fa fa-eye-slash'"></i>
+            <i :class="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
           </button>
           <div v-if="errors.password" class="error-message">{{ errors.password }}</div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group password-wrapper">
           <input
-            :type="showPassword ? 'text' : 'password'"
+            :type="showConfirmPassword ? 'text' : 'password'"
             v-model="confirm_password"
             id="confirm_password"
             class="fadeIn third"
             name="confirm_password"
             placeholder="Подтвердите пароль"
           />
+          <button type="button" @click="toggleConfirmPasswordVisibility" class="password-toggle">
+            <i :class="showConfirmPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
+          </button>
           <div v-if="errors.confirm_password" class="error-message">{{ errors.confirm_password }}</div>
         </div>
 
@@ -89,6 +91,7 @@ export default {
     const nickname = ref('');
     const email = ref('');
     const password = ref('');
+    const showConfirmPassword = ref(false);
     const birth_date = ref('');
     const confirm_password = ref('');
 
@@ -118,8 +121,6 @@ export default {
           this.$router.push('/auth');
 
         } catch (error) {
-          console.log('Status:', error.response.status);
-          console.log('Status Text:', error.response.statusText);
         }
       }
     };
@@ -175,6 +176,9 @@ export default {
     const togglePasswordVisibility = () => {
       showPassword.value = !showPassword.value;
     };
+    const toggleConfirmPasswordVisibility = () => {
+      showConfirmPassword.value = !showConfirmPassword.value;
+    };
 
     return {
       first_name,
@@ -185,6 +189,8 @@ export default {
       confirm_password,
       showPassword,
       register,
+      showConfirmPassword,
+      toggleConfirmPasswordVisibility,
       validateInputs,
       togglePasswordVisibility,
       birth_date,
@@ -298,9 +304,9 @@ h2 {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 15px;
   font-bold: 17px;
-  color: #0c0303;
+  color: #15249f;
 }
 
 
