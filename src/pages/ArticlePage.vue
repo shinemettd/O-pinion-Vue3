@@ -3,11 +3,10 @@ import axios from "axios";
 import { onBeforeMount, ref } from "vue";
 import { useRoute } from 'vue-router';
 import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
-import CommentComponent from "@/components/CommentComponent.vue";
-import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
 
 const currentArticle = ref('');
 const currentArticleComments = ref('');
+const currentArticleCommentsReplies = ref('');
 
 const route = useRoute();
 const articleId = route.params.articleId;
@@ -18,7 +17,7 @@ const getArticle = async () => {
 
 const getComments = async () => {
   currentArticleComments.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId}`);
-  await console.log(currentArticleComments.value.data);
+  currentArticleCommentsReplies.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId}/replies`);
 }
 
 onBeforeMount(() => { getArticle(); getComments()});
@@ -37,6 +36,7 @@ onBeforeMount(() => { getArticle(); getComments()});
     :article-total-comments = "currentArticle.data.total_comments"
     :article-total-views = "currentArticle.data.total_views"
     :article-comments = "currentArticleComments.data"
+    :article-comments-replies = "currentArticleCommentsReplies.data"
   />
 
 </template>
