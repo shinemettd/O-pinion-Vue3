@@ -6,7 +6,6 @@
           <router-link to="/" class="navbar-brand" style = "font-size: 25px">O!pinion</router-link>
           <div class = "navbar-tabs">
             <router-link to="/hello-world" class="navbar-item">Hello World</router-link>
-            <router-link to="/test-article" class="navbar-item">Test Article</router-link>
           </div>
 
           <!-- Other link in navbar -->
@@ -26,8 +25,8 @@
         <button @click="toggleMenu" class="burger-button">☰</button>
 
         <div :class="['menu', { 'is-open': isMenuOpen }]">
-          <router-link to="/person" class="menu-item"><i class="fas fa-user"></i>Личный кабинет</router-link>
-          <router-link to="/auth" class="menu-item"><i class="fas fa-sign-in-alt"></i>войти</router-link>
+          <router-link to="/user" class="menu-item"><i class="fas fa-user"></i>Личный кабинет</router-link>
+          <router-link to="/auth" class="menu-item"><i class="fas fa-sign-in-alt"></i>Войти</router-link>
           <router-link to="/" class="menu-item"><i class="fas fa-home"></i> Главная</router-link>
           <router-link to="/about" class="menu-item"><i class="fas fa-info-circle"></i> О нас</router-link>
           <router-link to="/notification" class="menu-item"><i class="fas fa-bell"></i> Уведомление</router-link>

@@ -52,7 +52,7 @@
                 <img src="/icons/zap_icon.svg" alt="Rating Icon">
               </div>
               <b v-if = "articleRating>0" style="color: green">{{ articleRating }}</b>
-              <b v-else-if="articleRating<0" if = "articleRating>0" style="color: red">{{ articleRating }}</b>
+              <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
               <b v-else style="color: black">{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
@@ -93,7 +93,7 @@
 <script setup>
 import axios from 'axios';
 
-const props = defineProps({
+defineProps({
   authorsNickname: String,
   authorsAvatarUrl: {
     type: String,
@@ -116,19 +116,13 @@ const props = defineProps({
   articleTotalViews: Number
 })
 
-async function getNewArticles() {
-  let articles = await axios.get('http://194.152.37.7:8812/api/articles');
-  let articlesArray = articles.data.content;
-  console.log(articlesArray[0].author.id);
-}
 function formatDateTime(timeString) {
   const dateTime = new Date(timeString);
-  const formattedDateTime = dateTime.toLocaleDateString('ru-RU', {
+  return dateTime.toLocaleDateString('ru-RU', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
-  return formattedDateTime;
 }
 </script>
 

@@ -24,30 +24,31 @@ function formatDateTime(timeString) {
 </script>
 
 <template>
-  <div class = "border">
-    <div class = "flex justify-between border">
-      <div class="authors-avatar" alt = "avatar">
-        <img :src="authorsAvatarUrl">
+    <div class = "info-header">
+      <div class = "user-avatar">
+        <router-link :to="`/user/${authorsNickname}`">
+          <img :src="authorsAvatarUrl" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
+        </router-link>
       </div>
-      <div>
-        {{ authorsNickname }}
-      </div>
-      <div>
-        {{ formatDateTime(postedTimeAgo) }}
-      </div>
-    </div>
-    <div>
-      {{ commentText }}
-    </div>
-    <div class = "border">
-      <div>
-        Лайки/дизлайки
-      </div>
-      <div>
-        Ответить
+      <div class = "comment-user-data">
+        <router-link :to="'/user/$${authorsNickname}'">
+          <p style = "font-weight: 700;"> {{ authorsNickname }}</p>
+        </router-link>
+        <p style = "font-size: 0.75em"> {{ formatDateTime(postedTimeAgo) }} </p>
       </div>
     </div>
-  </div>
+    <div class="my-2 ml-11">
+      <div style = "font-size: 1.15em">
+        {{ commentText }}
+      </div>
+      <div class = "my-2" style = "font-size: 0.85em">
+        <span> Ответить </span>
+      </div>
+    </div>
+
+    <div v-if = "comment.replies > 0">
+      БОЛЬШЕ 0 ОТВЕТОВ
+    </div>
 </template>
 
 <style scoped>
