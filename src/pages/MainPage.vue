@@ -15,6 +15,7 @@
     methods: {
       async getArticles() {
         let articles = await axios.get('http://194.152.37.7:8812/api/articles');
+        console.log('main page get')
         this.articles = articles.data.content;
       }
     },

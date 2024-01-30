@@ -7,12 +7,15 @@ import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
 const currentArticle = ref('');
 const currentArticleComments = ref('');
 const currentArticleCommentsReplies = ref('');
+const dataFetched = ref(false);
 
 const route = useRoute();
 const articleId = route.params.articleId;
 
 const getArticle = async () => {
   currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
+  console.log('article page page get')
+  dataFetched.value = true;
 }
 
 const getComments = async () => {
@@ -20,7 +23,12 @@ const getComments = async () => {
   currentArticleCommentsReplies.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId}/replies`);
 }
 
-onBeforeMount(() => { getArticle(); getComments()});
+onBeforeMount(() => {
+  if (!dataFetched.value) {
+    getArticle();
+    getComments();
+  }
+});
 </script>
 
 <template>
