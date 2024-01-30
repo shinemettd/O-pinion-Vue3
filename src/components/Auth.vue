@@ -4,7 +4,6 @@
 
       <h2 class="inactive text-black cursor-default">Войти</h2>
       <router-link to="/register"><h2 class="inactive underlineHover">Зарегистрироваться</h2></router-link>
-<!--      <a href="/register"><h2 class="inactive underlineHover">Зарегистрироваться</h2></a>-->
 
       <div class="fadeIn first"></div>
 
@@ -41,7 +40,7 @@ export default {
     const login = async () => {
       if (validateInputs()) {
         try {
-          const response = await axios.post('http://194.152.37.7:8812/api/auth', {
+          const response = await axios.post('http://194.152.37.7:8812/api/auth/sign-in', {
             email: email.value,
             password: password.value,
           });
@@ -485,6 +484,4 @@ body {
   text-align: center;
   padding-top: 2rem;
 }
-
-
 </style>
