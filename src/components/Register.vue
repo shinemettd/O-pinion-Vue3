@@ -154,10 +154,23 @@ export default {
         }
       }
 
+      const currentDate = new Date();
+
+      const birthDateInput = new Date(birth_date.value);
+
       if (!birth_date.value.trim()) {
         errors.value.birth_date = 'Пожалуйста, введите дату рождения.';
         isValid = false;
+      } else {
+
+        const age = currentDate.getFullYear() - birthDateInput.getFullYear();
+
+        if (age < 10 || age > 120) {
+          errors.value.birth_date = 'Возраст должен быть от 10 до 120 лет.';
+          isValid = false;
+        }
       }
+
 
       const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,100}$/;
       if (!passwordRegex.test(password.value)) {
