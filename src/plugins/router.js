@@ -8,7 +8,7 @@ import Notification from "@/components/Notification.vue";
 import Register from "@/components/Register.vue";
 import Auth from "@/components/Auth.vue";
 import ArticlePage from "@/pages/ArticlePage.vue";
-import CreateTab from "@/components/CreateTab.vue";
+
 
 export default createRouter({
   history: createWebHistory(),
@@ -55,14 +55,9 @@ export default createRouter({
       path: '/auth'
     },
     {
-      component:Register,
+      component: Register,
       name: 'Register',
       path: '/register'
-    },
-    {
-      component:CreateTab,
-      name: 'CreateTab',
-      path: '/save/articles'
     }
   ]
 })
