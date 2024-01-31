@@ -8,6 +8,7 @@ import Notification from "@/components/Notification.vue";
 import Register from "@/components/Register.vue";
 import Auth from "@/components/Auth.vue";
 import ArticlePage from "@/pages/ArticlePage.vue";
+import UserProfilePage from "@/pages/UserProfilePage.vue";
 
 
 export default createRouter({
@@ -27,7 +28,7 @@ export default createRouter({
     },
     {
       path: '/user/:userId',
-      component: Person
+      component: UserProfilePage
     },
     {
       path: '/about',
