@@ -27,7 +27,7 @@ export default createRouter({
       component: ArticlePage
     },
     {
-      path: '/user/:userId',
+      path: '/user/:userNickname',
       component: UserProfilePage
     },
     {
