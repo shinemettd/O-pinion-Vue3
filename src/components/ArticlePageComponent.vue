@@ -43,20 +43,26 @@ function formatDateTime(timeString) {
 <template>
   <main class = "container mx-auto">
     <div class = "scroll mx-auto border w-50 h-100 px-3 py-3">
-      <div class = "article-header ">
+      <hr>
+      <div class = "article-header mt-3">
         <p style = "font-size: 2em"> {{ articleTitle }} </p>
-        <div class = "article-header-data">
-          <div class = "user-avatar">
-            <img :src = "authorsAvatarUrl" class = "my-1">
+        <div class = "article-header-data my-2" style = "display: flex">
+          <div class = "user-avatar mr-3">
+            <router-link :to="'/user/' + authorsNickname">
+              <img :src = "authorsAvatarUrl" class = "my-1 mt-2">
+            </router-link>
           </div>
           <div class = "">
-            <p> {{ authorsNickname }}</p>
+            <router-link :to="'/user/' + authorsNickname">
+              <p style = "font-size: 1.25em"> <strong> {{ authorsNickname }} </strong> </p>
+            </router-link>
+
             <p> {{ formatDateTime(postedTimeAgo) }}</p>
           </div>
         </div>
       </div>
       <!--   article content     -->
-      <p class = "my-3"> Контент статьи {{ articleContent }} </p>
+      <p class = "my-3" style = "font-size: 1.25em"> {{ articleContent }} </p>
 
 
       <div class="my-3">
@@ -109,8 +115,11 @@ function formatDateTime(timeString) {
       </div>
       <hr class = "my-3">
 
-      <div class="my-6">
+      <div class="my-5">
         <p style="font-size: 1.5em"> Комментарии <strong> {{articleTotalComments}}</strong> </p>
+        <div v-show = "articleTotalComments === 0" class = "px-5 pt-5" style = "font-style: italic">
+          Комментариев пока нет :(
+        </div>
         <div class = "comments-list my-5" v-for = "comment in articleComments.content" :key="comment.id">
             <div class = "info-header">
               <div class = "user-avatar">
@@ -168,8 +177,8 @@ function formatDateTime(timeString) {
 
 <style scoped>
 .user-avatar img {
-  width: 32px;
-  height: 32px;
+  width: 2.5em;
+  height: 2.5em;
   border-radius: 50%;
   vertical-align: middle;
 }

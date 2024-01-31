@@ -37,6 +37,7 @@ onBeforeMount(() => {
     :posted-time-ago = "currentArticle.data.date_time"
     :article-id = "currentArticle.data.id"
     :article-title = "currentArticle.data.title"
+    :article-content = "currentArticle.data.content"
     :article-rating = "currentArticle.data.rating"
     :article-in-favourites = "currentArticle.data.in_favourites"
     :article-total-favourites = "currentArticle.data.total_favourites"
