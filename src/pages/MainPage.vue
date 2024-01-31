@@ -27,6 +27,7 @@
 <template>
   <main class = "container mx-auto">
     <div class = "scroll mx-auto border w-50 h-100">
+      <hr class = "mt-5">
       <div class = "sorter w-20 h-20 my-5">
         <div class = "w-100 justify-between mb-5 text-center">
           Отображать:
@@ -44,6 +45,7 @@
           </v-btn-toggle>
         </div>
       </div>
+      <hr>
       <div v-for="article in articles" :key="article.id" class = "scroll-content my-7">
         <ArticlePreviewComponent
                           :authors-nickname = "article.author.nickname"
