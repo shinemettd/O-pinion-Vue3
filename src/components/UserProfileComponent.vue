@@ -1,8 +1,14 @@
 <script setup>
 import axios from "axios";
-import {ref} from "vue";
+import {onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {onBeforeRouteUpdate, useRoute} from "vue-router";
+import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
 
 const props = defineProps({
+  userId: {
+    type: Number,
+    default: null
+  },
   userNickname: {
     type: String,
     default: 'username'
@@ -45,11 +51,24 @@ const props = defineProps({
   }
 })
 
+const route = useRoute();
+const userNickname = route.params.userNickname;
+
 const articles = ref([]);
 
 const getUserArticles = async () => {
-  // articles.value = await axios.get('http://194.152.37.7:8812/api/articles');
+  if (props.userId !== null) {
+    articles.value = (await axios.get('http://194.152.37.7:8812/api/articles/' + props.userId + '/articles')).data.content;
+  }
 }
+
+onMounted(() => {
+  getUserArticles();
+});
+
+watch(() => props.userId, () => {
+  getUserArticles();
+});
 </script>
 
 <template>
@@ -78,10 +97,25 @@ const getUserArticles = async () => {
       </div>
       <hr class = "mt-5">
       <div class = "my-5">
-        <strong> Статьи пользователя: </strong>
+        <strong style = "font-size: 1.5em"> Статьи пользователя: </strong>
+      </div>
+      <div v-for="article in articles" :key="article.id" class = "scroll-content my-7">
+        <ArticlePreviewComponent
+          :show-without-header = "true"
+          :authors-avatar-url = "null"
+          :postedTimeAgo = "article.date_time"
+          :article-id = "article.id"
+          :article-title = "article.title"
+          :article-main-picture-url = "article.cover_image"
+          :article-short-description= "article.short_description"
+          :article-rating = "article.rating"
+          :article-in-favourites = "article.in_favourites"
+          :article-total-favourites = "article.total_favourites"
+          :article-total-comments = "article.total_comments"
+          :article-total-views = "article.total_views"
+        />
       </div>
       <hr class = "my-5">
-
     </div>
 
   </main>
