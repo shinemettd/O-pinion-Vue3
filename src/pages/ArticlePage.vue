@@ -14,7 +14,6 @@ const articleId = route.params.articleId;
 
 const getArticle = async () => {
   currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
-  console.log('article page page get')
   dataFetched.value = true;
 }
 
@@ -38,6 +37,7 @@ onBeforeMount(() => {
     :posted-time-ago = "currentArticle.data.date_time"
     :article-id = "currentArticle.data.id"
     :article-title = "currentArticle.data.title"
+    :article-content = "currentArticle.data.content"
     :article-rating = "currentArticle.data.rating"
     :article-in-favourites = "currentArticle.data.in_favourites"
     :article-total-favourites = "currentArticle.data.total_favourites"

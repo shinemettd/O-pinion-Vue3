@@ -1,7 +1,7 @@
 <template>
   <article class = "article-block">
     <div class = "article-content">
-      <div class = "article-header">
+      <div v-show = "!showWithoutHeader" class = "article-header">
         <div class = "article-header-data">
           <div class = "article-authors-avatar">
             <router-link :to="'/user/' + authorsNickname">
@@ -26,13 +26,15 @@
           </div>
         </div>
       </div>
+      <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
         <div class = "article-title">
           <router-link :to="'/article/' + articleId">
             <p> {{ articleTitle }} </p>
+
           </router-link>
         </div>
-        <div v-if = "articleMainPictureUrl !== '' && articleMainPictureUrl !== null" class = "article-picture">
+        <div :v-show = "(articleMainPictureUrl !== '' && articleMainPictureUrl !== null)" class = "article-picture">
           <router-link :to="'/article/' + articleId">
             <img :src = "articleMainPictureUrl" alt = "Main picture of article preview">
           </router-link>
@@ -94,6 +96,10 @@
 import axios from 'axios';
 
 defineProps({
+  showWithoutHeader: {
+    type: Boolean,
+    default: false
+  },
   authorsNickname: String,
   authorsAvatarUrl: {
     type: String,
