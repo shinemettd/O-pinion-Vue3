@@ -14,7 +14,6 @@ const articleId = route.params.articleId;
 
 const getArticle = async () => {
   currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
-  console.log('article page page get')
   dataFetched.value = true;
 }
 
