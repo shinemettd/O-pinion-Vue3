@@ -1,3 +1,41 @@
+<script setup>
+defineProps({
+  showWithoutHeader: {
+    type: Boolean,
+    default: false
+  },
+  authorsNickname: String,
+  authorsAvatarUrl: {
+    type: String,
+    default: 'https://cdn-icons-png.flaticon.com/512/10/10938.png'
+  },
+  postedTimeAgo: String,
+  articleId: Number,
+  articleTitle: String,
+  articleMainPictureUrl: {
+    type: String,
+  },
+  articleShortDescription: String,
+  articleRating: Number,
+  articleTotalFavourites: Number,
+  articleInFavourites: {
+    type: Boolean,
+    default: false,
+  },
+  articleTotalComments: Number,
+  articleTotalViews: Number
+})
+
+function formatDateTime(timeString) {
+  const dateTime = new Date(timeString);
+  return dateTime.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+</script>
+
 <template>
   <article class = "article-block">
     <div class = "article-content">
@@ -91,46 +129,6 @@
     </div>
   </article>
 </template>
-
-<script setup>
-import axios from 'axios';
-
-defineProps({
-  showWithoutHeader: {
-    type: Boolean,
-    default: false
-  },
-  authorsNickname: String,
-  authorsAvatarUrl: {
-    type: String,
-    default: 'https://cdn-icons-png.flaticon.com/512/10/10938.png'
-  },
-  postedTimeAgo: String,
-  articleId: Number,
-  articleTitle: String,
-  articleMainPictureUrl: {
-    type: String,
-  },
-  articleShortDescription: String,
-  articleRating: Number,
-  articleTotalFavourites: Number,
-  articleInFavourites: {
-    type: Boolean,
-    default: false,
-  },
-  articleTotalComments: Number,
-  articleTotalViews: Number
-})
-
-function formatDateTime(timeString) {
-  const dateTime = new Date(timeString);
-  return dateTime.toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
-</script>
 
 <style scoped>
 article {

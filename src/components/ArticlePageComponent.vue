@@ -1,11 +1,9 @@
 <script setup>
-
-import CommentComponent from "@/components/CommentComponent.vue";
 import {ref} from "vue";
 
 const reaction = ref('');
 
-const props = defineProps({
+defineProps({
   authorsNickname: String,
   authorsAvatarUrl: {
     type: String,
@@ -49,7 +47,7 @@ function formatDateTime(timeString) {
         <div class = "article-header-data my-2" style = "display: flex">
           <div class = "user-avatar mr-3">
             <router-link :to="'/user/' + authorsNickname">
-              <img :src = "authorsAvatarUrl" class = "my-1 mt-2">
+              <img :src = "authorsAvatarUrl" class = "my-1 mt-2" alt = "user avatar">
             </router-link>
           </div>
           <div class = "">
@@ -128,7 +126,7 @@ function formatDateTime(timeString) {
                 </router-link>
               </div>
               <div class = "comment-user-data">
-                <router-link :to="'/user/${comment.user.nickname}'">
+                <router-link :to="`/user/${comment.user.nickname}`">
                   <p style = "font-weight: 700;"> {{ comment.user.nickname }}</p>
                 </router-link>
                   <p v-if = "comment.altered" style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} (Изменено) </p>
@@ -155,7 +153,7 @@ function formatDateTime(timeString) {
                   </router-link>
                 </div>
                 <div class = "comment-user-data">
-                  <router-link :to="'/user/${comment.user.nickname}'">
+                  <router-link :to="`/user/${reply.user.nickname}`">
                     <p style = "font-weight: 700;"> {{ reply.user.nickname }}</p>
                   </router-link>
                   <p v-if = "reply.altered" style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(reply.date) }} (Изменено) </p>
