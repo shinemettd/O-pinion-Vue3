@@ -1,7 +1,7 @@
 <script setup>
   import axios from 'axios';
   import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
-  import {onBeforeMount, onMounted, ref} from "vue";
+  import {onBeforeMount, ref} from "vue";
 
   const articles = ref('');
   const sortToggle = ref(0);

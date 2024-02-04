@@ -22,7 +22,7 @@ onBeforeMount(() => {
   <UserProfileComponent
     :user-id="user.id"
     :user-nickname="user.nickname"
-    :user-avatar-url="user.avatar"
+    :user-avatar-url="user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
     :user-first-name="user.firstName"
     :user-last-name="user.lastName"
     :user-email="user.email"

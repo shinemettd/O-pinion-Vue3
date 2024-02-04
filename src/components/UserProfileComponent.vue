@@ -1,7 +1,7 @@
 <script setup>
 import axios from "axios";
-import {onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {onBeforeRouteUpdate, useRoute} from "vue-router";
+import {onMounted, ref, watch} from "vue";
+import {useRoute} from "vue-router";
 import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
 
 const props = defineProps({
