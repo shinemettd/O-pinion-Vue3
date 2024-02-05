@@ -7,18 +7,19 @@
       <input v-model="title" type="text" id="title"/>
 
       <label for="short-description">Краткое описание:</label>
-      <textarea v-model="short_description" id="short-description"></textarea>
+      <textarea v-model="shortDescription" id="short-description"></textarea>
 
       <label for="cover-image">Главное изображение (выберите файл):</label>
-      <input type="file" @change="handleFile" accept="image/*"/>
+      <input type="file" @change="handleImageChange" accept="image/*"/>
 
       <button @click="submitArticle">Создать статью</button>
     </div>
-    <div v-if="id" class="content-form">
+
+    <div v-if="articleId" class="content-form">
       <h2>Добавление контента</h2>
 
-      <label for="cover-image">Контент статьи (HTML файл):</label>
-      <input type="file" @change="article_content" accept="text/html"/>
+      <label for="article-content">Контент статьи (HTML файл):</label>
+      <textarea v-model="articleContent" id="article-content"></textarea>
 
       <button @click="submitContent">Добавить контент</button>
     </div>
@@ -30,16 +31,16 @@ import axios from 'axios';
 import {ref} from 'vue';
 
 const title = ref('');
-const short_description = ref('');
-const cover_image = ref('');
+const shortDescription = ref('');
+const coverImage = ref('');
 
-const id = ref('');
-const article_content = ref('');
+const articleId = ref('');
+const articleContent = ref('');
 
-const handleFile = (event) => {
+const handleImageChange = (event) => {
   const file = event.target.files[0];
   if (file) {
-    cover_image.value = file;
+    coverImage.value = file;
   }
 };
 
@@ -47,17 +48,17 @@ const submitArticle = async () => {
   try {
     const formData = new FormData();
     formData.append('title', title.value);
-    formData.append('short_description', short_description.value);
-    formData.append('cover_image', cover_image.value);
-
+    formData.append('short_description', shortDescription.value);
+    formData.append('cover-image', coverImage.value);
     const accessToken = localStorage.getItem('accessToken');
+
     const response = await axios.post('http://194.152.37.7:8812/api/articles', formData, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       }
     });
-    id.value = response.data.id;
+    articleId.value = response.data.id;
   } catch (error) {
     console.error('Error submitting article:', error);
   }
@@ -65,11 +66,8 @@ const submitArticle = async () => {
 
 const submitContent = async () => {
   try {
-    await axios.put(`http://194.152.37.7:8812/api/articles/${id.value}/set-content`, formData, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'multipart/form-data'
-      }
+    await axios.post(`http://194.152.37.7:8812/api/articles/${articleId.value}/set-content`, {
+      articleContent: articleContent.value,
     });
   } catch (error) {
     console.error('Error submitting article content:', error);

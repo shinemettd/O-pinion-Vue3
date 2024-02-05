@@ -5,19 +5,25 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "nohup": "nohup vite --host --port 8811 &"
+    "nohup": "echo \"\" > nohup.out && nohup vite --host --port 8811 &"
   },
   "dependencies": {
+    "-": "^0.0.1",
     "@mdi/font": "7.0.96",
+    "autoprefixer": "^10.4.17",
     "axios": "^1.6.5",
+    "bootstrap": "^5.3.2",
+    "postcss": "^8.4.33",
     "roboto-fontface": "*",
     "vue": "^3.3.0",
+    "vue-axios": "^3.5.2",
     "vue-router": "^4.2.5",
     "vuetify": "^3.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",
     "sass": "^1.69.0",
+    "tailwindcss": "^3.4.1",
     "unplugin-fonts": "^1.1.0",
     "unplugin-vue-components": "^0.26.0",
     "vite": "^5.0.0",

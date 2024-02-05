@@ -1,47 +1,89 @@
+<script setup>
+defineProps({
+  showWithoutHeader: {
+    type: Boolean,
+    default: false
+  },
+  authorsNickname: String,
+  authorsAvatarUrl: {
+    type: String,
+    default: 'https://cdn-icons-png.flaticon.com/512/10/10938.png'
+  },
+  postedTimeAgo: String,
+  articleId: Number,
+  articleTitle: String,
+  articleMainPictureUrl: {
+    type: String,
+  },
+  articleShortDescription: String,
+  articleRating: Number,
+  articleTotalFavourites: Number,
+  articleInFavourites: {
+    type: Boolean,
+    default: false,
+  },
+  articleTotalComments: Number,
+  articleTotalViews: Number
+})
+
+function formatDateTime(timeString) {
+  const dateTime = new Date(timeString);
+  return dateTime.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+</script>
+
 <template>
   <article class = "article-block">
     <div class = "article-content">
-      <div class = "article-header">
+      <div v-show = "!showWithoutHeader" class = "article-header">
         <div class = "article-header-data">
           <div class = "article-authors-avatar">
-            <a :href="authorsNickname"> <!--  here is described a path to localhost:8811/nickname  -->
-              <img :src="authorsAvatarUrl" alt = "users avatar picture">
-            </a>
+            <router-link :to="'/user/' + authorsNickname">
+              <img :src="authorsAvatarUrl" alt = "Users avatar picture">
+            </router-link>
           </div>
           <div class = "article-authors-nickname">
-            <a :href="authorsNickname"> <!--  here is described a path to localhost:8811/nickname  -->
-              <p> {{ authorsNickname }}</p>
-            </a>
+            <router-link :to="'/user/' + authorsNickname">
+              <p style = "font-weight: 700;"> {{ authorsNickname }}</p>
+            </router-link>
           </div>
           <div class = "article-recently-date">
-            <a :href="articleId"> <!--  here is described a path to localhost:8811/articleId  -->
-              <p> {{ postedTimeAgo }} </p>
-            </a>
+            <router-link :to="'/article/' + articleId">
+              <p> {{ formatDateTime(postedTimeAgo) }} </p>
+            </router-link>
           </div>
         </div>
         <div class = "article-header-report">
           <div class = "article-header-report-icon">
-            <img src="/icons/alert_circle_icon.svg" @click="showMsg" alt = "Report Icon">
-            <!-- instead of showMsg on click should be a method call to show a window with report -->
+            <img src="/icons/alert_circle_icon.svg" @click="getNewArticles" alt = "Report Icon">
+            <!-- instead of getNewArticles on click should be a method calling to show a window with report -->
           </div>
         </div>
       </div>
+      <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
         <div class = "article-title">
-          <a :href="articleId">
+          <router-link :to="'/article/' + articleId">
             <p> {{ articleTitle }} </p>
-          </a>
+
+          </router-link>
         </div>
-        <div v-if = "articleMainPictureUrl !== ''" class = "article-picture">
-          <img :src = "articleMainPictureUrl" alt = "Main picture of article preview">
+        <div :v-show = "(articleMainPictureUrl !== '' && articleMainPictureUrl !== null)" class = "article-picture">
+          <router-link :to="'/article/' + articleId">
+            <img :src = "articleMainPictureUrl" alt = "Main picture of article preview">
+          </router-link>
         </div>
         <div class = "article-description">
           <p> {{ articleShortDescription }} </p>
         </div>
         <div class = "article-read-more">
-          <a :href="basePath + '/' + articleId"> <!--  here is described a path to localhost:8811/articleId  -->
+          <router-link :to="'/article/' + articleId" class="navbar-item">
             <v-btn style="margin-top: 10px; margin-bottom: 10px;">Читать далее</v-btn>
-          </a>
+          </router-link>
         </div>
         <div class = "article-footer-bar">
           <div class = "article-footer">
@@ -49,13 +91,15 @@
               <div class = "article-rating-icon">
                 <img src="/icons/zap_icon.svg" alt="Rating Icon">
               </div>
-              <b>{{ articleRating }}</b>
+              <b v-if = "articleRating>0" style="color: green">{{ articleRating }}</b>
+              <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
+              <b v-else style="color: black">{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
-                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="changeFavouriteStatus">
+                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
                   <img src="/icons/star_icon.svg" alt = "Favourites Icon">
                 </div>
-                <div v-else class = article-not-in-favourites-icon @click="changeFavouriteStatus">
+                <div v-else class = article-not-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
                   <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
                 </div>
                 <b> {{ articleTotalFavourites }}</b>
@@ -67,7 +111,9 @@
             </div>
             <div class = "article-comments">
                 <div class = "article-comments-icon">
-                  <img src="/icons/message_square_icon.svg" alt="Comments Icon">
+                  <router-link :to="'/article/' + articleId" class="navbar-item">
+                    <img src="/icons/message_square_icon.svg" alt="Comments Icon">
+                  </router-link>
                 </div>
                 <b>{{ articleTotalComments }}</b>
             </div>
@@ -84,39 +130,10 @@
   </article>
 </template>
 
-<script setup>
-const basePath = 'http://localhost:8811';
-const showMsg = () => {
-  console.log('навелись')
-}
-const props = defineProps({
-  authorsNickname: String,
-  authorsAvatarUrl: String,
-  postedTimeAgo: String,
-  articleId: Number,
-  articleTitle: String,
-  articleMainPictureUrl: String,
-  articleShortDescription: String,
-  articleRating: Number,
-  articleTotalFavourites: Number,
-  articleInFavourites: {
-    type: Boolean,
-    default: false
-  },
-  articleTotalComments: Number,
-  articleTotalViews: Number,
-})
-
-function changeFavouriteStatus() {
-  console.log(props.articleInFavourites);
-  alert('after');
-}
-</script>
-
 <style scoped>
 article {
-  width: 45%;
-  border: solid 1px black;
+  width: 95%;
+  border: solid 1px #350454FF;
   border-radius: 20px;
   box-sizing: border-box;
   margin: 0 auto;
@@ -161,6 +178,12 @@ article {
 
 .article-recently-date {
   margin-left: 0.75em;
+  opacity: 75%;
+}
+
+.article-recently-date:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .article-header-report {
@@ -180,6 +203,10 @@ article {
 
 .article-title {
   max-width: 90%;
+}
+
+.article-data div:not(:last-child) {
+  margin-bottom: 5px;
 }
 
 .article-title p {
@@ -206,7 +233,7 @@ article {
 }
 
 .article-footer > div:not(:last-child) {
-  margin-right: 50px;
+  margin-right: 35px;
 }
 
 .article-not-in-favourites-icon {
@@ -223,6 +250,7 @@ article {
 }
 
 .article-in-favourites-icon:hover {
+  cursor: pointer;
   opacity: 50%;
 }
 
@@ -245,14 +273,6 @@ article {
 
 .article-share-icon {
   vertical-align: center;
-}
-
-.article-share a,
-.article-favourites a,
-.article-comments a {
-  text-decoration: none;
-  color: black;
-  display: flex;
 }
 
 .article-views-count {
