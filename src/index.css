@@ -6,3 +6,29 @@
 .ProseMirror:focus {
     outline: none;
 }
+
+.tiptap {
+    > * + * {
+      margin-top: 0.75em;
+    }
+  
+    ul {
+      padding: 0 1rem;
+      list-style-type: disc;
+    }
+    ol {
+        padding: 0 1rem;
+        list-style-type: decimal;
+    }
+
+    a {
+        color:rgb(59, 59, 239) ;
+        text-decoration:underline;
+    }
+
+    a:hover {
+        color: darkblue; 
+        text-decoration: underline; 
+        cursor: pointer;
+    }
+  }
