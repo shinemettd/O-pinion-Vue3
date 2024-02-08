@@ -16,27 +16,22 @@
             <button class="delete-btn" @click="deleteImage">Удалить</button> 
         </div>
         
-        
         <h2>Добавление контента</h2>
         <div class="editor-tool">
             <div v-if="editor">
                 <input type="file" ref="fileInputRef" style="display: none;" @change="addImage">
-                <img src="/public/icons/upload_img.svg" alt="icon" width="25" height="25" @click="openFileInput">
-                <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
-                    toggleBold
-                </button>
-                <button @click="editor.chain().focus().setBold().run()" :disabled="editor.isActive('bold')">
-                    setBold
-                </button>
-                <button @click="editor.chain().focus().unsetBold().run()" :disabled="!editor.isActive('bold')">
-                    unsetBold
-                </button>
+                <img src="/public/icons/upload_img.svg" class="btn-toolbar img" alt="icon"  @click="openFileInput">
+
+                <button class="btn-toolbar bold"  @click="toggleBold">B</button>
+                <button class="btn-toolbar italic">I</button>
+                <button class="btn-toolbar underline">U</button>
+                <button class="btn-toolbar strikethrough">S</button>
             </div>
         </div>
         <editor-content :editor="editor" class="custom-editor"/>
        
   
-        <button @click="submitArticle">Создать статью</button>
+        <button class="btn" @click="submitArticle">Создать статью</button>
       </div>
     </div>
   </template>
@@ -50,7 +45,8 @@
   import Text from '@tiptap/extension-text'
   import { Editor, EditorContent } from '@tiptap/vue-3'
   import axios from 'axios';
-  import { ref , onMounted} from 'vue';
+  import { ref , onMounted } from 'vue';
+  
 
 
 export default {
@@ -83,6 +79,17 @@ export default {
       // Устанавливаем ссылку на DOM-элемент input
       fileInputRef.value = document.querySelector('input[type="file"]');
     });
+    
+     // Функция для переключения стиля жирного текста
+     const toggleBold = () => {
+      if (editor) {
+        if (editor.isActive('bold')) {
+          editor.chain().focus().unsetBold().run();
+        } else {
+          editor.chain().focus().setBold().run();
+        }
+      }
+    };
 
     const openFileInput = () => {
       fileInputRef.value.click();
@@ -186,6 +193,8 @@ export default {
       addImage,
       deleteImage,
       submitArticle,
+      toggleBold,
+     
     };
   },
   beforeUnmount() {
@@ -232,15 +241,9 @@ export default {
     border: 1px solid #ddd;
     border-radius: 4px;
   }
-  .delete-btn {
-    background-color: red;
-    padding: 6px 10px;
-  }
-  .delete-btn:hover {
-    background-color: rgb(143, 37, 37);
-  }
+
   
-  button {
+  .btn, .delete-btn{
     background-color: #1e066e;
     color: #fff;
     padding: 12px 20px;
@@ -251,10 +254,18 @@ export default {
     font-size: 16px;
   }
   
-  button:hover {
+  .btn:hover {
     background-color: #0056b3;
   }
 
+  .delete-btn {
+    background-color: red;
+    padding: 6px 10px;
+  }
+  .delete-btn:hover {
+    background-color: rgb(143, 37, 37);
+
+  }
   .custom-editor {
     border: #1e066e solid;
     height: 50vh;
@@ -262,10 +273,49 @@ export default {
     overflow-y: auto; /* Появляется вертикальный скролл, если контент выходит за пределы редактора */
     line-height: 2;
     
+  }
+  .editor-tool {
+    background-color: #f2f2f2;
+    padding: 10px;
+    border: 1px solid #ccc;
+    /* display: flex;
+    align-items: center; */
+  }
+
+  .btn-toolbar {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+    height: 2.5em;
+   
+  }
+
+  .btn-toolbar:hover {
+  background-color: #eaeaea;
+  }
+
+  .img {
+    display: inline;
+  }
+
+  .bold {
+  font-weight: bold;
 }
-/* 
-.ProseMirror:focus {
-    outline: none;
-} */
+
+.italic {
+  font-style: italic;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+}
+
 </style>
   
