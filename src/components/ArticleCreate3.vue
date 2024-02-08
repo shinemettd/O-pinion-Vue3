@@ -20,7 +20,7 @@
         <h2>Добавление контента</h2>
         <div class="editor-tool">
             <div v-if="editor">
-                <input type="file" ref="fileInput" style="display: none;" @change="addImage">
+                <input type="file" ref="fileInputRef" style="display: none;" @change="addImage">
                 <img src="/public/icons/upload_img.svg" alt="icon" width="25" height="25" @click="openFileInput">
                 <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
                     toggleBold
@@ -50,7 +50,7 @@
   import Text from '@tiptap/extension-text'
   import { Editor, EditorContent } from '@tiptap/vue-3'
   import axios from 'axios';
-  import { ref } from 'vue';
+  import { ref , onMounted} from 'vue';
 
 
 export default {
@@ -62,6 +62,7 @@ export default {
     const short_description = ref('');
     const cover_image = ref('');
     const id = ref('');
+    const fileInputRef = ref(null);
 
     const editor = new Editor({
       extensions: [
@@ -77,8 +78,14 @@ export default {
       `,
     });
 
+    // Функция, которая будет вызвана после монтирования элемента в DOM
+    onMounted(() => {
+      // Устанавливаем ссылку на DOM-элемент input
+      fileInputRef.value = document.querySelector('input[type="file"]');
+    });
+
     const openFileInput = () => {
-      this.$refs.fileInput.click();
+      fileInputRef.value.click();
     };
 
     const handleFile = async (event) => {
@@ -125,8 +132,7 @@ export default {
           if (response) {
             const imagePath = response.data;
             const fileName = imagePath.split('/').pop();
-            // this.editor.chain().focus().setImage({ src: '/images/articles_images/image1.jpg' }).run()
-            this.editor.chain().focus().setImage({ src: '/images/articles_images/' + fileName }).run();
+            editor.chain().focus().setImage({ src: '/images/articles_images/' + fileName }).run();
             console.log(response.data);
             console.log('/images/articles_images/' + fileName)
           }
@@ -174,6 +180,7 @@ export default {
       cover_image,
       id,
       editor,
+      fileInputRef,
       openFileInput,
       handleFile,
       addImage,
@@ -249,9 +256,16 @@ export default {
   }
 
   .custom-editor {
+    border: #1e066e solid;
     height: 50vh;
     max-height: 400px; /* Максимальная высота редактора */
     overflow-y: auto; /* Появляется вертикальный скролл, если контент выходит за пределы редактора */
+    line-height: 2;
+    
 }
-  </style>
+/* 
+.ProseMirror:focus {
+    outline: none;
+} */
+</style>
   
