@@ -23,9 +23,9 @@
                 <img src="/public/icons/upload_img.svg" class="btn-toolbar img" alt="icon"  @click="openFileInput">
 
                 <button class="btn-toolbar bold"  @click="toggleBold">B</button>
-                <button class="btn-toolbar italic">I</button>
-                <button class="btn-toolbar underline">U</button>
-                <button class="btn-toolbar strikethrough">S</button>
+                <button class="btn-toolbar italic" @click="toggleItalic">I</button>
+                <button class="btn-toolbar underline" @click="toggleUnderline">U</button>
+                <button class="btn-toolbar strikethrough" @click="toggleStrike">S</button>
             </div>
         </div>
         <editor-content :editor="editor" class="custom-editor"/>
@@ -38,11 +38,16 @@
   
   <script>
   import Document from '@tiptap/extension-document'
-  import Bold from '@tiptap/extension-bold'
   import Dropcursor from '@tiptap/extension-dropcursor'
-  import Image from '@tiptap/extension-image'
   import Paragraph from '@tiptap/extension-paragraph'
   import Text from '@tiptap/extension-text'
+
+  import Image from '@tiptap/extension-image'
+  import Bold from '@tiptap/extension-bold'
+  import Italic from '@tiptap/extension-italic'
+  import Strike from '@tiptap/extension-strike'
+  import Underline from '@tiptap/extension-underline'
+
   import { Editor, EditorContent } from '@tiptap/vue-3'
   import axios from 'axios';
   import { ref , onMounted } from 'vue';
@@ -68,6 +73,9 @@ export default {
         Image,
         Dropcursor,
         Bold,
+        Italic,
+        Strike,
+        Underline,
       ],
       content: `
         <p>This is a basic example of implementing images. </p>
@@ -81,12 +89,42 @@ export default {
     });
     
      // Функция для переключения стиля жирного текста
-     const toggleBold = () => {
+    const toggleBold = () => {
       if (editor) {
         if (editor.isActive('bold')) {
           editor.chain().focus().unsetBold().run();
         } else {
           editor.chain().focus().setBold().run();
+        }
+      }
+    };
+
+    const toggleItalic = () => {
+      if (editor) {
+        if (editor.isActive('italic')) {
+          editor.chain().focus().unsetItalic().run();
+        } else {
+          editor.chain().focus().setItalic().run();
+        }
+      }
+    };
+
+    const toggleStrike = () => {
+      if (editor) {
+        if (editor.isActive('strike')) {
+          editor.chain().focus().unsetStrike().run();
+        } else {
+          editor.chain().focus().setStrike().run();
+        }
+      }
+    };
+
+    const toggleUnderline = () => {
+      if (editor) {
+        if (editor.isActive('underline')) {
+          editor.chain().focus().unsetUnderline().run();
+        } else {
+          editor.chain().focus().setUnderline().run();
         }
       }
     };
@@ -194,6 +232,9 @@ export default {
       deleteImage,
       submitArticle,
       toggleBold,
+      toggleItalic,
+      toggleStrike,
+      toggleUnderline
      
     };
   },
