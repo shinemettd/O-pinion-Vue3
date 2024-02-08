@@ -3,11 +3,11 @@
       <h1>О нас</h1>
       <p>Информация о нас.</p>
     </div>
-  </template>
+</template>
   
-  <script>
+<script>
   export default {
     name: 'About'
   }
-  </script>
+</script>
   
