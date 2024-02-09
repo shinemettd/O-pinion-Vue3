@@ -19,13 +19,19 @@
         <h2>Добавление контента</h2>
         <div class="editor-tool">
             <div v-if="editor">
-                <input type="file" ref="fileInputRef" style="display: none;" @change="addImage">
-                <img src="/public/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
 
                 <button class="btn-toolbar bold"  @click="toggleBold">B</button>
                 <button class="btn-toolbar italic" @click="toggleItalic">I</button>
                 <button class="btn-toolbar underline" @click="toggleUnderline">U</button>
                 <button class="btn-toolbar strikethrough" @click="toggleStrike">S</button>
+                <div class="font-dropdown">
+                  <img src="/public/icons/search-font.svg" class="btn-toolbar font" alt="icon" @click="toggleFontMenu">
+                  <ul v-if="showFontMenu" class="font-menu">
+                    <li v-for="font in fontOptions" :key="font"  class="font-item" @click="setFont(font)" :style="{ fontFamily: font }">
+                      {{ font }}
+                    </li>
+                  </ul>
+                </div>
                 <button class="btn-toolbar link" @click="toggleLink">🔗</button>
                 <img src="/public/icons/align_left.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
                 <img src="/public/icons/align_justify.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('justify').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
@@ -36,6 +42,8 @@
                 <img src="/public/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleOrderedList().run()">
                 <img src="/public/icons/quotes.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
                 <img src="/public/icons/code.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
+                <input type="file" ref="fileInputRef" style="display: none;" @change="addImage">
+                <img src="/public/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
                
             </div>
         </div>
@@ -50,9 +58,11 @@
   <script>
    import { Editor, EditorContent } from '@tiptap/vue-3'
   import Document from '@tiptap/extension-document'
+  import FontFamily from '@tiptap/extension-font-family'
   import Dropcursor from '@tiptap/extension-dropcursor'
   import Paragraph from '@tiptap/extension-paragraph'
   import Text from '@tiptap/extension-text'
+  import TextStyle from '@tiptap/extension-text-style'
   import Heading from '@tiptap/extension-heading'
 
   import Image from '@tiptap/extension-image'
@@ -87,8 +97,10 @@ export default {
     const cover_image = ref('');
     const id = ref('');
     const fileInputRef = ref(null);
-
     const lowlight = createLowlight(common);
+
+    const showFontMenu = ref(false);
+    const fontOptions = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Tahoma', 'monospace'];
 
     const editor = new Editor({
       extensions: [
@@ -100,6 +112,8 @@ export default {
           types: ['heading', 'paragraph'],
         }),
         Image,
+        TextStyle,
+        FontFamily,
         Dropcursor,
         Bold,
         Italic,
@@ -127,6 +141,15 @@ export default {
       // Устанавливаем ссылку на DOM-элемент input
       fileInputRef.value = document.querySelector('input[type="file"]');
     });
+
+    const toggleFontMenu = () => {
+      showFontMenu.value = !showFontMenu.value;
+    };
+
+    const setFont = (font) => {
+      editor.chain().focus().setFontFamily(font).run();
+      toggleFontMenu(); 
+    };
     
     const setLink = () => {
       const previousUrl = editor.getAttributes('link').href
@@ -316,7 +339,11 @@ export default {
       toggleStrike,
       toggleUnderline,
       toggleLink,
-     
+      showFontMenu,
+      fontOptions,
+      toggleFontMenu,
+      setFont,
+
     };
   },
 
@@ -415,7 +442,7 @@ export default {
     margin-right: 5px;
     cursor: pointer;
     height: 2.5em;
-   
+    display: inline;
   }
 
   .btn-toolbar:hover {
@@ -442,8 +469,51 @@ export default {
   text-decoration: line-through;
 }
 
+.font-dropdown {
+  display: inline;
+  position: relative;
+}
 
 
+.font-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  z-index: 1;
+  min-width: 300px;
+  max-height: 150px;
+  overflow-y: auto; 
+}
 
+.font-menu li {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.font-menu li:hover {
+  background-color: #ddd;
+}
+
+.font-menu {
+  display: none;
+}
+
+.font-dropdown:hover .font-menu {
+  display: block;
+}
+
+.font-item {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.font-item:hover {
+  background-color: #ddd;
+}
 </style>
   
