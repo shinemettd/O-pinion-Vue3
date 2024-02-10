@@ -20,32 +20,44 @@
         <div class="editor-tool">
             <div v-if="editor">
 
-                <button class="btn-toolbar bold"  @click="toggleBold">B</button>
-                <button class="btn-toolbar italic" @click="toggleItalic">I</button>
-                <button class="btn-toolbar underline" @click="toggleUnderline">U</button>
-                <button class="btn-toolbar strikethrough" @click="toggleStrike">S</button>
+                <img src="/icons/type-bold.svg" class="btn-toolbar icon" alt="icon" @click="toggleBold">
+                <img src="/icons/type-italic.svg" class="btn-toolbar icon" alt="icon" @click="toggleItalic">
+                <img src="/icons/type-underline.svg" class="btn-toolbar icon" alt="icon" @click="toggleUnderline">
+                <img src="/icons/type-strikethrough.svg" class="btn-toolbar icon" alt="icon"  @click="toggleStrike">
+            
                 <div class="font-dropdown">
-                  <img src="/public/icons/search-font.svg" class="btn-toolbar font" alt="icon" @click="toggleFontMenu">
+                  <img src="/icons/search-font.svg" class="btn-toolbar icon" alt="icon" @click="toggleFontMenu">
                   <ul v-if="showFontMenu" class="font-menu">
-                    <li v-for="font in fontOptions" :key="font"  class="font-item" @click="setFont(font)" :style="{ fontFamily: font }">
+                    <li v-for="font in fontOptions" :key="font"  @click="setFont(font)" :style="{ fontFamily: font }">
                       {{ font }}
                     </li>
                   </ul>
                 </div>
-                <button class="btn-toolbar link" @click="toggleLink">🔗</button>
-                <img src="/public/icons/align_left.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
-                <img src="/public/icons/align_justify.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('justify').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
-                <img src="/public/icons/align_center.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
-                <img src="/public/icons/align_right.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
 
-                <img src="/public/icons/list-ul.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBulletList().run()">
-                <img src="/public/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleOrderedList().run()">
-                <img src="/public/icons/quotes.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
-                <img src="/public/icons/code.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
+                <img src="/icons/link.svg" class="btn-toolbar icon" alt="icon"   @click="toggleLink">
+                <img src="/icons/align_left.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
+                <img src="/icons/align_justify.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('justify').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
+                <img src="/icons/align_center.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
+                <img src="/icons/align_right.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
+
+                <img src="/icons/list-ul.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBulletList().run()">
+                <img src="/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleOrderedList().run()">
+                <img src="/icons/quotes.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
+                <img src="/icons/code.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
                 <input type="file" ref="fileInputRef" style="display: none;" @change="addImage">
-                <img src="/public/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
-               
-            </div>
+                <img src="/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
+
+              
+                <div class="math-dropdown">
+                  <img src="/icons/math-sign.svg" class="btn-toolbar icon" alt="icon" @click="toggleMathMenu">
+                  <ul v-if="showMathMenu" class="math-menu">
+                      <li v-for="operation in mathOptions" :key="operation.name" @click="insertMathOperation(operation)" class="list-item">
+                          <img v-if="operation.icon !== null" :src="operation.icon" class="math-icon" :alt="operation.name">
+                          <span v-else>{{ operation.value }}</span>
+                      </li>
+                  </ul>
+              </div>
+          </div>
         </div>
         <editor-content :editor="editor" class="custom-editor"/>
        
@@ -77,16 +89,15 @@
   import OrderedList from '@tiptap/extension-ordered-list'
   import Blockquote from '@tiptap/extension-blockquote'
   import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+  import {common, createLowlight} from 'lowlight'
 
+  import { Mathematics } from '@tiptap-pro/extension-mathematics'
+  import 'katex/dist/katex.min.css'
  
   import axios from 'axios';
   import { ref , onMounted } from 'vue';
   
-  import {common, createLowlight} from 'lowlight'
-
-
-
-export default {
+  export default {
   components: {
     EditorContent,
   },
@@ -100,7 +111,26 @@ export default {
     const lowlight = createLowlight(common);
 
     const showFontMenu = ref(false);
+    const showMathMenu = ref(false);
     const fontOptions = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Tahoma', 'monospace'];
+    const mathOptions = [
+                { name: '√x', icon: '/icons/sqrt.svg' , value: '$\\sqrt{x}$'},
+                { name: '√', icon: '/icons/root.svg', value: '$\\sqrt[n]{x}$' },
+                { name: 'power', icon: '/icons/power.svg', value: '$x^{n}$' },
+                { name: '∑', icon: '/icons/sum.svg', value: '$\\sum_{i=0}^n x_i$' },
+                { name: '∫', icon: '/icons/integral.svg', value: '$\\int_a^b x^2 dx$' },
+                { name: 'sin(x)', icon: null,  value:'sin(x)'},
+                { name: 'cos(x)', icon: null, value:'cos(x)'},
+                { name: 'tan(x)', icon: null, value:'tan(x)' },
+                { name: 'log(x)', icon: null, value: 'log(x)'},
+                { name: 'ln(x)',  icon: null, value: 'ln(x)'},
+                { name: 'binom', icon: '/icons/binom.svg', value: '$\\binom{n}{k}$' },
+                { name: '1/x', icon: '/icons/over.svg', value: '$\\frac{1}{x}$' },
+                { name: '(1/x)', icon: '/icons/over2.svg', value: '$\\left(\\frac{1}{x}\\right)$' },
+                { name: '𝝅', icon: null, value: '𝝅' },
+                { name: 'e', icon: null, value: 'e' },
+                { name: 'infinity', icon: '/icons/infinity.svg', value: '$\\infty$' }
+            ];
 
     const editor = new Editor({
       extensions: [
@@ -129,6 +159,7 @@ export default {
         CodeBlockLowlight.configure({
           lowlight,
         }),
+        Mathematics,
        
       ],
       content: `
@@ -141,6 +172,15 @@ export default {
       // Устанавливаем ссылку на DOM-элемент input
       fileInputRef.value = document.querySelector('input[type="file"]');
     });
+
+    const insertMathOperation = (operation) => {
+      //  editor.chain().focus().insertText(operation.value).run();
+      editor.commands.insertContent(operation.value);
+    }
+
+    const toggleMathMenu = () => {
+      showMathMenu.value = !showMathMenu.value;
+    };
 
     const toggleFontMenu = () => {
       showFontMenu.value = !showFontMenu.value;
@@ -340,13 +380,17 @@ export default {
       toggleUnderline,
       toggleLink,
       showFontMenu,
+      showMathMenu,
       fontOptions,
+      mathOptions,
       toggleFontMenu,
+      toggleMathMenu,
       setFont,
+      insertMathOperation,
 
     };
   },
-
+  
   beforeUnmount() {
     editor.destroy();
   },
@@ -430,8 +474,6 @@ export default {
     background-color: #f2f2f2;
     padding: 10px;
     border: 1px solid #ccc;
-    /* display: flex;
-    align-items: center; */
   }
 
   .btn-toolbar {
@@ -443,13 +485,15 @@ export default {
     cursor: pointer;
     height: 2.5em;
     display: inline;
+    width: 50px;
+    height: 40px;
   }
 
   .btn-toolbar:hover {
   background-color: #eaeaea;
   }
 
-  .icon {
+  .icon  {
     display: inline;
   }
 
@@ -469,13 +513,14 @@ export default {
   text-decoration: line-through;
 }
 
-.font-dropdown {
+.font-dropdown , .math-dropdown {
   display: inline;
   position: relative;
 }
 
 
-.font-menu {
+
+.font-menu , .math-menu{
   list-style: none;
   padding: 0;
   margin: 0;
@@ -490,16 +535,21 @@ export default {
   overflow-y: auto; 
 }
 
-.font-menu li {
+.font-menu li, .math-menu li {
   padding: 8px 16px;
   cursor: pointer;
+  max-height: 40px;
 }
 
-.font-menu li:hover {
+.math-menu li img {
+  max-height: 30px;
+}
+.font-menu li:hover , .math-menu li:hover{
   background-color: #ddd;
 }
 
-.font-menu {
+
+.font-menu , .math-menu{
   display: none;
 }
 
@@ -507,13 +557,11 @@ export default {
   display: block;
 }
 
-.font-item {
-  padding: 8px 16px;
-  cursor: pointer;
+.math-dropdown:hover .math-menu {
+  display: block;
 }
 
-.font-item:hover {
-  background-color: #ddd;
-}
+
+
 </style>
   
