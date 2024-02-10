@@ -34,6 +34,7 @@
     border-radius: 0.25rem;
     display: inline-block;
   }
+
 }
 
 .tiptap {
@@ -54,6 +55,31 @@
         color:rgb(59, 59, 239) ;
         text-decoration:underline;
     }
+
+    h1 {
+      font-size: 2em; 
+    }
+    
+    h2 {
+      font-size: 1.5em; 
+    }
+    
+    h3 {
+      font-size: 1.17em;
+    }
+    
+    h4 {
+      font-size: 1em; 
+    }
+    
+    h5 {
+      font-size: 0.83em; 
+    }
+    
+    h6 {
+      font-size: 0.67em; 
+    }
+ 
 
     a:hover {
         color: darkblue; 

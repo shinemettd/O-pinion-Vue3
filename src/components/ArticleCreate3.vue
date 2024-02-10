@@ -25,9 +25,9 @@
                 <img src="/icons/type-underline.svg" class="btn-toolbar icon" alt="icon" @click="toggleUnderline">
                 <img src="/icons/type-strikethrough.svg" class="btn-toolbar icon" alt="icon"  @click="toggleStrike">
             
-                <div class="font-dropdown">
+                <div class="dropdown">
                   <img src="/icons/search-font.svg" class="btn-toolbar icon" alt="icon" @click="toggleFontMenu">
-                  <ul v-if="showFontMenu" class="font-menu">
+                  <ul v-if="showFontMenu" class="menu">
                     <li v-for="font in fontOptions" :key="font"  @click="setFont(font)" :style="{ fontFamily: font }">
                       {{ font }}
                     </li>
@@ -48,15 +48,27 @@
                 <img src="/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
 
               
-                <div class="math-dropdown">
+                <div class="dropdown">
                   <img src="/icons/math-sign.svg" class="btn-toolbar icon" alt="icon" @click="toggleMathMenu">
-                  <ul v-if="showMathMenu" class="math-menu">
+                  <ul v-if="showMathMenu" class="menu">
                       <li v-for="operation in mathOptions" :key="operation.name" @click="insertMathOperation(operation)" class="list-item">
                           <img v-if="operation.icon !== null" :src="operation.icon" class="math-icon" :alt="operation.name">
                           <span v-else>{{ operation.value }}</span>
                       </li>
                   </ul>
               </div>
+              <div class="dropdown">
+                <img src="/icons/type-h1.svg" class="btn-toolbar icon" alt="icon"  @click="toggleHeadingMenu">
+                <ul v-if="showHeadingMenu" class="menu">
+                      <li v-for="heading in headings" :key="heading" @click="setHeading(heading.value)" class="list-item">
+                          <span>{{ heading.name }}</span>
+                      </li>
+                  </ul>
+              </div>
+             
+
+
+
           </div>
         </div>
         <editor-content :editor="editor" class="custom-editor"/>
@@ -112,6 +124,15 @@
 
     const showFontMenu = ref(false);
     const showMathMenu = ref(false);
+    const showHeadingMenu = ref(false);
+    const headings = [
+                { name: 'H1', value: 1 },
+                { name: 'H2', value: 2 },
+                { name: 'H3', value: 3 },
+                { name: 'H4', value: 4 },
+                { name: 'H5', value: 5 },
+                { name: 'H6', value: 6 }
+    ];
     const fontOptions = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Tahoma', 'monospace'];
     const mathOptions = [
                 { name: '√x', icon: '/icons/sqrt.svg' , value: '$\\sqrt{x}$'},
@@ -178,6 +199,9 @@
       editor.commands.insertContent(operation.value);
     }
 
+    const toggleHeadingMenu = () => {
+      showHeadingMenu.value = !showHeadingMenu.value;
+    }
     const toggleMathMenu = () => {
       showMathMenu.value = !showMathMenu.value;
     };
@@ -186,6 +210,10 @@
       showFontMenu.value = !showFontMenu.value;
     };
 
+    const setHeading = (value) => {
+      editor.chain().focus().toggleHeading({ level: value }).run();
+    };
+    
     const setFont = (font) => {
       editor.chain().focus().setFontFamily(font).run();
       toggleFontMenu(); 
@@ -381,11 +409,15 @@
       toggleLink,
       showFontMenu,
       showMathMenu,
+      showHeadingMenu,
       fontOptions,
       mathOptions,
+      headings,
       toggleFontMenu,
       toggleMathMenu,
+      toggleHeadingMenu,
       setFont,
+      setHeading,
       insertMathOperation,
 
     };
@@ -513,14 +545,14 @@
   text-decoration: line-through;
 }
 
-.font-dropdown , .math-dropdown {
+.dropdown {
   display: inline;
   position: relative;
 }
 
 
 
-.font-menu , .math-menu{
+.menu{
   list-style: none;
   padding: 0;
   margin: 0;
@@ -535,31 +567,29 @@
   overflow-y: auto; 
 }
 
-.font-menu li, .math-menu li {
+.menu li{
   padding: 8px 16px;
   cursor: pointer;
   max-height: 40px;
 }
 
-.math-menu li img {
+.menu li img {
   max-height: 30px;
 }
-.font-menu li:hover , .math-menu li:hover{
+.menu li:hover {
   background-color: #ddd;
 }
 
 
-.font-menu , .math-menu{
+.menu{
   display: none;
 }
 
-.font-dropdown:hover .font-menu {
+.dropdown:hover .menu {
   display: block;
 }
 
-.math-dropdown:hover .math-menu {
-  display: block;
-}
+
 
 
 
