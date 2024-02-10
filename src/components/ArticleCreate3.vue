@@ -17,60 +17,61 @@
         </div>
         
         <h2>Добавление контента</h2>
-        <div class="editor-tool">
-            <div v-if="editor">
-
-                <img src="/icons/type-bold.svg" class="btn-toolbar icon" alt="icon" @click="toggleBold">
-                <img src="/icons/type-italic.svg" class="btn-toolbar icon" alt="icon" @click="toggleItalic">
-                <img src="/icons/type-underline.svg" class="btn-toolbar icon" alt="icon" @click="toggleUnderline">
-                <img src="/icons/type-strikethrough.svg" class="btn-toolbar icon" alt="icon"  @click="toggleStrike">
-            
-                <div class="dropdown">
-                  <img src="/icons/search-font.svg" class="btn-toolbar icon" alt="icon" @click="toggleFontMenu">
-                  <ul v-if="showFontMenu" class="menu">
-                    <li v-for="font in fontOptions" :key="font"  @click="setFont(font)" :style="{ fontFamily: font }">
-                      {{ font }}
-                    </li>
-                  </ul>
-                </div>
-
-                <img src="/icons/link.svg" class="btn-toolbar icon" alt="icon"   @click="toggleLink">
-                <img src="/icons/align_left.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
-                <img src="/icons/align_justify.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('justify').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
-                <img src="/icons/align_center.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
-                <img src="/icons/align_right.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
-
-                <img src="/icons/list-ul.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBulletList().run()">
-                <img src="/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleOrderedList().run()">
-                <img src="/icons/quotes.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
-                <img src="/icons/code.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
-                <input type="file" ref="fileInputRef" style="display: none;" @change="addImage">
-                <img src="/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
-
+        <div v-if="editor" class="editor-tool">
+                <div class="main-tools">
+                  <img src="/icons/type-bold.svg" class="btn-toolbar icon" alt="icon" @click="toggleBold">
+                  <img src="/icons/type-italic.svg" class="btn-toolbar icon" alt="icon" @click="toggleItalic">
+                  <img src="/icons/type-underline.svg" class="btn-toolbar icon" alt="icon" @click="toggleUnderline">
+                  <img src="/icons/type-strikethrough.svg" class="btn-toolbar icon" alt="icon"  @click="toggleStrike">
               
-                <div class="dropdown">
-                  <img src="/icons/math-sign.svg" class="btn-toolbar icon" alt="icon" @click="toggleMathMenu">
-                  <ul v-if="showMathMenu" class="menu">
-                      <li v-for="operation in mathOptions" :key="operation.name" @click="insertMathOperation(operation)" class="list-item">
-                          <img v-if="operation.icon !== null" :src="operation.icon" class="math-icon" :alt="operation.name">
-                          <span v-else>{{ operation.value }}</span>
+                  <div class="dropdown">
+                    <img src="/icons/search-font.svg" class="btn-toolbar icon" alt="icon" @click="toggleFontMenu">
+                    <ul v-if="showFontMenu" class="menu">
+                      <li v-for="font in fontOptions" :key="font"  @click="setFont(font)" :style="{ fontFamily: font }">
+                        {{ font }}
                       </li>
-                  </ul>
-              </div>
-              <div class="dropdown">
-                <img src="/icons/type-h1.svg" class="btn-toolbar icon" alt="icon"  @click="toggleHeadingMenu">
-                <ul v-if="showHeadingMenu" class="menu">
-                      <li v-for="heading in headings" :key="heading" @click="setHeading(heading.value)" class="list-item">
-                          <span>{{ heading.name }}</span>
-                      </li>
-                  </ul>
-              </div>
-             
+                    </ul>
+                  </div>
 
+                  <div class="dropdown">
+                  <img src="/icons/type-h1.svg" class="btn-toolbar icon" alt="icon"  @click="toggleHeadingMenu">
+                  <ul v-if="showHeadingMenu" class="menu">
+                        <li v-for="heading in headings" :key="heading" @click="setHeading(heading.value)" class="list-item">
+                            <span>{{ heading.name }}</span>
+                        </li>
+                    </ul>
+                  </div>
 
+                  <img src="/icons/link.svg" class="btn-toolbar icon" alt="icon"   @click="toggleLink">
+                  <img src="/icons/align_left.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
+                  <img src="/icons/align_justify.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('justify').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
+                  <img src="/icons/align_center.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
+                  <img src="/icons/align_right.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
 
-          </div>
-        </div>
+                  <img src="/icons/list-ul.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBulletList().run()">
+                  <img src="/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleOrderedList().run()">
+                  <img src="/icons/quotes.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
+                  <img src="/icons/code.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
+                  <input type="file" ref="fileInputRef" style="display: none;" @change="addImage">
+                  <img src="/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
+
+                
+                  <div class="dropdown">
+                    <img src="/icons/math-sign.svg" class="btn-toolbar icon" alt="icon" @click="toggleMathMenu">
+                    <ul v-if="showMathMenu" class="menu">
+                        <li v-for="operation in mathOptions" :key="operation.name" @click="insertMathOperation(operation)" class="list-item">
+                            <img v-if="operation.icon !== null" :src="operation.icon" class="math-icon" :alt="operation.name">
+                            <span v-else>{{ operation.value }}</span>
+                        </li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div class="undo-redo">
+                  <img src="/icons/undo.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()">
+                  <img src="/icons/redo.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()">
+                </div>
+            </div>
         <editor-content :editor="editor" class="custom-editor"/>
        
   
@@ -105,6 +106,7 @@
 
   import { Mathematics } from '@tiptap-pro/extension-mathematics'
   import 'katex/dist/katex.min.css'
+  import History from '@tiptap/extension-history'
  
   import axios from 'axios';
   import { ref , onMounted } from 'vue';
@@ -181,6 +183,9 @@
           lowlight,
         }),
         Mathematics,
+        History.configure({
+          depth: 10,
+        }),
        
       ],
       content: `
@@ -213,7 +218,7 @@
     const setHeading = (value) => {
       editor.chain().focus().toggleHeading({ level: value }).run();
     };
-    
+
     const setFont = (font) => {
       editor.chain().focus().setFontFamily(font).run();
       toggleFontMenu(); 
@@ -506,6 +511,9 @@
     background-color: #f2f2f2;
     padding: 10px;
     border: 1px solid #ccc;
+    
+    display: flex;
+    justify-content: space-between;
   }
 
   .btn-toolbar {
@@ -589,6 +597,9 @@
   display: block;
 }
 
+/* .undo-redo {
+  display: inline;
+} */
 
 
 
