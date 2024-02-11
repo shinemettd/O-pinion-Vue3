@@ -78,7 +78,6 @@
 
                   <div class="dropdown">
                     <img src="/icons/highlighter.svg" id="colorPickerButton" class="btn-toolbar icon" alt="icon">
-                    <!-- <input type="color" id="colorPicker" style="display: none;"> -->
                     <ul v-if="showColorMenu" class="color-menu">
                           <li v-for="color in colors" :key="color" @click="highlightText(color)" class="color-item">
                             <div class="color-circle" :style="{ backgroundColor: color }"></div>
@@ -95,7 +94,11 @@
                 </div>
             </div>
         <editor-content :editor="editor" class="custom-editor"/>
-       
+        <div class="character-count" v-if="editor">
+          {{ editor.storage.characterCount.characters() }}/{{ limit }} characters
+          <br>
+          {{ editor.storage.characterCount.words() }} words
+        </div>
   
         <button class="btn" @click="submitArticle">Создать статью</button>
       </div>
@@ -130,6 +133,7 @@
   import 'katex/dist/katex.min.css'
   import History from '@tiptap/extension-history'
   import Highlight from '@tiptap/extension-highlight'
+  import CharacterCount from '@tiptap/extension-character-count'
  
   import axios from 'axios';
   import { ref , onMounted } from 'vue';
@@ -146,6 +150,7 @@
     const id = ref('');
     const fileInputRef = ref(null);
     const lowlight = createLowlight(common);
+    const limit = ref(40000);
 
     const showFontMenu = ref(false);
     const showMathMenu = ref(false);
@@ -213,6 +218,9 @@
           depth: 10,
         }),
         Highlight.configure({ multicolor: true }),
+        CharacterCount.configure({
+          limit: 40000,
+        }),
        
       ],
       content: `
@@ -350,7 +358,6 @@
       const file = event.target.files[0];
       if(!file) return;
       if(!isImage(file.name)) {
-        // alert('Пожалуйста, выберите файл с расширением .png, .jpg или .jpeg.');
         showModal();
         event.target.value = ''; // Очищаем выбранный файл
         return;
@@ -381,7 +388,6 @@
       const file = event.target.files[0];
       if(!file) return;
       if(!isImage(file.name)) {
-        // alert('Пожалуйста, выберите файл с расширением .png, .jpg или .jpeg.');
         showModal();
         event.target.value = ''; 
         return;
@@ -412,7 +418,7 @@
     };
 
     function isImage(fileName) {
-      const allowedExtensions = ['png', 'jpg', 'jpeg'];
+      const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif'];
       const fileExtension = fileName.split('.').pop().toLowerCase();
       return allowedExtensions.includes(fileExtension);
     }
@@ -486,7 +492,7 @@
       setHeading,
       insertMathOperation,
       highlightText,
-
+      limit,
     };
   },
   

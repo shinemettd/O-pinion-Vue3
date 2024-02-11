@@ -164,5 +164,9 @@
       border-radius: 0.25em;
       box-decoration-break: clone;
     }
+    .character-count {
+      margin-top: 1rem;
+      color: #868e96;
+    }
 
   }
