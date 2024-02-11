@@ -158,5 +158,11 @@
           font-weight: 700;
         }
     }
+    mark {
+      background-color: #ffe066;
+      padding: 0.3em 0;
+      border-radius: 0.25em;
+      box-decoration-break: clone;
+    }
 
   }

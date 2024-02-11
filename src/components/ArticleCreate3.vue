@@ -65,6 +65,18 @@
                         </li>
                     </ul>
                   </div>
+
+                  <div class="dropdown">
+                    <img src="/icons/highlighter.svg" id="colorPickerButton" class="btn-toolbar icon" alt="icon">
+                    <!-- <input type="color" id="colorPicker" style="display: none;"> -->
+                    <ul v-if="showColorMenu" class="color-menu">
+                          <li v-for="color in colors" :key="color" @click="highlightText(color)" class="color-item">
+                            <div class="color-circle" :style="{ backgroundColor: color }"></div>
+                          </li>
+                    </ul>
+                  </div>
+                  
+
                 </div>
                 
                 <div class="undo-redo">
@@ -107,6 +119,7 @@
   import { Mathematics } from '@tiptap-pro/extension-mathematics'
   import 'katex/dist/katex.min.css'
   import History from '@tiptap/extension-history'
+  import Highlight from '@tiptap/extension-highlight'
  
   import axios from 'axios';
   import { ref , onMounted } from 'vue';
@@ -127,6 +140,9 @@
     const showFontMenu = ref(false);
     const showMathMenu = ref(false);
     const showHeadingMenu = ref(false);
+    const showColorMenu = ref(false);
+    const colors = ['#DBA945','#FC8282','#9ADEFF','#9AFFC3'];
+
     const headings = [
                 { name: 'H1', value: 1 },
                 { name: 'H2', value: 2 },
@@ -186,6 +202,7 @@
         History.configure({
           depth: 10,
         }),
+        Highlight.configure({ multicolor: true }),
        
       ],
       content: `
@@ -195,12 +212,20 @@
 
     // Функция, которая будет вызвана после монтирования элемента в DOM
     onMounted(() => {
-      // Устанавливаем ссылку на DOM-элемент input
+    
       fileInputRef.value = document.querySelector('input[type="file"]');
+      const colorPickerButton = document.getElementById('colorPickerButton');
+
+      colorPickerButton.addEventListener('click', () => {
+        showColorMenu.value = !showColorMenu.value;
+      });
+
     });
 
+    const highlightText = (selectedColor) => {
+      editor.chain().focus().toggleHighlight({ color: selectedColor}).run();
+    }
     const insertMathOperation = (operation) => {
-      //  editor.chain().focus().insertText(operation.value).run();
       editor.commands.insertContent(operation.value);
     }
 
@@ -228,12 +253,10 @@
       const previousUrl = editor.getAttributes('link').href
       const url = window.prompt('URL', previousUrl)
 
-      // cancelled
       if (url === null) {
         return
       }
 
-      // empty
       if (url === '') {
         editor
           .chain()
@@ -245,7 +268,6 @@
         return
       }
 
-      // update link
       editor
         .chain()
         .focus()
@@ -254,7 +276,6 @@
         .run()
     };
 
-     // Функция для переключения стиля жирного текста
     const toggleBold = () => {
       if (editor) {
         if (editor.isActive('bold')) {
@@ -415,8 +436,10 @@
       showFontMenu,
       showMathMenu,
       showHeadingMenu,
+      showColorMenu,
       fontOptions,
       mathOptions,
+      colors,
       headings,
       toggleFontMenu,
       toggleMathMenu,
@@ -424,6 +447,7 @@
       setFont,
       setHeading,
       insertMathOperation,
+      highlightText,
 
     };
   },
@@ -501,8 +525,8 @@
   .custom-editor {
     border: #1e066e solid;
     height: 50vh;
-    max-height: 400px; /* Максимальная высота редактора */
-    overflow-y: auto; /* Появляется вертикальный скролл, если контент выходит за пределы редактора */
+    max-height: 400px; 
+    overflow-y: auto;
     line-height: 2;
     padding: 20px;
     
@@ -575,7 +599,29 @@
   overflow-y: auto; 
 }
 
-.menu li{
+.color-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  z-index: 1;
+  min-width: 200px;
+  max-height: 60px;
+  overflow-x: auto; 
+  display: flex;
+}
+.color-circle {
+    width: 20px;
+    height: 20px; 
+    border-radius: 50%; 
+    display: inline-block; 
+}
+
+.menu li, .color-menu li{
   padding: 8px 16px;
   cursor: pointer;
   max-height: 40px;
@@ -589,7 +635,7 @@
 }
 
 
-.menu{
+.menu, .color-menu {
   display: none;
 }
 
@@ -597,12 +643,9 @@
   display: block;
 }
 
-/* .undo-redo {
-  display: inline;
-} */
-
-
-
+.dropdown:hover .color-menu {
+  display: flex;
+}
 
 </style>
   
