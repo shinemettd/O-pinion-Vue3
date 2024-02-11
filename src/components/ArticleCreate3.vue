@@ -15,6 +15,16 @@
             <input type="file" @change="handleFile" accept="image/*"/>
             <button class="delete-btn" @click="deleteImage">Удалить</button> 
         </div>
+        <div id="myModal" class="modal">
+          <div class="modal-content">
+            <div class="close">&times;</div>
+            <div class="warning">
+                <img src="/icons/warning.svg" class="warning-icon" alt="wsrning">
+                <p>Пожалуйста, выберите изображение</p>
+            </div>
+            <img src="/icons/mem.jpg" alt="image">
+          </div>
+        </div>
         
         <h2>Добавление контента</h2>
         <div v-if="editor" class="editor-tool">
@@ -52,7 +62,7 @@
                   <img src="/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleOrderedList().run()">
                   <img src="/icons/quotes.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
                   <img src="/icons/code.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
-                  <input type="file" ref="fileInputRef" style="display: none;" @change="addImage">
+                  <input type="file" ref="fileInputRef" style="display: none;" @change="addImage" accept="image/*">
                   <img src="/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
 
                 
@@ -220,6 +230,12 @@
         showColorMenu.value = !showColorMenu.value;
       });
 
+       // Закрыть всплывающее окно при нажатии на "X"
+      document.querySelector('.close').addEventListener('click', function() {
+        const modal = document.getElementById('myModal');
+        modal.style.display = 'none';
+      });
+
     });
 
     const highlightText = (selectedColor) => {
@@ -332,8 +348,14 @@
 
     const handleFile = async (event) => {
       const file = event.target.files[0];
-      if (file) {
-        try {
+      if(!file) return;
+      if(!isImage(file.name)) {
+        // alert('Пожалуйста, выберите файл с расширением .png, .jpg или .jpeg.');
+        showModal();
+        event.target.value = ''; // Очищаем выбранный файл
+        return;
+      }
+      try {
           const formData = new FormData();
           formData.append('photo', file);
     
@@ -353,13 +375,18 @@
         } catch (error) {
           console.error('Ошибка загрузки изображения:', error);
         }
-      }
     };
 
     const addImage = async (event) => {
       const file = event.target.files[0];
-      if (file) {
-        try {
+      if(!file) return;
+      if(!isImage(file.name)) {
+        // alert('Пожалуйста, выберите файл с расширением .png, .jpg или .jpeg.');
+        showModal();
+        event.target.value = ''; 
+        return;
+      }
+      try {
           const formData = new FormData();
           formData.append('photo', file);
     
@@ -372,7 +399,7 @@
           });
     
           if (response) {
-            const imagePath = response.data;
+            const imagePath = response.data; // добавить в массив фотографий путь до этой фотографии чтобы можно было удалить 
             const fileName = imagePath.split('/').pop();
             editor.chain().focus().setImage({ src: '/images/articles_images/' + fileName }).run();
             console.log(response.data);
@@ -382,8 +409,19 @@
         } catch (error) {
           console.error('Ошибка загрузки изображения:', error);
         }
-      }
     };
+
+    function isImage(fileName) {
+      const allowedExtensions = ['png', 'jpg', 'jpeg'];
+      const fileExtension = fileName.split('.').pop().toLowerCase();
+      return allowedExtensions.includes(fileExtension);
+    }
+
+    function showModal() {
+      const modal = document.getElementById('myModal');
+      modal.style.display = 'block';
+    }
+
 
     const deleteImage = async (event) => {
       console.log("Удаление картинки");
@@ -524,8 +562,8 @@
   }
   .custom-editor {
     border: #1e066e solid;
-    height: 50vh;
-    max-height: 400px; 
+    height: 80vh;
+    max-height: 700px; 
     overflow-y: auto;
     line-height: 2;
     padding: 20px;
@@ -547,10 +585,27 @@
     padding: 6px 10px;
     margin-right: 5px;
     cursor: pointer;
-    height: 2.5em;
+    /* height: 2.5em; */
     display: inline;
     width: 50px;
     height: 40px;
+  }
+
+  .warning {
+    display: flex;
+    align-items: flex-end;
+  }
+  .warning p{
+    display: inline;
+    margin-bottom: 10px;
+    flex-grow: 1;
+  }
+  .warning-icon {
+    border-radius: 4px;
+    display: inline;
+    width: 70px;
+    height: 60px;
+    margin-right: 10px;
   }
 
   .btn-toolbar:hover {
@@ -646,6 +701,47 @@
 .dropdown:hover .color-menu {
   display: flex;
 }
+
+
+.modal {
+  display: none; /* Скрыто по умолчанию */
+  position: fixed; /* Зафиксированное положение */
+  z-index: 1; /* Наверху */
+  left: 0;
+  top: 0;
+  width: 100%; /* Ширина экрана */
+  height: 100%; /* Высота экрана */
+  overflow: auto; /* Разрешить прокрутку */
+  background-color: rgb(0,0,0); /* Черный фон */
+  background-color: rgba(0,0,0,0.4); /* Черный фон с прозрачностью */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+}
+
+.modal-content img {
+  margin: auto;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 
 </style>
   
