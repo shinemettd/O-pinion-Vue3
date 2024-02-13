@@ -1,20 +1,22 @@
 <template>
     <div class="article-container">
       <div class="article-form">
-        <h2>Создание статьи</h2>
   
         <label for="title">Заголовок:</label>
-        <input v-model="title" type="text" id="title"/>
+        <input v-model="title" type="text" id="title" class="title-input"/>
+
+        <div class="cover-image">
+            <label for="cover-image">Главное изображение (выберите файл):</label>
+            <img id="uploaded-image" src="" alt="Загруженное изображение">
+            <div class="image-upload">
+                <!-- <input type="file" @change="handleFile" accept="image/*"/> -->
+                <button class="delete-btn" @click="deleteImage">Удалить</button> 
+            </div>
+        </div>
   
         <label for="short-description">Краткое описание:</label>
-        <textarea v-model="short_description" id="short-description"></textarea>
+        <Editor/>
   
-        <label for="cover-image">Главное изображение (выберите файл):</label>
-        <img id="uploaded-image" src="" alt="Загруженное изображение">
-        <div class="image-upload">
-            <!-- <input type="file" @change="handleFile" accept="image/*"/> -->
-            <button class="delete-btn" @click="deleteImage">Удалить</button> 
-        </div>
         <div id="myModal" class="modal">
           <div class="modal-content">
             <div class="close">&times;</div>
@@ -26,11 +28,10 @@
           </div>
         </div>
         
-        <h2>Добавление контента</h2>
+        <h2>Содержание статьи :</h2>
 
-        <!-- editor -->
-
-        <Editor :showModal="showModal"/>
+    
+        <ArticleEditor :showModal="showModal"/>
 
         <button class="btn" @click="submitArticle">Создать статью</button>
       </div>
@@ -38,12 +39,14 @@
 </template>
 
 <script>
+import ArticleEditor from "@/components/ArticleEditor.vue";
 import Editor from "@/components/Editor.vue";
 import axios from "axios";
 import { ref , onMounted } from 'vue';
 
 export default {
   components: {
+    ArticleEditor,
     Editor
   },
   setup() {
@@ -184,15 +187,15 @@ label {
     font-weight: bold;
 }
 
-/* input,
-textarea {
-    width: 100%;
+.title-input {
+    min-width: 100%;
+    height: 2em;
+    font-size: 2em; /* Размер текста в поле ввода */
+    max-width: 500px; 
+    border:#333 solid 1px;
     padding: 10px;
-    margin-bottom: 16px;
-    box-sizing: border-box;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-} */
+    border-radius: 10px;
+}
 
 
 .btn, .delete-btn{
