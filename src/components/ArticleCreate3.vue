@@ -106,7 +106,7 @@
   </template>
   
   <script>
-   import { Editor, EditorContent } from '@tiptap/vue-3'
+  import { Editor, EditorContent } from '@tiptap/vue-3'
   import Document from '@tiptap/extension-document'
   import FontFamily from '@tiptap/extension-font-family'
   import Dropcursor from '@tiptap/extension-dropcursor'
@@ -134,8 +134,8 @@
   import History from '@tiptap/extension-history'
   import Highlight from '@tiptap/extension-highlight'
   import CharacterCount from '@tiptap/extension-character-count'
- 
-  import axios from 'axios';
+  
+  import axios from "axios";
   import { ref , onMounted } from 'vue';
   
   export default {
@@ -143,7 +143,7 @@
     EditorContent,
   },
   setup() {
-    // const lowlight = createLowlight(common)
+
     const title = ref('');
     const short_description = ref('');
     const cover_image = ref('');

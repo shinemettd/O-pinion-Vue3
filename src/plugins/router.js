@@ -3,15 +3,14 @@ import HelloWorldPage from "@/pages/HelloWorldPage.vue";
 import MainPage from "@/pages/MainPage.vue";
 import About from '@/components/About.vue';
 import Person from '@/components/Person.vue';
-// import ArticleCreate from "@/components/ArticleCreate.vue";
-// import ArticleCreate2 from "@/components/ArticleCreate2.vue";
-import ArticleCreate3 from "@/components/ArticleCreate3.vue";
+
 import Notification from "@/components/Notification.vue";
 import Register from "@/components/Register.vue";
 import Auth from "@/components/Auth.vue";
 import ArticlePage from "@/pages/ArticlePage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
-
+// потом убрать 
+import ArticleCreatePage from "@/pages/ArticleCreatePage.vue";
 
 
 export default createRouter({
@@ -40,8 +39,8 @@ export default createRouter({
     },
     {
       path: '/create-article',
-      name: 'ArticleCreate',
-      component: ArticleCreate3
+      name: 'ArticleCreatePage',
+      component: ArticleCreatePage
     },
     {
       path: '/notification',
