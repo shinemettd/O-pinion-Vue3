@@ -4,8 +4,8 @@
   
         <label for="title">Заголовок:</label>
         <input v-model="title" type="text" id="title" class="title-input"/>
-        <p v-if="title.length > 120" style="color: red;">Превышен лимит символов {{ title.length }}/120</p>
-
+        <p :style="{ color: title.length > 120 ? 'red' : 'black' }">{{ title.length }}/120</p>
+        
         <div class="cover-image">
 
             <div
