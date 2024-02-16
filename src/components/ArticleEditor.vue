@@ -37,7 +37,7 @@
                   <img src="/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleOrderedList().run()">
                   <img src="/icons/quotes.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
                   <img src="/icons/code.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
-                  <input type="file" ref="fileInputRef" style="display: none;" @change="addImage" accept="image/*">
+                  <input type="file"  style="display: none;" @change="addImage" accept="image/*" id = "addImage">
                   <img src="/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
 
                 
@@ -121,7 +121,8 @@ export default {
         const lowlight = createLowlight(common);
         const limit = ref(40000);
 
-        const fileInputRef = ref(null);
+        const imageInput = ref(null);
+
         const showFontMenu = ref(false);
         const showMathMenu = ref(false);
         const showHeadingMenu = ref(false);
@@ -200,7 +201,7 @@ export default {
 
         // Функция, которая будет вызвана после монтирования элемента в DOM
         onMounted(() => {
-            fileInputRef.value = document.querySelector('input[type="file"]');
+            imageInput.value = document.getElementById('addImage');
 
             const colorPickerButton = document.getElementById('colorPickerButton');
 
@@ -315,7 +316,7 @@ export default {
         };
 
         const openFileInput = () => {
-            fileInputRef.value.click();
+            imageInput.value.click();
         };
 
         const addImage = async (event) => {

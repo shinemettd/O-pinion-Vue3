@@ -4,14 +4,36 @@
   
         <label for="title">Заголовок:</label>
         <input v-model="title" type="text" id="title" class="title-input"/>
+        <p v-if="title.length > 120" style="color: red;">Превышен лимит символов {{ title.length }}/120</p>
 
         <div class="cover-image">
-            <label for="cover-image">Главное изображение (выберите файл):</label>
-            <img id="uploaded-image" src="" alt="Загруженное изображение">
-            <div class="image-upload">
-                <!-- <input type="file" @change="handleFile" accept="image/*"/> -->
-                <button class="delete-btn" @click="deleteImage">Удалить</button> 
+
+            <div
+            class="drop-zone"
+            @drop="dropFile($event)"
+            @dragover.prevent
+            @dragenter.prevent
+            @dragleave.prevent
+            >
+            <p>Перетащите файл сюда или нажмите для выбора файла</p>
+            <input
+              type="file"
+              id="addCoverImage"
+              style="display: none"
+              @change="handleFile"
+              accept="image/*"
+            />
+            <button @click="openFileInput">Выбрать файл</button>
+
+          </div>
+
+          <div v-if="isCoverImageValid">
+            <p>Главное изображение статьи: {{ coverImageFile.name }}</p>
+            <div class="image-container">
+              <img :src="coverImageSrc" alt="uploaded-image" id="uploaded-image"/>
+              <img src="/icons/trash-can.svg" class="delete-button" alt="delete-icon" @click="removeImage"/>
             </div>
+          </div>
         </div>
   
         <label for="short-description">Краткое описание:</label>
@@ -50,13 +72,19 @@ export default {
     Editor
   },
   setup() {
+    const coverImageFile = ref(null);
+    const coverImageinput = ref(null);
     const title = ref('');
     const short_description = ref('');
-    const cover_image = ref('');
+    const coverImageServerPath= ref('');
+    const coverImageSrc = ref('');
     const id = ref('');
+    const isCoverImageValid = ref(false);
 
 
     onMounted(() => {
+
+        coverImageinput.value = document.getElementById('addCoverImage');
 
         // Закрыть всплывающее окно при нажатии на "X"
         document.querySelector('.close').addEventListener('click', function() {
@@ -66,18 +94,116 @@ export default {
 
     });
 
+    const openFileInput = () => {
+      coverImageinput.value.click();
+    };
+
+    const removeImage = () => {
+      coverImageFile.value = null;
+      coverImageSrc.value = '';
+      isCoverImageValid.value = false;
+    };
 
     const handleFile = async (event) => {
-      const file = event.target.files[0];
-      if(!file) return;
-      if(!isImage(file.name)) {
-        showModal();
-        event.target.value = ''; // Очищаем выбранный файл
+      console.log("IN handle FILE");
+      const files = event.target.files;
+      if (files.length > 0) {
+        coverImageFile.value = null; // чтобы рендерились изменения 
+        coverImageFile.value = files[0];
+      } else {
+        console.log("Пользователь отменил выбор файла.");
         return;
       }
+      if(await isImageValid(coverImageFile)) {
+        console.log('valid image');
+        isCoverImageValid.value = true;
+        coverImageSrc.value = URL.createObjectURL(coverImageFile.value);
+      } else {
+        isCoverImageValid.value = false;
+        coverImageSrc.value = '';
+      }
+
+
+    };
+
+    async function isImageValid(file) {
+      if(!file) return;
+      if(!isImage(file.value.name)) {
+        showModal();
+        return false;
+      }
+      const maxSize = 2 * 1024 * 1024;
+      if(file._value.size >  maxSize) {
+        alert('Размер файла превышает 2МБ ');
+        return false;
+      }
+      
+      try {
+        const isSizeValid = await isRequiredSize(file.value);
+        if (!isSizeValid) {
+          alert("Изображение должно быть не меньше 400px * 400px и не больше 2000px на 2000px");
+          return false;
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Ошибка при проверке размера изображения.");
+        return false;
+      }
+      return true;
+    }
+
+
+    function isRequiredSize (file) {
+      return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+        console.log('Width:', width);
+        console.log('Height:', height);
+
+        if (width > 400 && height > 400 && width < 2000 && height < 2000) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      };
+      img.onerror = () => {
+        reject(new Error("Ошибка загрузки изображения"));
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+    }
+
+    const  dropFile = async (event) => {
+      event.preventDefault();
+      console.log("IN DROP FILE");
+      const files = event.dataTransfer.files;
+      if (files.length > 0) {
+        coverImageFile.value = null; // чтобы рендерились изменения 
+        coverImageFile.value = files[0];
+      } else {
+        console.log("Пользователь отменил выбор файла.");
+        return;
+      }
+      if(await isImageValid(coverImageFile)) {
+        console.log('valid image');
+        isCoverImageValid.value = true;
+        coverImageSrc.value = URL.createObjectURL(coverImageFile.value);
+      } else {
+        isCoverImageValid.value = false;
+        coverImageSrc.value = '';
+      }
+
+
+    };
+
+
+    const loadImageOnServer = async () => {
       try {
           const formData = new FormData();
-          formData.append('photo', file);
+          formData.append('photo', file.value);
     
           const accessToken = localStorage.getItem('accessToken');
           const response = await axios.post('http://194.152.37.7:8812/api/images', formData, {
@@ -86,17 +212,17 @@ export default {
               'Content-Type': 'multipart/form-data'
             }
           });
-    
-          cover_image.value = response.data;
+          console.log('Изображение успешно загружено:');
+
+          // cover_image.value = response.data;
           const imgElement = document.getElementById('uploaded-image');
           const fileName = cover_image.value.split('/').pop();
           imgElement.src = '/images/articles_images/' + fileName;
-          console.log('Изображение успешно загружено:', imgElement.src);
+          
         } catch (error) {
           console.error('Ошибка загрузки изображения:', error);
         }
-    };
-
+    }
 
     function isImage(fileName) {
       const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif'];
@@ -147,12 +273,17 @@ export default {
     return {
       title,
       short_description,
-      cover_image,
       id,
       handleFile,
       deleteImage,
       submitArticle,
       showModal,
+      openFileInput,
+      dropFile,
+      coverImageFile,
+      isCoverImageValid,
+      coverImageSrc,
+      removeImage
     };
 
   }
@@ -189,12 +320,13 @@ label {
 
 .title-input {
     min-width: 100%;
+    max-width: 100%;
     height: 2em;
     font-size: 2em; /* Размер текста в поле ввода */
-    max-width: 500px; 
     border:#333 solid 1px;
     padding: 10px;
     border-radius: 10px;
+    overflow-x: auto !important;
 }
 
 
@@ -275,6 +407,27 @@ label {
 .close:focus {
   color: black;
   text-decoration: none;
+  cursor: pointer;
+}
+
+.drop-zone {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 24px; /* Установите ширину иконки */
+  height: 24px; /* Установите высоту иконки */
   cursor: pointer;
 }
 
