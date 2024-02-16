@@ -7,14 +7,6 @@
                     <img src="/icons/type-underline.svg" class="toolbar-item" alt="icon" @click="toggleUnderline">
                     <img src="/icons/type-strikethrough.svg" class="toolbar-item" alt="icon"  @click="toggleStrike">
                 
-                    <div class="dropdown">
-                    <img src="/icons/search-font.svg" class="toolbar-item" alt="icon" @click="toggleFontMenu">
-                    <ul v-if="showFontMenu" class="toolbar-menu">
-                        <li v-for="font in fontOptions" :key="font"  @click="setFont(font)" :style="{ fontFamily: font }">
-                        {{ font }}
-                        </li>
-                    </ul>
-                    </div>
                     <img src="/icons/link.svg" class="toolbar-item" alt="icon"   @click="toggleLink">
 
                     <img src="/icons/quotes.svg" class="toolbar-item" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
@@ -51,7 +43,6 @@
 <script>
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import Document from '@tiptap/extension-document'
-import FontFamily from '@tiptap/extension-font-family'
 import Dropcursor from '@tiptap/extension-dropcursor'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
@@ -110,7 +101,6 @@ export default {
             Document,
             Paragraph,
             Text,
-            FontFamily,
             Dropcursor,
             Bold,
             Italic,
@@ -244,13 +234,9 @@ export default {
             toggleStrike,
             toggleUnderline,
             toggleLink,
-            showFontMenu,
             showMathMenu,
-            fontOptions,
             mathOptions,
-            toggleFontMenu,
             toggleMathMenu,
-            setFont,
             insertMathOperation,
             limit,
         };
