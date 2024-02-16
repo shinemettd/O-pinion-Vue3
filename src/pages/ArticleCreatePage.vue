@@ -3,7 +3,7 @@
       <div class="article-form">
   
         <label for="title">Заголовок:</label>
-        <input v-model="title" type="text" id="title" class="title-input"/>
+        <input v-model="title" type="text" id="title" class="title-input" @input="limitInputLength" :maxlength="title.length >= 120 ? 120 : null" />
         <p :style="{ color: title.length > 120 ? 'red' : 'black' }">{{ title.length }}/120</p>
         
         <div class="cover-image">
@@ -94,6 +94,11 @@ export default {
 
     });
 
+    const limitInputLength = () => {
+      if (title.length > 120) {
+        title = title.slice(0, 120); // Обрезаем текст до 120 символов
+      }
+    }
     const openFileInput = () => {
       coverImageinput.value.click();
     };
@@ -283,7 +288,8 @@ export default {
       coverImageFile,
       isCoverImageValid,
       coverImageSrc,
-      removeImage
+      removeImage,
+      limitInputLength
     };
 
   }

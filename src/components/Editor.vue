@@ -14,7 +14,7 @@
                 
                     <div class="dropdown">
                         <img src="/icons/math-sign.svg" class="toolbar-item" alt="icon" @click="toggleMathMenu">
-                        <ul v-if="showMathMenu" class="toolbar-item">
+                        <ul v-if="showMathMenu" class="toolbar-menu">
                             <li v-for="operation in mathOptions" :key="operation.name" @click="insertMathOperation(operation)" class="list-item">
                                 <img v-if="operation.icon !== null" :src="operation.icon" class="math-icon" :alt="operation.name">
                                 <span v-else>{{ operation.value }}</span>
