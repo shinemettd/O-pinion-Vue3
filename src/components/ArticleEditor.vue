@@ -40,6 +40,8 @@
                   <input type="file"  style="display: none;" @change="addImage" accept="image/*" id = "addImage">
                   <img src="/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
 
+                  <img src="/icons/rm-image.svg" class="btn-toolbar icon" alt="icon"  @click="deleteSelection">
+
                 
                   <div class="dropdown">
                     <img src="/icons/math-sign.svg" class="btn-toolbar icon" alt="icon" @click="toggleMathMenu">
@@ -59,6 +61,8 @@
                           </li>
                     </ul>
                   </div>
+                 
+                  
                   
 
                 </div>
@@ -211,6 +215,18 @@ export default {
             });
 
         });
+
+        const deleteSelection = () => {
+            const selection = editor.state.selection;
+            if (selection.node && selection.node.attrs && selection.node.attrs.src) {
+                const src = selection.node.attrs.src;
+                console.log("Путь к изображению:", src);
+                const imagePath = '/home/opinion/opinion-front' + src;
+                editor.commands.deleteSelection();
+                console.log('Путь к картинке на сервере : ' + imagePath);
+            }
+        };
+        
 
         const getHTMLContent = () => {
             return editor.getHTML();
@@ -395,6 +411,7 @@ export default {
             openFileInput,
             addImage,
             getHTMLContent,
+            deleteSelection,
         };
     },
 
