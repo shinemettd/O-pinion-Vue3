@@ -224,9 +224,26 @@ export default {
                 const imagePath = '/home/opinion/opinion-front' + src;
                 editor.commands.deleteSelection();
                 console.log('Путь к картинке на сервере : ' + imagePath);
+                deleteImageFromServer(imagePath);
             }
         };
         
+        const deleteImageFromServer = async(imagePath) => {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+
+                const response = await axios.delete(`http://194.152.37.7:8812/api/images?image-path=${encodeURIComponent(imagePath)}`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                console.log('Изображение успешно удалено');
+            } catch (error) {
+                console.error('Ошибка удаления изображения:', error);
+            }
+
+        }
 
         const getHTMLContent = () => {
             return editor.getHTML();
