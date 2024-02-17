@@ -112,7 +112,7 @@ import { ref , onMounted } from 'vue';
 import axios from "axios";
 
 export default {
-    props: ['showModal'],
+    props: ['showModal', 'isImageValid'],
     components: {
         EditorContent,
     },
@@ -201,6 +201,7 @@ export default {
 
         // Функция, которая будет вызвана после монтирования элемента в DOM
         onMounted(() => {
+
             imageInput.value = document.getElementById('addImage');
 
             const colorPickerButton = document.getElementById('colorPickerButton');
@@ -210,6 +211,11 @@ export default {
             });
 
         });
+
+        const getHTMLContent = () => {
+            return editor.getHTML();
+        };
+
 
         const highlightText = (selectedColor) => {
             editor.chain().focus().toggleHighlight({ color: selectedColor}).run();
@@ -320,22 +326,19 @@ export default {
         };
 
         const addImage = async (event) => {
-            const file = event.target.files[0];
-            if(!file) return;
-            if(!isImage(file.name)) {
-                console.log(typeof props.showModal); // Проверка типа значения showModal
+            const imageFile = ref(event.target.files[0]);
+            if(await props.isImageValid(imageFile)) {
+                console.log('valid image');
+                loadImageOnServer(imageFile);
 
-                // Проверка на то, что showModal - это функция
-                if (typeof props.showModal === 'function') {
-                    props.showModal(); // Вызов функции showModal, переданной через props
-                }
-                props.showModal(); // Вызов функции showModal, переданной через props
-                event.target.value = ''; 
-                return;
             }
+        };
+        
+
+        const loadImageOnServer = async(file) => {
             try {
             const formData = new FormData();
-            formData.append('photo', file);
+            formData.append('photo', file.value);
         
             const accessToken = localStorage.getItem('accessToken');
             const response = await axios.post('http://194.152.37.7:8812/api/images', formData, {
@@ -346,7 +349,7 @@ export default {
             });
         
             if (response) {
-                const imagePath = response.data; // добавить в массив фотографий путь до этой фотографии чтобы можно было удалить 
+                const imagePath = response.data; 
                 const fileName = imagePath.split('/').pop();
                 editor.chain().focus().setImage({ src: '/images/articles_images/' + fileName }).run();
                 console.log(response.data);
@@ -356,14 +359,14 @@ export default {
             } catch (error) {
             console.error('Ошибка загрузки изображения:', error);
             }
-        };
+        }
+
 
         function isImage(fileName) {
             const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif'];
             const fileExtension = fileName.split('.').pop().toLowerCase();
             return allowedExtensions.includes(fileExtension);
         }
-
 
 
         return {
@@ -391,6 +394,7 @@ export default {
             limit,
             openFileInput,
             addImage,
+            getHTMLContent,
         };
     },
 

@@ -37,7 +37,7 @@
         </div>
   
         <label for="short-description">Краткое описание:</label>
-        <Editor/>
+        <Editor  ref="EditorComponentRef"/>
   
         <div id="myModal" class="modal">
           <div class="modal-content">
@@ -53,7 +53,7 @@
         <h2>Содержание статьи :</h2>
 
     
-        <ArticleEditor :showModal="showModal"/>
+        <ArticleEditor ref="ArticleEditorComponentRef" :showModal="showModal" :isImageValid="isImageValid"/>
 
         <button class="btn" @click="submitArticle">Создать статью</button>
       </div>
@@ -74,13 +74,16 @@ export default {
   setup() {
     const coverImageFile = ref(null);
     const coverImageinput = ref(null);
-    const title = ref('');
-    const short_description = ref('');
-    const coverImageServerPath= ref('');
     const coverImageSrc = ref('');
-    const id = ref('');
     const isCoverImageValid = ref(false);
 
+    const title = ref('');
+    const short_description = ref('');
+    const articleId = ref('');
+    
+
+    const ArticleEditorComponentRef = ref(null);
+    const EditorComponentRef = ref(null);
 
     onMounted(() => {
 
@@ -112,13 +115,12 @@ export default {
     const handleFile = async (event) => {
       console.log("IN handle FILE");
       const files = event.target.files;
-      if (files.length > 0) {
-        coverImageFile.value = null; // чтобы рендерились изменения 
-        coverImageFile.value = files[0];
-      } else {
-        console.log("Пользователь отменил выбор файла.");
+      if (files.length < 0) {
         return;
       }
+      coverImageFile.value = null; // чтобы рендерились изменения 
+      coverImageFile.value = files[0];
+
       if(await isImageValid(coverImageFile)) {
         console.log('valid image');
         isCoverImageValid.value = true;
@@ -185,13 +187,13 @@ export default {
       event.preventDefault();
       console.log("IN DROP FILE");
       const files = event.dataTransfer.files;
-      if (files.length > 0) {
-        coverImageFile.value = null; // чтобы рендерились изменения 
-        coverImageFile.value = files[0];
-      } else {
-        console.log("Пользователь отменил выбор файла.");
+      if (files.length < 0) {
         return;
       }
+
+      coverImageFile.value = null; // чтобы рендерились изменения 
+      coverImageFile.value = files[0];
+
       if(await isImageValid(coverImageFile)) {
         console.log('valid image');
         isCoverImageValid.value = true;
@@ -205,10 +207,14 @@ export default {
     };
 
 
-    const loadImageOnServer = async () => {
+    const loadCoverImageOnServer = async () => {
+      if(!coverImageFile) {
+        console.log('Главное изображение отсутствует');
+        return;
+      }
       try {
           const formData = new FormData();
-          formData.append('photo', file.value);
+          formData.append('photo', coverImageFile.value);
     
           const accessToken = localStorage.getItem('accessToken');
           const response = await axios.post('http://194.152.37.7:8812/api/images', formData, {
@@ -219,10 +225,8 @@ export default {
           });
           console.log('Изображение успешно загружено:');
 
-          // cover_image.value = response.data;
-          const imgElement = document.getElementById('uploaded-image');
-          const fileName = cover_image.value.split('/').pop();
-          imgElement.src = '/images/articles_images/' + fileName;
+          const fileName = response.data.split('/').pop();
+          coverImageSrc.value = '/images/articles_images/' + fileName;
           
         } catch (error) {
           console.error('Ошибка загрузки изображения:', error);
@@ -241,22 +245,25 @@ export default {
     };
 
 
-    const deleteImage = async (event) => {
-      console.log("Удаление картинки");
-      const imgElement = document.getElementById('uploaded-image');
-      imgElement.src = "";
-      const inputElement = document.querySelector('input[type="file"]');
-      inputElement.value = '';
+    // const deleteImage = async (event) => {
+    //   console.log("Удаление картинки");
+    //   const imgElement = document.getElementById('uploaded-image');
+    //   imgElement.src = "";
+    //   const inputElement = document.querySelector('input[type="file"]');
+    //   inputElement.value = '';
         
-      // запрос на сервер для удаления картинки 
-    };
+    //   // запрос на сервер для удаления картинки 
+    // };
 
     const submitArticle = async () => {
       try {
+        await loadCoverImageOnServer();
+
         const data = {
           title: title.value,
-          short_description: short_description.value,
-          cover_image: cover_image.value || '',
+          short_description: getShortDescription(),
+          cover_image: coverImageSrc.value || '',
+          content: getHTMLContent()
         };
     
         const accessToken = localStorage.getItem('accessToken');
@@ -266,11 +273,29 @@ export default {
             'Content-Type': 'application/json'
           }
         });
+        const id = ref(null);
         id.value = response.data.id;
+
+        console.log('id = ' + id.value);
       } catch (error) {
         console.error('Error submitting article:', error);
       }
+
     };
+    
+    const getHTMLContent = () => {
+      if (ArticleEditorComponentRef.value) {
+        return ArticleEditorComponentRef.value.getHTMLContent();
+        
+      }
+    }
+
+    const getShortDescription = () => {
+      if (EditorComponentRef.value) {
+        return EditorComponentRef.value.getHTMLContent();
+        
+      }
+    }
 
      // Добавляем console.log перед передачей пропса showModal
      console.log('showModal is', typeof showModal);
@@ -278,18 +303,19 @@ export default {
     return {
       title,
       short_description,
-      id,
       handleFile,
-      deleteImage,
       submitArticle,
       showModal,
+      isImageValid,
       openFileInput,
       dropFile,
       coverImageFile,
       isCoverImageValid,
       coverImageSrc,
       removeImage,
-      limitInputLength
+      limitInputLength,
+      ArticleEditorComponentRef, 
+      EditorComponentRef,
     };
 
   }

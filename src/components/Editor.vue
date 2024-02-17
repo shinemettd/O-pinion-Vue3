@@ -132,6 +132,10 @@ export default {
 
         });
 
+        const getHTMLContent = () => {
+            return editor.getHTML();
+        };
+
         const insertMathOperation = (operation) => {
             editor.commands.insertContent(operation.value);
         }
@@ -239,6 +243,7 @@ export default {
             toggleMathMenu,
             insertMathOperation,
             limit,
+            getHTMLContent, 
         };
     },
 
