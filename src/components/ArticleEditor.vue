@@ -68,7 +68,7 @@
                 </div>
                 
                 <div class="undo-redo">
-                  <img src="/icons/undo.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()">
+                  <img src="/icons/undo.svg" class="btn-toolbar icon" alt="icon"  @click="undoWithImages">
                   <img src="/icons/redo.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()">
                 </div>
             </div>
@@ -217,6 +217,25 @@ export default {
             });
 
         });
+
+        const undoWithImages = () => {
+            const imgNumBedoreUndo = ref(countImagesInEditor());
+            editor.chain().focus().undo().run();
+            if(imgNumBedoreUndo.value > countImagesInEditor()) { // если удалили фотографию 
+                editor.chain().focus().redo().run();
+            }
+        }
+
+        function countImagesInEditor() {
+            var editor = document.querySelector('.custom-editor');
+            if (!editor) {
+                return -1;
+            }
+            
+            var images = editor.querySelectorAll('img');
+            
+            return images.length;
+        }
 
         const deleteSelection = () => {
             const selection = editor.state.selection;
@@ -431,6 +450,7 @@ export default {
             addImage,
             getHTMLContent,
             deleteSelection,
+            undoWithImages,
         };
     },
 
