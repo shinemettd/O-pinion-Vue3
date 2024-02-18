@@ -79,7 +79,6 @@ export default {
 
     const title = ref('');
     const short_description = ref('');
-    const articleId = ref('');
     
 
     const ArticleEditorComponentRef = ref(null);
@@ -208,17 +207,17 @@ export default {
     };
 
 
-    const loadCoverImageOnServer = async () => {
-      if(!coverImageFile) {
+    const loadCoverImageOnServer = async (articleId) => {
+      if(!coverImageFile.value) {
         console.log('Главное изображение отсутствует');
-        return;
+        return null;
       }
       try {
           const formData = new FormData();
           formData.append('photo', coverImageFile.value);
     
           const accessToken = localStorage.getItem('accessToken');
-          const response = await axios.post('http://194.152.37.7:8812/api/images', formData, {
+          const response = await axios.put(`http://194.152.37.7:8812/api/images/${articleId}`, formData, {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
               'Content-Type': 'multipart/form-data'
@@ -229,6 +228,7 @@ export default {
           const fileName = response.data.split('/').pop();
           coverImageSrc.value = '/images/articles_images/' + fileName;
           
+          return response.data;
         } catch (error) {
           console.error('Ошибка загрузки изображения:', error);
         }
@@ -252,12 +252,9 @@ export default {
 
     const submitArticle = async () => {
       try {
-        await loadCoverImageOnServer();
-
-        const data = {
+         const data = {
           title: title.value,
           short_description: getShortDescription(),
-          cover_image: coverImageSrc.value || '',
           content: getHTMLContent()
         };
     
@@ -268,10 +265,11 @@ export default {
             'Content-Type': 'application/json'
           }
         });
-        const id = ref(null);
-        id.value = response.data.id;
 
-        console.log('id = ' + id.value);
+        console.log('id = ' + response.data.id);
+        // теперь присваиваем картинку статье 
+        const imagePath = await loadCoverImageOnServer(response.data.id);
+        console.log('cover image path :' + imagePath);
       } catch (error) {
         console.error('Error submitting article:', error);
       }
