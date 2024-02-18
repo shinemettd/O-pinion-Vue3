@@ -71,12 +71,11 @@ export default {
     setup() {
        
         const lowlight = createLowlight(common);
-        const limit = ref(400);
+        const limit = ref(1000);
 
         const showFontMenu = ref(false);
         const showMathMenu = ref(false);
         
-        const fontOptions = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Tahoma', 'monospace'];
         const mathOptions = [
                     { name: '√x', icon: '/icons/sqrt.svg' , value: '$\\sqrt{x}$'},
                     { name: '√', icon: '/icons/root.svg', value: '$\\sqrt[n]{x}$' },
@@ -118,7 +117,7 @@ export default {
                 depth: 10,
             }),
             CharacterCount.configure({
-                limit: 400,
+                limit: 1000,
             }),
             
             ],
