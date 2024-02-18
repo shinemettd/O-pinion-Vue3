@@ -241,6 +241,7 @@ export default {
                 });
 
                 console.log('Изображение успешно удалено');
+                currentImgNum.value--;
             } catch (error) {
                 console.error('Ошибка удаления изображения:', error);
             }
@@ -358,7 +359,7 @@ export default {
 
         const openFileInput = () => {
             if(currentImgNum.value === maxAcceptableImgNum.value) {
-                props.showModal("/icons/limit_mem.jpg", 'Максимальное количество фотографий в статье ' + maxAcceptableImgNum.value); /////////////
+                props.showModal("/icons/limit_mem.jpg", 'Максимальное количество фотографий в статье ' + maxAcceptableImgNum.value);
                 return;
             }
             imageInput.value.click();
@@ -400,13 +401,6 @@ export default {
             } catch (error) {
                 console.error('Ошибка загрузки изображения:', error);
             }
-        }
-
-
-        function isImage(fileName) {
-            const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif'];
-            const fileExtension = fileName.split('.').pop().toLowerCase();
-            return allowedExtensions.includes(fileExtension);
         }
 
 

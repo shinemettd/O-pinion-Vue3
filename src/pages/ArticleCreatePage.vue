@@ -141,13 +141,14 @@ export default {
       }
       const maxSize = 2 * 1024 * 1024;
       if(file._value.size >  maxSize) {
-        alert('Размер файла превышает 2МБ ');
+        showModal("/icons/too_much.jpg", 'Размер файла превышает 2МБ ');
         return false;
       }
       
       try {
         const isSizeValid = await isRequiredSize(file.value);
         if (!isSizeValid) {
+          // showModal("/icons/too_much.jpg", 'Размер файла превышает 2МБ ');
           alert("Изображение должно быть не меньше 400px * 400px и не больше 2000px на 2000px");
           return false;
         }
