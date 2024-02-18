@@ -124,6 +124,8 @@ export default {
         console.log('showModal received as', typeof props.showModal); // Добавляем console.log при получении пропса showModal
         const lowlight = createLowlight(common);
         const limit = ref(40000);
+        const maxAcceptableImgNum = ref(3);
+        const currentImgNum = ref(0);
 
         const imageInput = ref(null);
 
@@ -355,6 +357,10 @@ export default {
         };
 
         const openFileInput = () => {
+            if(currentImgNum.value === maxAcceptableImgNum.value) {
+                props.showModal("/icons/limit_mem.jpg", 'Максимальное количество фотографий в статье ' + maxAcceptableImgNum.value); /////////////
+                return;
+            }
             imageInput.value.click();
         };
 
@@ -370,27 +376,29 @@ export default {
 
         const loadImageOnServer = async(file) => {
             try {
-            const formData = new FormData();
-            formData.append('photo', file.value);
-        
-            const accessToken = localStorage.getItem('accessToken');
-            const response = await axios.post('http://194.152.37.7:8812/api/images', formData, {
-                headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'multipart/form-data'
+                const formData = new FormData();
+                formData.append('photo', file.value);
+            
+                const accessToken = localStorage.getItem('accessToken');
+                const response = await axios.post('http://194.152.37.7:8812/api/images', formData, {
+                    headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'multipart/form-data'
+                    }
+                });
+            
+                if (response) {
+                    const imagePath = response.data; 
+                    const fileName = imagePath.split('/').pop();
+                    editor.chain().focus().setImage({ src: '/images/articles_images/' + fileName }).run();
+                    console.log(response.data);
+                    console.log('/images/articles_images/' + fileName)
+                    currentImgNum.value++;
+                    console.log('currentImNum = ' + currentImgNum.value);
                 }
-            });
-        
-            if (response) {
-                const imagePath = response.data; 
-                const fileName = imagePath.split('/').pop();
-                editor.chain().focus().setImage({ src: '/images/articles_images/' + fileName }).run();
-                console.log(response.data);
-                console.log('/images/articles_images/' + fileName)
-            }
             
             } catch (error) {
-            console.error('Ошибка загрузки изображения:', error);
+                console.error('Ошибка загрузки изображения:', error);
             }
         }
 

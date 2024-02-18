@@ -43,10 +43,10 @@
           <div class="modal-content">
             <div class="close">&times;</div>
             <div class="warning">
-                <img src="/icons/warning.svg" class="warning-icon" alt="wsrning">
-                <p>Пожалуйста, выберите изображение</p>
+                <img src="/icons/warning.svg" class="warning-icon" alt="wsrning" >
+                <p id="warningText">Пожалуйста, выберите изображение</p>
             </div>
-            <img src="/icons/mem.jpg" alt="image">
+            <img src="/icons/mem.jpg" alt="image" id="warningImage">
           </div>
         </div>
         
@@ -136,7 +136,7 @@ export default {
     async function isImageValid(file) {
       if(!file) return;
       if(!isImage(file.value.name)) {
-        showModal();
+        showModal("/icons/mem.jpg", 'Пожалуйста, выберите изображение');
         return false;
       }
       const maxSize = 2 * 1024 * 1024;
@@ -239,21 +239,15 @@ export default {
       return allowedExtensions.includes(fileExtension);
     }
 
-    const showModal = () => {
-      const modal = document.getElementById('myModal');
-      modal.style.display = 'block';
+    const showModal = (imgSrc, text) => {
+      var modalImage = document.getElementById("warningImage");
+      var warningTextElement = document.getElementById("warningText");
+      
+      modalImage.src = imgSrc;
+      warningTextElement.textContent = text;
+
+      document.getElementById('myModal').style.display = 'block';
     };
-
-
-    // const deleteImage = async (event) => {
-    //   console.log("Удаление картинки");
-    //   const imgElement = document.getElementById('uploaded-image');
-    //   imgElement.src = "";
-    //   const inputElement = document.querySelector('input[type="file"]');
-    //   inputElement.value = '';
-        
-    //   // запрос на сервер для удаления картинки 
-    // };
 
     const submitArticle = async () => {
       try {
