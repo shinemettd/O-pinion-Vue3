@@ -3,7 +3,7 @@
       <div class="article-form">
   
         <label for="title">Заголовок:</label>
-        <input v-model="title" type="text" id="title" class="title-input" @input="limitInputLength" :maxlength="title.length >= 120 ? 120 : null" />
+        <input v-model="title" type="text" id="title" class="title-input" @input="limitInputLength" @paste="handlePaste" :maxlength="title.length >= 120 ? 120 : null" />
         <p :style="{ color: title.length > 120 ? 'red' : 'black' }">{{ title.length }}/120</p>
         
         <div class="cover-image">
@@ -97,10 +97,18 @@ export default {
     });
 
     const limitInputLength = () => {
-      if (title.length > 120) {
-        title = title.slice(0, 120); // Обрезаем текст до 120 символов
+      if (title.value.length > 120) {
+        title.value = title.value.slice(0, 120); // Обрезаем текст до 120 символов
       }
     }
+
+    const handlePaste = (event) => {
+      const pastedText = event.clipboardData.getData('text/plain');
+      if ((title.value.length + pastedText.length) > 120) {
+        event.preventDefault(); 
+      }
+    }
+
     const openFileInput = () => {
       coverImageinput.value.click();
     };
@@ -307,6 +315,7 @@ export default {
       coverImageSrc,
       removeImage,
       limitInputLength,
+      handlePaste,
       ArticleEditorComponentRef, 
       EditorComponentRef,
     };
