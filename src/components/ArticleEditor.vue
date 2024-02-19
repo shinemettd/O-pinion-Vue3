@@ -221,7 +221,7 @@ export default {
         const undoWithImages = () => {
             const imgNumBedoreUndo = ref(countImagesInEditor());
             editor.chain().focus().undo().run();
-            if(imgNumBedoreUndo.value > countImagesInEditor()) { // если удалили фотографию 
+            if(imgNumBedoreUndo.value !== countImagesInEditor()) { // если удалили фотографию 
                 editor.chain().focus().redo().run();
             }
         }
