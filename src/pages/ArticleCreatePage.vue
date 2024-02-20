@@ -64,7 +64,7 @@
 import ArticleEditor from "@/components/ArticleEditor.vue";
 import Editor from "@/components/Editor.vue";
 import axios from "axios";
-import { ref , onMounted } from 'vue';
+import { ref , onMounted , onBeforeUnmount} from 'vue';
 
 export default {
   components: {
@@ -85,6 +85,7 @@ export default {
     const EditorComponentRef = ref(null);
 
     onMounted(() => {
+        loadTitleFromLocalStorage();
 
         coverImageinput.value = document.getElementById('addCoverImage');
 
@@ -96,7 +97,25 @@ export default {
 
     });
 
+     
+     onBeforeUnmount(() => {
+      saveTitleToLocalStorage();
+    });
+
+    const loadTitleFromLocalStorage = () => {
+      const savedTitle = localStorage.getItem('savedTitle');
+      if (savedTitle) {
+        title.value = savedTitle;
+      }
+    };
+
+    const saveTitleToLocalStorage = () => {
+      localStorage.setItem('savedTitle', title.value);
+      // console.log('saved title to local storage');
+    };
+
     const limitInputLength = () => {
+      saveTitleToLocalStorage();
       if (title.value.length > 120) {
         title.value = title.value.slice(0, 120); // Обрезаем текст до 120 символов
       }
@@ -132,9 +151,12 @@ export default {
         console.log('valid image');
         isCoverImageValid.value = true;
         coverImageSrc.value = URL.createObjectURL(coverImageFile.value);
+
+
       } else {
         isCoverImageValid.value = false;
         coverImageSrc.value = '';
+        coverImageFile.value = null;
       }
 
 
