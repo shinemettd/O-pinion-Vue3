@@ -112,7 +112,7 @@ import History from '@tiptap/extension-history'
 import Highlight from '@tiptap/extension-highlight'
 import CharacterCount from '@tiptap/extension-character-count'
 
-import { ref , onMounted } from 'vue';
+import { ref , onMounted, onUpdated } from 'vue';
 import axios from "axios";
 
 export default {
@@ -207,6 +207,10 @@ export default {
 
         // Функция, которая будет вызвана после монтирования элемента в DOM
         onMounted(() => {
+            const savedContent = localStorage.getItem('articleContent');
+            if (savedContent) {
+                editor.commands.setContent(savedContent);
+            }
 
             imageInput.value = document.getElementById('addImage');
 
@@ -217,6 +221,11 @@ export default {
             });
 
         });
+
+        onUpdated(() => {
+            localStorage.setItem('articleContent', editor.getHTML());
+        });
+
 
         const undoWithImages = () => {
             const imgNumBedoreUndo = ref(countImagesInEditor());

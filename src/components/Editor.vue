@@ -62,7 +62,7 @@ import 'katex/dist/katex.min.css'
 import History from '@tiptap/extension-history'
 import CharacterCount from '@tiptap/extension-character-count'
 
-import { ref , onMounted } from 'vue';
+import { ref , onMounted, onUpdated } from 'vue';
 
 export default {
     components: {
@@ -128,7 +128,14 @@ export default {
 
         // Функция, которая будет вызвана после монтирования элемента в DOM
         onMounted(() => {
+            const savedShortDescription = localStorage.getItem('savedShortDescription');
+            if (savedShortDescription) {
+                editor.commands.setContent(savedShortDescription);
+            }
+        });
 
+        onUpdated(() => {
+            localStorage.setItem('savedShortDescription', editor.getHTML());
         });
 
         const getHTMLContent = () => {

@@ -300,6 +300,12 @@ export default {
         // теперь присваиваем картинку статье 
         const imagePath = await loadCoverImageOnServer(response.data.id);
         console.log('cover image path :' + imagePath);
+        // удаляем данные из localStorage 
+        localStorage.removeItem('articleContent');
+        localStorage.removeItem('savedTitle');
+        localStorage.removeItem('savedShortDescription');
+        
+
       } catch (error) {
         console.error('Error submitting article:', error);
       }
