@@ -122,7 +122,7 @@ export default {
             
             ],
             content: `
-            <p>Write text here ... </p>
+            <p>Введите текст ...</p>
             `,
         });
 
@@ -154,10 +154,6 @@ export default {
             showFontMenu.value = !showFontMenu.value;
         };
 
-        const setFont = (font) => {
-            editor.chain().focus().setFontFamily(font).run();
-            toggleFontMenu(); 
-        };
 
         const setLink = () => {
             const previousUrl = editor.getAttributes('link').href
@@ -253,9 +249,6 @@ export default {
         };
     },
 
-    beforeUnmount() {
-        editor.destroy();
-    },
 }
 
 </script>

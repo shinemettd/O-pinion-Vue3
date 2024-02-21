@@ -46,7 +46,7 @@
                 <img src="/icons/warning.svg" class="warning-icon" alt="wsrning" >
                 <p id="warningText">Пожалуйста, выберите изображение</p>
             </div>
-            <img src="/icons/mem.jpg" alt="image" id="warningImage">
+            <img v-if="imageSrc !== null" :src="imageSrc" alt="image" id="warningImage">
           </div>
         </div>
         
@@ -56,6 +56,7 @@
         <ArticleEditor ref="ArticleEditorComponentRef" :showModal="showModal" :isImageValid="isImageValid"/>
 
         <button class="btn" @click="submitArticle">Создать статью</button>
+        <button class="btn reset" @click="resetAll">Сбросить все </button>
       </div>
     </div>
 </template>
@@ -65,6 +66,7 @@ import ArticleEditor from "@/components/ArticleEditor.vue";
 import Editor from "@/components/Editor.vue";
 import axios from "axios";
 import { ref , onMounted , onBeforeUnmount} from 'vue';
+import router from '@/plugins/router'; 
 
 export default {
   components: {
@@ -75,6 +77,7 @@ export default {
     const coverImageFile = ref(null);
     const coverImageinput = ref(null);
     const coverImageSrc = ref('');
+    const imageSrc =  ref("/icons/mem.jpg");
     const isCoverImageValid = ref(false);
 
     const title = ref('');
@@ -99,9 +102,15 @@ export default {
 
      
      onBeforeUnmount(() => {
-      saveTitleToLocalStorage();
+      // saveTitleToLocalStorage();
     });
 
+    const resetAll = () => {
+      localStorage.removeItem('articleContent');
+      localStorage.removeItem('savedTitle');
+      localStorage.removeItem('savedShortDescription');
+      location.reload();
+    }
     const loadTitleFromLocalStorage = () => {
       const savedTitle = localStorage.getItem('savedTitle');
       if (savedTitle) {
@@ -111,7 +120,6 @@ export default {
 
     const saveTitleToLocalStorage = () => {
       localStorage.setItem('savedTitle', title.value);
-      // console.log('saved title to local storage');
     };
 
     const limitInputLength = () => {
@@ -260,7 +268,13 @@ export default {
           
           return response.data;
         } catch (error) {
-          console.error('Ошибка загрузки изображения:', error);
+          if (error.response && error.response.data && error.response.data.errors) {
+          const serverErrors = error.response.data.errors;
+          showModal(null, serverErrors);
+         
+          } else {
+            console.error('Ошибка загрузки изображения ', error);
+          }
         }
     }
 
@@ -270,17 +284,19 @@ export default {
       return allowedExtensions.includes(fileExtension);
     }
 
-    const showModal = (imgSrc, text) => {
-      var modalImage = document.getElementById("warningImage");
+    const showModal = (imgPath, text) => {
       var warningTextElement = document.getElementById("warningText");
       
-      modalImage.src = imgSrc;
+      imageSrc.value = imgPath;
+      if (Array.isArray(text)) {
+        text = text.join(' . \n'); 
+      }
       warningTextElement.textContent = text;
-
       document.getElementById('myModal').style.display = 'block';
     };
 
     const submitArticle = async () => {
+      
       try {
          const data = {
           title: title.value,
@@ -305,9 +321,18 @@ export default {
         localStorage.removeItem('savedTitle');
         localStorage.removeItem('savedShortDescription');
         
-
+        // выдаем страницу успешного создания статьи 
+        
+        router.push('/create-article/success');
+        
       } catch (error) {
-        console.error('Error submitting article:', error);
+        if (error.response && error.response.data && error.response.data.errors) {
+          const serverErrors = error.response.data.errors;
+          showModal(null, serverErrors);
+         
+        } else {
+          console.error('Error submitting article:', error);
+        }
       }
 
     };
@@ -341,11 +366,13 @@ export default {
       coverImageFile,
       isCoverImageValid,
       coverImageSrc,
+      imageSrc,
       removeImage,
       limitInputLength,
       handlePaste,
       ArticleEditorComponentRef, 
       EditorComponentRef,
+      resetAll,
     };
 
   }
@@ -392,7 +419,7 @@ label {
 }
 
 
-.btn, .delete-btn{
+.btn {
     background-color: #1e066e;
     color: #fff;
     padding: 12px 20px;
@@ -407,13 +434,12 @@ label {
     background-color: #0056b3;
 }
 
-.delete-btn {
-    background-color: red;
-    padding: 6px 10px;
+.reset {
+  background-color: #f42505;
 }
-.delete-btn:hover {
-    background-color: rgb(143, 37, 37);
 
+.reset:hover {
+  background-color: #910707;
 }
 
 .warning {

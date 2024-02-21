@@ -125,7 +125,6 @@ export default {
         const lowlight = createLowlight(common);
         const limit = ref(40000);
         const maxAcceptableImgNum = ref(3);
-        const currentImgNum = ref(0);
 
         const imageInput = ref(null);
 
@@ -201,7 +200,7 @@ export default {
             
             ],
             content: `
-            <p>This is a basic example of implementing images. </p>
+            <p>Введите текст ...</p>
             `,
         });
 
@@ -269,9 +268,15 @@ export default {
                 });
 
                 console.log('Изображение успешно удалено');
-                currentImgNum.value--;
+
             } catch (error) {
-                console.error('Ошибка удаления изображения:', error);
+                if (error.response && error.response.data && error.response.data.errors) {
+                    const serverErrors = error.response.data.errors;
+                    showModal(null, serverErrors);
+                    
+                } else {
+                    console.error('Ошибка удаления изображения:', error);
+                }
             }
 
         }
@@ -386,7 +391,8 @@ export default {
         };
 
         const openFileInput = () => {
-            if(currentImgNum.value === maxAcceptableImgNum.value) {
+            console.log(countImagesInEditor());
+            if(countImagesInEditor() >= maxAcceptableImgNum.value) {
                 props.showModal("/icons/limit_mem.jpg", 'Максимальное количество фотографий в статье ' + maxAcceptableImgNum.value);
                 return;
             }
@@ -419,15 +425,23 @@ export default {
                 if (response) {
                     const imagePath = response.data; 
                     const fileName = imagePath.split('/').pop();
-                    editor.chain().focus().setImage({ src: '/images/articles_images/' + fileName }).run();
+                    
+                    editor.commands.focus(editor.state.doc.content.size);
+                    editor.chain().setImage({ src: '/images/articles_images/' + fileName }).run();
+
                     console.log(response.data);
                     console.log('/images/articles_images/' + fileName)
-                    currentImgNum.value++;
-                    console.log('currentImNum = ' + currentImgNum.value);
+                    console.log('currentImNum = ' + countImagesInEditor());
                 }
             
             } catch (error) {
-                console.error('Ошибка загрузки изображения:', error);
+                if (error.response && error.response.data && error.response.data.errors) {
+                    const serverErrors = error.response.data.errors;
+                    showModal(null, serverErrors);
+                    
+                } else {
+                    console.error('Ошибка загрузки  изображения:', error);
+                }
             }
         }
 
@@ -463,9 +477,6 @@ export default {
         };
     },
 
-    beforeUnmount() {
-        editor.destroy();
-    },
 }
 
 </script>
