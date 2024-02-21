@@ -2,14 +2,15 @@ import {createRouter, createWebHistory} from 'vue-router';
 import HelloWorldPage from "@/pages/HelloWorldPage.vue";
 import MainPage from "@/pages/MainPage.vue";
 import About from '@/components/About.vue';
-import Person from '@/components/Person.vue';
-import ArticleCreate from "@/components/ArticleCreate.vue";
+
+
 import Notification from "@/components/Notification.vue";
 import Register from "@/components/Register.vue";
 import Auth from "@/components/Auth.vue";
 import ArticlePage from "@/pages/ArticlePage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
-
+import ArticleCreatePage from "@/pages/ArticleCreatePage.vue";
+import SuccessArticleCreationPage from "@/pages/SuccessArticleCreationPage";
 
 export default createRouter({
   history: createWebHistory(),
@@ -36,9 +37,19 @@ export default createRouter({
       component: About
     },
     {
-      path: '/create-Article',
-      name: 'ArticleCreate',
-      component: ArticleCreate
+      path: '/user',
+      name: 'user',
+      component: About
+    },
+    {
+      path: '/create-article',
+      name: 'ArticleCreatePage',
+      component: ArticleCreatePage
+    },
+    {
+      path: '/create-article/success',
+      name: 'SuccessArticleCreationPage',
+      component: SuccessArticleCreationPage
     },
     {
       path: '/notification',

@@ -20,7 +20,7 @@
 
       <div>
         <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
-        <router-link to="/create-Article" class="burger-button"><i class="fas fa-plus"></i></router-link>
+        <router-link to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
 
         <button @click="toggleMenu" class="burger-button">☰</button>
 
@@ -30,7 +30,7 @@
           <router-link to="/" class="menu-item"><i class="fas fa-home"></i> Главная</router-link>
           <router-link to="/about" class="menu-item"><i class="fas fa-info-circle"></i> О нас</router-link>
           <router-link to="/notification" class="menu-item"><i class="fas fa-bell"></i> Уведомление</router-link>
-          <router-link to="/create-Article" class="menu-item"><i class="fas fa-plus"></i> Создать статью</router-link>
+          <router-link to="/create-article" class="menu-item"><i class="fas fa-plus"></i> Создать статью</router-link>
           <!-- Other link into menu -->
         </div>
       </div>
