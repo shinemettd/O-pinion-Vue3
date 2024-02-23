@@ -1,4 +1,7 @@
 <script setup>
+import axios from "axios";
+import store from "@/store/store";
+
 defineProps({
   showWithoutHeader: {
     type: Boolean,
@@ -33,6 +36,24 @@ function formatDateTime(timeString) {
     month: 'long',
     year: 'numeric',
   });
+}
+
+async function addToFavourites(articleId) {
+  try {
+    await axios.post(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, store.state.config);
+    console.log(`Статья ${articleId} добавлена в избранное пользователя ${store.state.nickname}`);
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+async function deleteFromFavourites(articleId) {
+  try {
+    await axios.delete(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, store.state.config);
+    console.log(`Статья ${articleId} удалена из избранного пользователя ${store.state.nickname}`);
+  } catch (e) {
+    console.log(e)
+  }
 }
 </script>
 
@@ -96,10 +117,10 @@ function formatDateTime(timeString) {
               <b v-else style="color: black">{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
-                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
+                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { deleteFromFavourites(articleId); articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
                   <img src="/icons/star_icon.svg" alt = "Favourites Icon">
                 </div>
-                <div v-else class = article-not-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
+                <div v-else class = article-not-in-favourites-icon @click="() => { addToFavourites(articleId); articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
                   <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
                 </div>
                 <b> {{ articleTotalFavourites }}</b>
