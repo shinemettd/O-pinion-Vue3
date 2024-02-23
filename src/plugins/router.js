@@ -12,8 +12,9 @@ import UserProfilePage from "@/pages/UserProfilePage.vue";
 import ArticleCreatePage from "@/pages/ArticleCreatePage.vue";
 import SuccessArticleCreationPage from "@/pages/SuccessArticleCreationPage";
 import PageNotFound from "@/pages/PageNotFound.vue";
+import store from "@/store/store";
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
@@ -63,11 +64,6 @@ export default createRouter({
       component: Auth
     },
     {
-      name: 'Auth',
-      path: '/auth',
-      component: Auth
-    },
-    {
       name: 'Register',
       path: '/register',
       component: Register
@@ -78,3 +74,15 @@ export default createRouter({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const isAuthorized = store.state.isAuthorized;
+
+  if (isAuthorized && (to.path === '/register' || to.path === '/auth' )) {
+    next('/');
+  } else {
+    next();
+  }
+});
+
+export default router;
