@@ -1,8 +1,9 @@
 <script setup>
 import axios from "axios";
-import {onBeforeMount, ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {useRoute} from "vue-router";
 import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
+import {useStore} from 'vuex';
 
 const props = defineProps({
   userId: {
@@ -31,19 +32,31 @@ const props = defineProps({
 })
 
 const route = useRoute();
-const userNickname = route.params.userNickname;
+const store = useStore();
+const userLink = route.params.userNickname;
+const isUserAuthorized = store.state.isAuthorized;
 
 const articles = ref([]);
 const isArticlesFound = ref();
 
+function isUserItself() {
+  return isUserAuthorized && userLink === store.state.nickname;
+}
+
 const getUserArticles = async () => {
   if (props.userId !== null) {
-    articles.value = (await axios.get('http://194.152.37.7:8812/api/articles/' + props.userId + '/articles')).data.content;
+    if (isUserItself()) {
+      const userToken = store.state.userToken;
+      console.log(userToken);
+      articles.value = (await axios.get('http://194.152.37.7:8812/api/articles/my-articles', store.state.config)).data.content;
+    } else {
+      articles.value = (await axios.get('http://194.152.37.7:8812/api/articles/' + props.userId + '/articles')).data.content;
+    }
     isArticlesFound.value = articles.value.length > 0;
   }
 }
 
-onBeforeMount(() => {
+onMounted(() => {
   getUserArticles();
 });
 
