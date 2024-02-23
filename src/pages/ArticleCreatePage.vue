@@ -56,7 +56,6 @@
         <ArticleEditor ref="ArticleEditorComponentRef" :showModal="showModal" :isImageValid="isImageValid"/>
 
         <button class="btn" @click="submitArticle">Создать статью</button>
-        <button class="btn reset" @click="resetAll">Сбросить все </button>
       </div>
     </div>
 </template>
@@ -105,12 +104,7 @@ export default {
       // saveTitleToLocalStorage();
     });
 
-    const resetAll = () => {
-      localStorage.removeItem('articleContent');
-      localStorage.removeItem('savedTitle');
-      localStorage.removeItem('savedShortDescription');
-      location.reload();
-    }
+    
     const loadTitleFromLocalStorage = () => {
       const savedTitle = localStorage.getItem('savedTitle');
       if (savedTitle) {
@@ -372,7 +366,6 @@ export default {
       handlePaste,
       ArticleEditorComponentRef, 
       EditorComponentRef,
-      resetAll,
     };
 
   }
