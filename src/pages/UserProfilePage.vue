@@ -6,13 +6,13 @@ import {useRoute} from "vue-router";
 import {onBeforeMount, ref} from "vue";
 import PageNotFound from "@/pages/PageNotFound.vue";
 const route = useRoute();
-const userNickname = route.params.userNickname;
+const userLink = route.params.userNickname;
 const user = ref([]);
 const isUserValid = ref();
 
 const getUser = async () => {
   try {
-    let response = await axios.get(`http://194.152.37.7:8812/api/users/nickname/${userNickname}/profile`);
+    let response = await axios.get(`http://194.152.37.7:8812/api/users/nickname/${userLink}/profile`);
     user.value = response.data;
     isUserValid.value = true;
   } catch (e) {

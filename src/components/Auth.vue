@@ -2,9 +2,11 @@
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import axios from 'axios';
+import {useStore} from 'vuex';
 
 export default {
   setup() {
+    const store = useStore();
     const email = ref('');
     const password = ref('');
     const router = useRouter();
@@ -18,8 +20,20 @@ export default {
           });
           const accessToken = response.data.access_token;
           localStorage.setItem('accessToken', accessToken);
-
-          // Перенаправление на другую страницу после успешного входа
+          console.log(accessToken);
+          const config = {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          };
+          const user = (await axios.get('http://194.152.37.7:8812/api/users/my-profile', config)).data;
+          localStorage.setItem('user', JSON.stringify(user));
+          store.commit('setAuthorized');
+          store.commit('setEmail', user.email);
+          store.commit('setId', user.id);
+          store.commit('setNickname', user.nickname)
+          store.commit('setToken', accessToken);
+          store.commit('setConfig', config);
           router.push('/');
         } catch (error) {
           console.error('Ошибка при входе:', error);
