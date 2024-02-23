@@ -11,6 +11,7 @@ import ArticlePage from "@/pages/ArticlePage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
 import ArticleCreatePage from "@/pages/ArticleCreatePage.vue";
 import SuccessArticleCreationPage from "@/pages/SuccessArticleCreationPage";
+import PageNotFound from "@/pages/PageNotFound.vue";
 
 export default createRouter({
   history: createWebHistory(),
@@ -57,19 +58,23 @@ export default createRouter({
       component: Notification
     },
     {
-      component: Auth,
       name: 'Auth',
-      path: '/auth'
+      path: '/auth',
+      component: Auth
     },
     {
-      component: Auth,
       name: 'Auth',
-      path: '/auth'
+      path: '/auth',
+      component: Auth
     },
     {
-      component: Register,
       name: 'Register',
-      path: '/register'
+      path: '/register',
+      component: Register
+    },
+    {
+      path: '/:catchAll(.*)',
+      component: PageNotFound
     }
   ]
 })
