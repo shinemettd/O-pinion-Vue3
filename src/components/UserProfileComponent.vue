@@ -46,8 +46,6 @@ function isUserItself() {
 const getUserArticles = async () => {
   if (props.userId !== null) {
     if (isUserItself()) {
-      const userToken = store.state.userToken;
-      console.log(userToken);
       articles.value = (await axios.get('http://194.152.37.7:8812/api/articles/my-articles', store.state.config)).data.content;
     } else {
       articles.value = (await axios.get('http://194.152.37.7:8812/api/articles/' + props.userId + '/articles')).data.content;
