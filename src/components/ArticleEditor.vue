@@ -11,7 +11,7 @@
               
                   <div class="dropdown">
                     <img src="/icons/search-font.svg" class="btn-toolbar icon" alt="icon" @click="toggleFontMenu">
-                    <ul v-if="showFontMenu" class="toolbar-menu">
+                    <ul v-if="showFontMenu  && characterCountNumber < 400" class="toolbar-menu">
                       <li v-for="font in fontOptions" :key="font"  @click="setFont(font)" :style="{ fontFamily: font }">
                         {{ font }}
                       </li>
@@ -20,7 +20,7 @@
 
                   <div class="dropdown">
                   <img src="/icons/type-h1.svg" class="btn-toolbar icon" alt="icon"  @click="toggleHeadingMenu">
-                  <ul v-if="showHeadingMenu" class="toolbar-menu">
+                  <ul v-if="showHeadingMenu && characterCountNumber < 400" class="toolbar-menu">
                         <li v-for="heading in headings" :key="heading" @click="setHeading(heading.value)" class="list-item">
                             <span>{{ heading.name }}</span>
                         </li>
@@ -28,15 +28,15 @@
                   </div>
 
                   <img src="/icons/link.svg" class="btn-toolbar icon" alt="icon"   @click="toggleLink">
-                  <img src="/icons/align_left.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
-                  <img src="/icons/align_justify.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('justify').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
-                  <img src="/icons/align_center.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
-                  <img src="/icons/align_right.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
+                  <img src="/icons/align_left.svg" class="btn-toolbar icon" alt="icon"  @click="setTextAlign('left')" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
+                  <img src="/icons/align_justify.svg" class="btn-toolbar icon" alt="icon" @click="setTextAlign('justify')" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
+                  <img src="/icons/align_center.svg" class="btn-toolbar icon" alt="icon" @click="setTextAlign('center')" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
+                  <img src="/icons/align_right.svg" class="btn-toolbar icon" alt="icon" @click="setTextAlign('right')" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
 
-                  <img src="/icons/list-ul.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBulletList().run()">
-                  <img src="/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleOrderedList().run()">
-                  <img src="/icons/quotes.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
-                  <img src="/icons/code.svg" class="btn-toolbar icon" alt="icon" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
+                  <img src="/icons/list-ul.svg" class="btn-toolbar icon" alt="icon" @click="toggleBulletList">
+                  <img src="/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="toggleOrderedList">
+                  <img src="/icons/quotes.svg" class="btn-toolbar icon" alt="icon" @click="toggleBlockquote">
+                  <img src="/icons/code.svg" class="btn-toolbar icon" alt="icon" @click="toggleCodeBlock">
                   <input type="file"  style="display: none;" @change="addImage" accept="image/*" id = "addImage">
                   <img src="/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
 
@@ -45,7 +45,7 @@
                 
                   <div class="dropdown">
                     <img src="/icons/math-sign.svg" class="btn-toolbar icon" alt="icon" @click="toggleMathMenu">
-                    <ul v-if="showMathMenu" class="toolbar-menu">
+                    <ul v-if="showMathMenu && characterCountNumber < 400" class="toolbar-menu">
                         <li v-for="operation in mathOptions" :key="operation.name" @click="insertMathOperation(operation)" class="list-item">
                             <img v-if="operation.icon !== null" :src="operation.icon" class="math-icon" :alt="operation.name">
                             <span v-else>{{ operation.value }}</span>
@@ -55,7 +55,7 @@
 
                   <div class="dropdown">
                     <img src="/icons/highlighter.svg" id="colorPickerButton" class="btn-toolbar icon" alt="icon">
-                    <ul v-if="showColorMenu" class="color-menu">
+                    <ul v-if="showColorMenu && characterCountNumber < 400" class="color-menu">
                           <li v-for="color in colors" :key="color" @click="highlightText(color)" class="color-item">
                             <div class="color-circle" :style="{ backgroundColor: color }"></div>
                           </li>
@@ -74,11 +74,15 @@
             </div>
 
             <editor-content :editor="editor" class="custom-editor"/>
-            <div class="character-count" v-if="editor">
-            {{ editor.storage.characterCount.characters() }}/{{ limit }} characters
-            <br>
-            {{ editor.storage.characterCount.words() }} words
+            <div class="character-count"  v-if="editor">
+                {{ editor.storage.characterCount.words() }} words
+                <br>
+                <div class="character-count" v-if="characterCountNumber >= 300" :style="{ color: 'red'}">
+                    {{ characterCountNumber }}/{{ limit }} HTML characters
+                </div>
             </div>
+           
+
         </div>
     </div>
 </template>
@@ -123,7 +127,8 @@ export default {
     setup(props) {
         console.log('showModal received as', typeof props.showModal); // Добавляем console.log при получении пропса showModal
         const lowlight = createLowlight(common);
-        const limit = ref(40000);
+        const limit = ref(400);
+        const characterCountNumber = ref(0);
         const maxAcceptableImgNum = ref(3);
 
         const imageInput = ref(null);
@@ -194,11 +199,8 @@ export default {
                 depth: 10,
             }),
             Highlight.configure({ multicolor: true }),
-            CharacterCount.configure({
-                limit: 40000,
-            }),
-            
-            ],
+            CharacterCount
+        ],
             content: `
             <p>Введите текст ...</p>
             `,
@@ -209,8 +211,26 @@ export default {
             const savedContent = localStorage.getItem('articleContent');
             if (savedContent) {
                 editor.commands.setContent(savedContent);
+                characterCountNumber.value = editor.getHTML().length; 
             }
 
+
+            editor.on('update', ({ editor }) => {
+                characterCountNumber.value = editor.getHTML().length; 
+                if (characterCountNumber.value > limit.value) {
+                    editor.chain().focus().undo().run();
+                    props.showModal('/icons/risovach.ru.jpg', null);
+                }
+                if (characterCountNumber.value >= limit.value) {
+                    editor.setOptions({ editable: false });
+                   
+                } else {
+                    editor.setOptions({ editable: true });
+                    
+                }
+            });
+
+        
             imageInput.value = document.getElementById('addImage');
 
             const colorPickerButton = document.getElementById('colorPickerButton');
@@ -340,53 +360,92 @@ export default {
             .run()
         };
 
+        const toggleBlockquote = () => {
+            if (editor) {
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleBlockquote().run();
+            }
+        }
+        const toggleOrderedList = () => {
+            if (editor) {
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleOrderedList().run();
+            }
+        }
+        const toggleBulletList = () => {
+            if (editor) {
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleBulletList().run();
+            }
+        }
+        const setTextAlign = (type) => {
+            if (editor) {
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().setTextAlign(type).run();
+            }
+        }
+        const toggleCodeBlock = () => {
+            if (editor) {
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleCodeBlock().run();
+            }
+        }
         const toggleBold = () => {
             if (editor) {
-            if (editor.isActive('bold')) {
-                editor.chain().focus().unsetBold().run();
-            } else {
-                editor.chain().focus().setBold().run();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleBold().run();
             }
         };
 
         const toggleItalic = () => {
             if (editor) {
-            if (editor.isActive('italic')) {
-                editor.chain().focus().unsetItalic().run();
-            } else {
-                editor.chain().focus().setItalic().run();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleItalic().run();
             }
         };
 
         const toggleStrike = () => {
             if (editor) {
-            if (editor.isActive('strike')) {
-                editor.chain().focus().unsetStrike().run();
-            } else {
-                editor.chain().focus().setStrike().run();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleStrike().run();
             }
         };
 
         const toggleUnderline = () => {
             if (editor) {
-            if (editor.isActive('underline')) {
-                editor.chain().focus().unsetUnderline().run();
-            } else {
-                editor.chain().focus().setUnderline().run();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleUnderline().run();
             }
         };
 
         const toggleLink = () => {
             if (editor) {
-            if (editor.isActive('link')) {
-                editor.chain().focus().unsetLink().run();
-            } else {
-                setLink();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                if (editor.isActive('link')) {
+                    editor.chain().focus().unsetLink().run();
+                } else {
+                    setLink();
+                }
             }
         };
 
@@ -394,6 +453,9 @@ export default {
             console.log(countImagesInEditor());
             if(countImagesInEditor() >= maxAcceptableImgNum.value) {
                 props.showModal("/icons/limit_mem.jpg", 'Максимальное количество фотографий в статье ' + maxAcceptableImgNum.value);
+                return;
+            }
+            if(characterCountNumber.value >= limit.value) {
                 return;
             }
             imageInput.value.click();
@@ -474,6 +536,12 @@ export default {
             getHTMLContent,
             deleteSelection,
             undoWithImages,
+            characterCountNumber,
+            toggleCodeBlock,
+            toggleBulletList, 
+            toggleOrderedList, 
+            toggleBlockquote, 
+            setTextAlign, 
         };
     },
 
