@@ -6,8 +6,8 @@
   const articles = ref('');
   const sortToggle = ref(0);
   const showToggle = ref(0);
-  const sortBy = ref('Newness');
-  const showContent = ref('All');
+  const sortBy = ref('newness');
+  const showContent = ref('articles');
 
   const getArticles = async () => {
     let response = await axios.get('http://194.152.37.7:8812/api/articles');
@@ -31,17 +31,16 @@
       <div class = "sorter w-20 h-20 my-5">
         <div class = "w-100 justify-between mb-5 text-center">
           Отображать:
-          <v-btn-toggle v-model="showToggle" color="#350454" class = "ml-5">
-            <v-btn @click="showContent = 'All'">Всё</v-btn>
-            <v-btn @click="showContent = 'Articles'">Статьи</v-btn>
-            <v-btn @click="showContent = 'Announcements'">Объявления</v-btn>
+          <v-btn-toggle v-model="showToggle" color="#350454" class = "ml-5" mandatory>
+            <v-btn @click="showContent = 'articles'">Статьи</v-btn>
+            <v-btn @click="showContent = 'announcements'">Объявления</v-btn>
           </v-btn-toggle>
         </div>
         <div class = "text-center">
           Сортировка:
-          <v-btn-toggle v-model="sortToggle" color="#350454"  class = "ml-5">
-            <v-btn @click="sortBy = 'Newness'">По новизне</v-btn>
-            <v-btn @click="sortBy = 'Popularity'">По популярности</v-btn>
+          <v-btn-toggle v-model="sortToggle" color="#350454"  class = "ml-5" mandatory>
+            <v-btn @click="sortBy = 'newness'">По новизне</v-btn>
+            <v-btn @click="sortBy = 'popularity'">По популярности</v-btn>
           </v-btn-toggle>
         </div>
       </div>
@@ -67,5 +66,9 @@
 </template>
 
 <style scoped>
-
+.toggle-btn[disabled] {
+  background-color: transparent;
+  color: inherit;
+  cursor: not-allowed;
+}
 </style>
