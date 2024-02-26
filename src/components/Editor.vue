@@ -9,12 +9,12 @@
                 
                     <img src="/icons/link.svg" class="toolbar-item" alt="icon"   @click="toggleLink">
 
-                    <img src="/icons/quotes.svg" class="toolbar-item" alt="icon" @click="editor.chain().focus().toggleBlockquote().run()">
-                    <img src="/icons/code.svg" class="toolbar-item" alt="icon" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
+                    <img src="/icons/quotes.svg" class="toolbar-item" alt="icon" @click="toggleBlockquote">
+                    <img src="/icons/code.svg" class="toolbar-item" alt="icon" @click="toggleCodeBlock" :class="{ 'is-active': editor.isActive('codeBlock') }">
                 
                     <div class="dropdown">
                         <img src="/icons/math-sign.svg" class="toolbar-item" alt="icon" @click="toggleMathMenu">
-                        <ul v-if="showMathMenu" class="toolbar-menu">
+                        <ul v-if="showMathMenu && characterCountNumber < limit" class="toolbar-menu">
                             <li v-for="operation in mathOptions" :key="operation.name" @click="insertMathOperation(operation)" class="list-item">
                                 <img v-if="operation.icon !== null" :src="operation.icon" class="math-icon" :alt="operation.name">
                                 <span v-else>{{ operation.value }}</span>
@@ -32,8 +32,15 @@
             </div>
 
             <editor-content :editor="editor" class="custom-text-editor"/>
-            <div class="character-count" v-if="editor">
+            <!-- <div class="character-count" v-if="editor">
             {{ editor.storage.characterCount.characters() }}/{{ limit }} characters
+            </div> -->
+            <div class="character-count"  v-if="editor">
+                {{ editor.storage.characterCount.words() }} words
+                <br>
+                <div class="character-count" v-if="characterCountNumber >= 100" :style="{ color: 'red'}">
+                    {{ characterCountNumber }}/{{ limit }} HTML characters
+                </div>
             </div>
         </div>
 </template>
@@ -63,15 +70,17 @@ import CharacterCount from '@tiptap/extension-character-count'
 import { ref , onMounted, onUpdated } from 'vue';
 
 export default {
+    props: ['showModal'],
     components: {
         EditorContent,
     },
-    setup() {
+    setup(props) {
        
         const lowlight = createLowlight(common);
         const limit = ref(1000);
+        const characterCountNumber = ref(0);
 
-        const showFontMenu = ref(false);
+       
         const showMathMenu = ref(false);
         
         const mathOptions = [
@@ -130,6 +139,23 @@ export default {
             if (savedShortDescription) {
                 editor.commands.setContent(savedShortDescription);
             }
+
+
+            editor.on('update', ({  }) => {
+                characterCountNumber.value = editor.getHTML().length; 
+                // console.log('char in short description ' + characterCountNumber.value);
+                if (characterCountNumber.value > limit.value) {
+                    editor.chain().focus().undo().run();
+                    props.showModal('/icons/risovach.ru.jpg', null);
+                }
+                if (characterCountNumber.value >= limit.value) {
+                    editor.setOptions({ editable: false });
+                   
+                } else {
+                    editor.setOptions({ editable: true });
+                    
+                }
+            });
         });
 
         onUpdated(() => {
@@ -148,10 +174,7 @@ export default {
             showMathMenu.value = !showMathMenu.value;
         };
 
-        const toggleFontMenu = () => {
-            showFontMenu.value = !showFontMenu.value;
-        };
-
+      
 
         const setLink = () => {
             const previousUrl = editor.getAttributes('link').href
@@ -180,53 +203,70 @@ export default {
             .run()
         };
 
+        const toggleBlockquote = () => {
+            if (editor) {
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleBlockquote().run();
+            }
+        };
+
+        const toggleCodeBlock = () => {
+            if (editor) {
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleCodeBlock().run();
+            }
+        };
+
         const toggleBold = () => {
             if (editor) {
-            if (editor.isActive('bold')) {
-                editor.chain().focus().unsetBold().run();
-            } else {
-                editor.chain().focus().setBold().run();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleBold().run();
             }
         };
 
         const toggleItalic = () => {
             if (editor) {
-            if (editor.isActive('italic')) {
-                editor.chain().focus().unsetItalic().run();
-            } else {
-                editor.chain().focus().setItalic().run();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleItalic().run();
             }
         };
 
         const toggleStrike = () => {
             if (editor) {
-            if (editor.isActive('strike')) {
-                editor.chain().focus().unsetStrike().run();
-            } else {
-                editor.chain().focus().setStrike().run();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleStrike().run();
             }
         };
 
         const toggleUnderline = () => {
             if (editor) {
-            if (editor.isActive('underline')) {
-                editor.chain().focus().unsetUnderline().run();
-            } else {
-                editor.chain().focus().setUnderline().run();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                editor.chain().focus().toggleUnderline().run();
             }
         };
 
         const toggleLink = () => {
             if (editor) {
-            if (editor.isActive('link')) {
-                editor.chain().focus().unsetLink().run();
-            } else {
-                setLink();
-            }
+                if(characterCountNumber.value >= limit.value) {
+                    return;
+                }
+                if (editor.isActive('link')) {
+                    editor.chain().focus().unsetLink().run();
+                } else {
+                    setLink();
+                }
             }
         };
 
@@ -243,7 +283,10 @@ export default {
             toggleMathMenu,
             insertMathOperation,
             limit,
-            getHTMLContent, 
+            getHTMLContent,
+            characterCountNumber, 
+            toggleCodeBlock,
+            toggleBlockquote, 
         };
     },
 
