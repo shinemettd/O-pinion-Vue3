@@ -48,14 +48,14 @@
 <script setup>
 import axios from 'axios';
 import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
-import { onBeforeMount, ref } from "vue";
+import {onBeforeMount, ref} from "vue";
 
 const currentPage = ref(0);
 const pageSize = ref(10);
 const articles = ref([]);
 const sortToggle = ref(0);
 const showToggle = ref(0);
-const sortBy = ref('dateTime');
+const sortBy = ref('dateTime,desc'); // Изменение сортировки на 'dateTime,desc'
 const showContent = ref('articles');
 const totalPages = ref(0);
 
@@ -71,12 +71,12 @@ const getArticles = async () => {
     articles.value = response.data.content;
     totalPages.value = response.data.totalPages;
   } catch (error) {
-    console.error('Failed to fetch articles:', error);
+    console.error('Не удалось загрузить статьи:', error);
   }
 }
 
 const sortByDateTime = () => {
-  sortBy.value = 'dateTime';
+  sortBy.value = 'dateTime,desc';
   setPage(0);
 }
 
