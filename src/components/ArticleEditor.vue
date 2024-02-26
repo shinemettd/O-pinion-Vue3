@@ -11,7 +11,7 @@
               
                   <div class="dropdown">
                     <img src="/icons/search-font.svg" class="btn-toolbar icon" alt="icon" @click="toggleFontMenu">
-                    <ul v-if="showFontMenu  && characterCountNumber < 400" class="toolbar-menu">
+                    <ul v-if="showFontMenu  && characterCountNumber < limit" class="toolbar-menu">
                       <li v-for="font in fontOptions" :key="font"  @click="setFont(font)" :style="{ fontFamily: font }">
                         {{ font }}
                       </li>
@@ -20,7 +20,7 @@
 
                   <div class="dropdown">
                   <img src="/icons/type-h1.svg" class="btn-toolbar icon" alt="icon"  @click="toggleHeadingMenu">
-                  <ul v-if="showHeadingMenu && characterCountNumber < 400" class="toolbar-menu">
+                  <ul v-if="showHeadingMenu && characterCountNumber < limit" class="toolbar-menu">
                         <li v-for="heading in headings" :key="heading" @click="setHeading(heading.value)" class="list-item">
                             <span>{{ heading.name }}</span>
                         </li>
@@ -45,7 +45,7 @@
                 
                   <div class="dropdown">
                     <img src="/icons/math-sign.svg" class="btn-toolbar icon" alt="icon" @click="toggleMathMenu">
-                    <ul v-if="showMathMenu && characterCountNumber < 400" class="toolbar-menu">
+                    <ul v-if="showMathMenu && characterCountNumber < limit" class="toolbar-menu">
                         <li v-for="operation in mathOptions" :key="operation.name" @click="insertMathOperation(operation)" class="list-item">
                             <img v-if="operation.icon !== null" :src="operation.icon" class="math-icon" :alt="operation.name">
                             <span v-else>{{ operation.value }}</span>
@@ -55,7 +55,7 @@
 
                   <div class="dropdown">
                     <img src="/icons/highlighter.svg" id="colorPickerButton" class="btn-toolbar icon" alt="icon">
-                    <ul v-if="showColorMenu && characterCountNumber < 400" class="color-menu">
+                    <ul v-if="showColorMenu && characterCountNumber < limit" class="color-menu">
                           <li v-for="color in colors" :key="color" @click="highlightText(color)" class="color-item">
                             <div class="color-circle" :style="{ backgroundColor: color }"></div>
                           </li>
@@ -77,7 +77,7 @@
             <div class="character-count"  v-if="editor">
                 {{ editor.storage.characterCount.words() }} words
                 <br>
-                <div class="character-count" v-if="characterCountNumber >= 300" :style="{ color: 'red'}">
+                <div class="character-count" v-if="characterCountNumber >= 38000" :style="{ color: 'red'}">
                     {{ characterCountNumber }}/{{ limit }} HTML characters
                 </div>
             </div>
@@ -127,7 +127,7 @@ export default {
     setup(props) {
         console.log('showModal received as', typeof props.showModal); // Добавляем console.log при получении пропса showModal
         const lowlight = createLowlight(common);
-        const limit = ref(400);
+        const limit = ref(40000);
         const characterCountNumber = ref(0);
         const maxAcceptableImgNum = ref(3);
 
