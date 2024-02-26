@@ -1,16 +1,16 @@
 <template>
   <main class="container mx-auto">
-    <div class="scroll mx-auto border w-50 h-100">
+    <div class="scroll mx-auto border w-full lg:w-2/3 xl:w-1/2 h-auto lg:h-100">
       <hr class="mt-5">
-      <div class="sorter w-20 h-20 my-5">
-        <div class="w-100 justify-between mb-5 text-center">
+      <div class="sorter w-full lg:w-1/2 h-auto my-5 flex flex-col lg:flex-row items-center justify-between">
+        <div class="w-full lg:w-auto mb-5 lg:mb-0 text-center lg:text-left">
           Отображать:
           <v-btn-toggle v-model="showToggle" color="#ff6347" class="ml-5" mandatory>
             <v-btn @click="showContent = 'articles'">Статьи</v-btn>
             <v-btn @click="showContent = 'announcements'">Объявления</v-btn>
           </v-btn-toggle>
         </div>
-        <div class="text-center">
+        <div class="w-full lg:w-auto text-center lg:text-right">
           Сортировка:
           <v-btn-toggle v-model="sortToggle" color="#20b2aa" class="ml-5" mandatory>
             <v-btn @click="sortByDateTime">По дате</v-btn>
@@ -115,5 +115,25 @@ onBeforeMount(() => {
 .pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@media screen and (max-width: 767px) {
+  .sorter {
+    flex-direction: column;
+  }
+  .sorter div {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .sorter div:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@media screen and (min-width: 768px) {
+
+  .scroll {
+    width: 50%;
+  }
 }
 </style>
