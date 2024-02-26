@@ -37,7 +37,7 @@
         </div>
   
         <label for="short-description">Краткое описание:</label>
-        <Editor  ref="EditorComponentRef"/>
+        <Editor  ref="EditorComponentRef" :showModal="showModal"/>
   
         <div id="myModal" class="modal">
           <div class="modal-content">

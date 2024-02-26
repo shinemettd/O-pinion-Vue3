@@ -2,7 +2,7 @@
     <!-- Hello from Editor ! -->
     <div class="editor-wrapper">
         <div class="editor">
-            <div v-if="editor" class="editor-tool">
+            <div v-if="contentEditor" class="editor-tool">
                 <div class="main-tools">
                   <img src="/icons/type-bold.svg" class="btn-toolbar icon" alt="icon" @click="toggleBold">
                   <img src="/icons/type-italic.svg" class="btn-toolbar icon" alt="icon" @click="toggleItalic">
@@ -11,7 +11,7 @@
               
                   <div class="dropdown">
                     <img src="/icons/search-font.svg" class="btn-toolbar icon" alt="icon" @click="toggleFontMenu">
-                    <ul v-if="showFontMenu  && characterCountNumber < limit" class="toolbar-menu">
+                    <ul v-if="showFontMenu  && contentCharacterCountNumber < contentLimit" class="toolbar-menu">
                       <li v-for="font in fontOptions" :key="font"  @click="setFont(font)" :style="{ fontFamily: font }">
                         {{ font }}
                       </li>
@@ -20,7 +20,7 @@
 
                   <div class="dropdown">
                   <img src="/icons/type-h1.svg" class="btn-toolbar icon" alt="icon"  @click="toggleHeadingMenu">
-                  <ul v-if="showHeadingMenu && characterCountNumber < limit" class="toolbar-menu">
+                  <ul v-if="showHeadingMenu && contentCharacterCountNumber < contentLimit" class="toolbar-menu">
                         <li v-for="heading in headings" :key="heading" @click="setHeading(heading.value)" class="list-item">
                             <span>{{ heading.name }}</span>
                         </li>
@@ -28,10 +28,10 @@
                   </div>
 
                   <img src="/icons/link.svg" class="btn-toolbar icon" alt="icon"   @click="toggleLink">
-                  <img src="/icons/align_left.svg" class="btn-toolbar icon" alt="icon"  @click="setTextAlign('left')" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
-                  <img src="/icons/align_justify.svg" class="btn-toolbar icon" alt="icon" @click="setTextAlign('justify')" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
-                  <img src="/icons/align_center.svg" class="btn-toolbar icon" alt="icon" @click="setTextAlign('center')" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
-                  <img src="/icons/align_right.svg" class="btn-toolbar icon" alt="icon" @click="setTextAlign('right')" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
+                  <img src="/icons/align_left.svg" class="btn-toolbar icon" alt="icon"  @click="setTextAlign('left')" :class="{ 'is-active': contentEditor.isActive({ textAlign: 'left' }) }">
+                  <img src="/icons/align_justify.svg" class="btn-toolbar icon" alt="icon" @click="setTextAlign('justify')" :class="{ 'is-active': contentEditor.isActive({ textAlign: 'justify' }) }">
+                  <img src="/icons/align_center.svg" class="btn-toolbar icon" alt="icon" @click="setTextAlign('center')" :class="{ 'is-active': contentEditor.isActive({ textAlign: 'center' }) }">
+                  <img src="/icons/align_right.svg" class="btn-toolbar icon" alt="icon" @click="setTextAlign('right')" :class="{ 'is-active': contentEditor.isActive({ textAlign: 'right' }) }">
 
                   <img src="/icons/list-ul.svg" class="btn-toolbar icon" alt="icon" @click="toggleBulletList">
                   <img src="/icons/list-ol.svg" class="btn-toolbar icon" alt="icon" @click="toggleOrderedList">
@@ -45,7 +45,7 @@
                 
                   <div class="dropdown">
                     <img src="/icons/math-sign.svg" class="btn-toolbar icon" alt="icon" @click="toggleMathMenu">
-                    <ul v-if="showMathMenu && characterCountNumber < limit" class="toolbar-menu">
+                    <ul v-if="showMathMenu && contentCharacterCountNumber < contentLimit" class="toolbar-menu">
                         <li v-for="operation in mathOptions" :key="operation.name" @click="insertMathOperation(operation)" class="list-item">
                             <img v-if="operation.icon !== null" :src="operation.icon" class="math-icon" :alt="operation.name">
                             <span v-else>{{ operation.value }}</span>
@@ -55,7 +55,7 @@
 
                   <div class="dropdown">
                     <img src="/icons/highlighter.svg" id="colorPickerButton" class="btn-toolbar icon" alt="icon">
-                    <ul v-if="showColorMenu && characterCountNumber < limit" class="color-menu">
+                    <ul v-if="showColorMenu && contentCharacterCountNumber < contentLimit" class="color-menu">
                           <li v-for="color in colors" :key="color" @click="highlightText(color)" class="color-item">
                             <div class="color-circle" :style="{ backgroundColor: color }"></div>
                           </li>
@@ -69,16 +69,16 @@
                 
                 <div class="undo-redo">
                   <img src="/icons/undo.svg" class="btn-toolbar icon" alt="icon"  @click="undoWithImages">
-                  <img src="/icons/redo.svg" class="btn-toolbar icon" alt="icon"  @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()">
+                  <img src="/icons/redo.svg" class="btn-toolbar icon" alt="icon"  @click="contentEditor.chain().focus().redo().run()" :disabled="!contentEditor.can().redo()">
                 </div>
             </div>
 
-            <editor-content :editor="editor" class="custom-editor"/>
-            <div class="character-count"  v-if="editor">
-                {{ editor.storage.characterCount.words() }} words
+            <editor-content :editor="contentEditor" class="custom-editor"/>
+            <div class="character-count"  v-if="contentEditor">
+                {{ contentEditor.storage.characterCount.words() }} words
                 <br>
-                <div class="character-count" v-if="characterCountNumber >= 38000" :style="{ color: 'red'}">
-                    {{ characterCountNumber }}/{{ limit }} HTML characters
+                <div class="character-count" v-if="contentCharacterCountNumber >= 38000" :style="{ color: 'red'}">
+                    {{ contentCharacterCountNumber }}/{{ contentLimit }} HTML characters
                 </div>
             </div>
            
@@ -127,8 +127,8 @@ export default {
     setup(props) {
         console.log('showModal received as', typeof props.showModal); // Добавляем console.log при получении пропса showModal
         const lowlight = createLowlight(common);
-        const limit = ref(40000);
-        const characterCountNumber = ref(0);
+        const contentLimit = ref(40000);
+        const contentCharacterCountNumber = ref(0);
         const maxAcceptableImgNum = ref(3);
 
         const imageInput = ref(null);
@@ -167,7 +167,7 @@ export default {
                     { name: 'infinity', icon: '/icons/infinity.svg', value: '$\\infty$' }
                 ];
 
-        const editor = new Editor({
+        const contentEditor = new Editor({
             extensions: [
             Document,
             Paragraph,
@@ -210,22 +210,22 @@ export default {
         onMounted(() => {
             const savedContent = localStorage.getItem('articleContent');
             if (savedContent) {
-                editor.commands.setContent(savedContent);
-                characterCountNumber.value = editor.getHTML().length; 
+                contentEditor.commands.setContent(savedContent);
+                contentCharacterCountNumber.value = contentEditor.getHTML().length; 
             }
 
 
-            editor.on('update', ({ editor }) => {
-                characterCountNumber.value = editor.getHTML().length; 
-                if (characterCountNumber.value > limit.value) {
-                    editor.chain().focus().undo().run();
+            contentEditor.on('update', ({  }) => {
+                contentCharacterCountNumber.value = contentEditor.getHTML().length; 
+                if (contentCharacterCountNumber.value > contentLimit.value) {
+                    contentEditor.chain().focus().undo().run();
                     props.showModal('/icons/risovach.ru.jpg', null);
                 }
-                if (characterCountNumber.value >= limit.value) {
-                    editor.setOptions({ editable: false });
+                if (contentCharacterCountNumber.value >= contentLimit.value) {
+                    contentEditor.setOptions({ editable: false });
                    
                 } else {
-                    editor.setOptions({ editable: true });
+                    contentEditor.setOptions({ editable: true });
                     
                 }
             });
@@ -242,15 +242,15 @@ export default {
         });
 
         onUpdated(() => {
-            localStorage.setItem('articleContent', editor.getHTML());
+            localStorage.setItem('articleContent', contentEditor.getHTML());
         });
 
 
         const undoWithImages = () => {
             const imgNumBedoreUndo = ref(countImagesInEditor());
-            editor.chain().focus().undo().run();
+            contentEditor.chain().focus().undo().run();
             if(imgNumBedoreUndo.value !== countImagesInEditor()) { // если удалили фотографию 
-                editor.chain().focus().redo().run();
+                contentEditor.chain().focus().redo().run();
             }
         }
 
@@ -266,12 +266,12 @@ export default {
         }
 
         const deleteSelection = () => {
-            const selection = editor.state.selection;
+            const selection = contentEditor.state.selection;
             if (selection.node && selection.node.attrs && selection.node.attrs.src) {
                 const src = selection.node.attrs.src;
                 console.log("Путь к изображению:", src);
                 const imagePath = '/home/opinion/opinion-front' + src;
-                editor.commands.deleteSelection();
+                contentEditor.commands.deleteSelection();
                 console.log('Путь к картинке на сервере : ' + imagePath);
                 deleteImageFromServer(imagePath);
             }
@@ -302,15 +302,15 @@ export default {
         }
 
         const getHTMLContent = () => {
-            return editor.getHTML();
+            return contentEditor.getHTML();
         };
 
 
         const highlightText = (selectedColor) => {
-            editor.chain().focus().toggleHighlight({ color: selectedColor}).run();
+            contentEditor.chain().focus().toggleHighlight({ color: selectedColor}).run();
         }
         const insertMathOperation = (operation) => {
-            editor.commands.insertContent(operation.value);
+            contentEditor.commands.insertContent(operation.value);
         }
 
         const toggleHeadingMenu = () => {
@@ -325,16 +325,16 @@ export default {
         };
 
         const setHeading = (value) => {
-            editor.chain().focus().toggleHeading({ level: value }).run();
+            contentEditor.chain().focus().toggleHeading({ level: value }).run();
         };
 
         const setFont = (font) => {
-            editor.chain().focus().setFontFamily(font).run();
+            contentEditor.chain().focus().setFontFamily(font).run();
             toggleFontMenu(); 
         };
 
         const setLink = () => {
-            const previousUrl = editor.getAttributes('link').href
+            const previousUrl = contentEditor.getAttributes('link').href
             const url = window.prompt('URL', previousUrl)
 
             if (url === null) {
@@ -342,7 +342,7 @@ export default {
             }
 
             if (url === '') {
-            editor
+            contentEditor
                 .chain()
                 .focus()
                 .extendMarkRange('link')
@@ -352,7 +352,7 @@ export default {
             return
             }
 
-            editor
+            contentEditor
             .chain()
             .focus()
             .extendMarkRange('link')
@@ -361,88 +361,88 @@ export default {
         };
 
         const toggleBlockquote = () => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                editor.chain().focus().toggleBlockquote().run();
+                contentEditor.chain().focus().toggleBlockquote().run();
             }
         }
         const toggleOrderedList = () => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                editor.chain().focus().toggleOrderedList().run();
+                contentEditor.chain().focus().toggleOrderedList().run();
             }
         }
         const toggleBulletList = () => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                editor.chain().focus().toggleBulletList().run();
+                contentEditor.chain().focus().toggleBulletList().run();
             }
         }
         const setTextAlign = (type) => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                editor.chain().focus().setTextAlign(type).run();
+                contentEditor.chain().focus().setTextAlign(type).run();
             }
         }
         const toggleCodeBlock = () => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                editor.chain().focus().toggleCodeBlock().run();
+                contentEditor.chain().focus().toggleCodeBlock().run();
             }
         }
         const toggleBold = () => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                editor.chain().focus().toggleBold().run();
+                contentEditor.chain().focus().toggleBold().run();
             }
         };
 
         const toggleItalic = () => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                editor.chain().focus().toggleItalic().run();
+                contentEditor.chain().focus().toggleItalic().run();
             }
         };
 
         const toggleStrike = () => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                editor.chain().focus().toggleStrike().run();
+                contentEditor.chain().focus().toggleStrike().run();
             }
         };
 
         const toggleUnderline = () => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                editor.chain().focus().toggleUnderline().run();
+                contentEditor.chain().focus().toggleUnderline().run();
             }
         };
 
         const toggleLink = () => {
-            if (editor) {
-                if(characterCountNumber.value >= limit.value) {
+            if (contentEditor) {
+                if(contentCharacterCountNumber.value >= contentLimit.value) {
                     return;
                 }
-                if (editor.isActive('link')) {
-                    editor.chain().focus().unsetLink().run();
+                if (contentEditor.isActive('link')) {
+                    contentEditor.chain().focus().unsetLink().run();
                 } else {
                     setLink();
                 }
@@ -455,7 +455,7 @@ export default {
                 props.showModal("/icons/limit_mem.jpg", 'Максимальное количество фотографий в статье ' + maxAcceptableImgNum.value);
                 return;
             }
-            if(characterCountNumber.value >= limit.value) {
+            if(contentCharacterCountNumber.value >= contentLimit.value) {
                 return;
             }
             imageInput.value.click();
@@ -488,8 +488,8 @@ export default {
                     const imagePath = response.data; 
                     const fileName = imagePath.split('/').pop();
                     
-                    editor.commands.focus(editor.state.doc.content.size);
-                    editor.chain().setImage({ src: '/images/articles_images/' + fileName }).run();
+                    contentEditor.commands.focus(contentEditor.state.doc.content.size);
+                    contentEditor.chain().setImage({ src: '/images/articles_images/' + fileName }).run();
 
                     console.log(response.data);
                     console.log('/images/articles_images/' + fileName)
@@ -509,7 +509,7 @@ export default {
 
 
         return {
-            editor,
+            contentEditor,
             toggleBold,
             toggleItalic,
             toggleStrike,
@@ -530,13 +530,13 @@ export default {
             setHeading,
             insertMathOperation,
             highlightText,
-            limit,
+            contentLimit,
             openFileInput,
             addImage,
             getHTMLContent,
             deleteSelection,
             undoWithImages,
-            characterCountNumber,
+            contentCharacterCountNumber,
             toggleCodeBlock,
             toggleBulletList, 
             toggleOrderedList, 
