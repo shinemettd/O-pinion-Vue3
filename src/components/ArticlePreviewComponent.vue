@@ -1,6 +1,8 @@
 <script setup>
 import axios from "axios";
-import store from "@/store/store";
+import {useStore} from "vuex";
+
+const store = useStore();
 
 defineProps({
   showWithoutHeader: {
@@ -40,7 +42,7 @@ function formatDateTime(timeString) {
 
 async function addToFavourites(articleId) {
   try {
-    await axios.post(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, store.state.config);
+    await axios.post(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, '', store.state.config);
     console.log(`Статья ${articleId} добавлена в избранное пользователя ${store.state.nickname}`);
   } catch (e) {
     console.log(e)
@@ -54,6 +56,10 @@ async function deleteFromFavourites(articleId) {
   } catch (e) {
     console.log(e)
   }
+}
+
+function openReportDialog() {
+
 }
 </script>
 
@@ -80,7 +86,7 @@ async function deleteFromFavourites(articleId) {
         </div>
         <div class = "article-header-report">
           <div class = "article-header-report-icon">
-            <img src="/icons/alert_circle_icon.svg" @click="getNewArticles" alt = "Report Icon">
+            <img src="/icons/alert_circle_icon.svg" @click="openReportDialog" alt = "Report Icon">
             <!-- instead of getNewArticles on click should be a method calling to show a window with report -->
           </div>
         </div>

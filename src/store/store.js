@@ -50,5 +50,19 @@ export default createStore({
       state.email = null;
     }
   },
+  actions: {
+    checkTokenExpiration({ commit, state }) {
+      if (state.userToken && state.userToken.timestamp) {
+        const currentTime = new Date().getTime();
+        const tokenTime = state.userToken.timestamp;
+        const elapsedTime = currentTime - tokenTime;
+        const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
+
+        if (elapsedTime >= twelveHoursInMilliseconds) {
+          commit('logout');
+        }
+      }
+    },
+  },
   plugins: [createPersistedState()]
 })
