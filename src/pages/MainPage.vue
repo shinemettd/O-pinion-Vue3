@@ -13,7 +13,7 @@
         <div class="w-full lg:w-auto text-center lg:text-right">
           Сортировка:
           <v-btn-toggle v-model="sortToggle" color="#20b2aa" class="ml-5" mandatory>
-            <v-btn @click="sortByDateTime">По дате</v-btn>
+            <v-btn @click="sortByDateTime">По новизне</v-btn>
             <v-btn @click="sortByPopularity">По популярности</v-btn>
           </v-btn-toggle>
         </div>

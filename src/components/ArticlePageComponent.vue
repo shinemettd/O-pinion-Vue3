@@ -1,5 +1,7 @@
 <script setup>
 import {ref} from "vue";
+import axios from "axios";
+import store from "@/store/store";
 
 const reaction = ref('');
 
@@ -27,6 +29,24 @@ defineProps({
   articleCommentsReplies: String
 })
 
+async function addToFavourites(articleId) {
+  try {
+    await axios.post(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, '', store.state.config);
+    console.log(`Статья ${articleId} добавлена в избранное пользователя ${store.state.nickname}`);
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+async function deleteFromFavourites(articleId) {
+  try {
+    await axios.delete(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, store.state.config);
+    console.log(`Статья ${articleId} удалена из избранного пользователя ${store.state.nickname}`);
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 function formatDateTime(timeString) {
   const dateTime = new Date(timeString);
   const formattedDateTime = dateTime.toLocaleDateString('ru-RU', {
@@ -40,7 +60,7 @@ function formatDateTime(timeString) {
 
 <template>
   <main class = "container mx-auto">
-    <div class = "scroll mx-auto border w-50 h-100 px-3 py-3">
+    <div class = "scroll mx-auto border w-50 h-100 px-4 py-3">
       <hr>
       <div class = "article-header mt-3">
         <p style = "font-size: 2em"> {{ articleTitle }} </p>
@@ -70,7 +90,7 @@ function formatDateTime(timeString) {
       <hr class = "my-3">
       <div class = "article-footer-bar">
         <div class = "article-footer">
-          <div class = "article-rating">
+          <div v-if = "store.state.isAuthorized" class = "article-rating">
             <div class = "article-rating-icon">
               <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="() => {
                 if (reaction === 'disliked') { articleRating += 2; reaction = 'liked'; }
@@ -89,12 +109,20 @@ function formatDateTime(timeString) {
               }">
             </div>
           </div>
+          <div v-else class = "article-rating pl-1">
+              <div class = "article-rating-icon">
+                <img src="/icons/zap_icon.svg" alt="Rating Icon">
+              </div>
+              <b v-if = "articleRating>0" style="color: green">{{ articleRating }}</b>
+              <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
+              <b v-else style="color: black">{{ articleRating }}</b>
+          </div>
           <div class = "article-favourites">
-            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
+            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { console.log(articleInFavourites); deleteFromFavourites(articleId); articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
               <img src="/icons/star_icon.svg" alt = "Favourites Icon">
             </div>
             <div v-else class = article-not-in-favourites-icon>
-              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="() => { articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
+              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="() => { console.log(articleInFavourites); addToFavourites(articleId); articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
             </div>
             <b> {{ articleTotalFavourites }}</b>
           </div>
