@@ -13,6 +13,8 @@ import ArticleCreatePage from "@/pages/ArticleCreatePage.vue";
 import SuccessArticleCreationPage from "@/pages/SuccessArticleCreationPage";
 import PageNotFound from "@/pages/PageNotFound.vue";
 import store from "@/store/store";
+// потом удалить 
+import TagZone from "@/components/TagZone.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -42,6 +44,11 @@ const router = createRouter({
       path: '/user',
       name: 'user',
       component: About
+    },
+    {
+      path: '/tag-zone',
+      name: 'TagZone',
+      component: TagZone
     },
     {
       path: '/create-article',
