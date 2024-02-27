@@ -30,7 +30,8 @@
               </div>
             </div>
             <div class="create-tag">
-
+              <input type="text" placeholder="Введите название тега" v-model="newTagName" class="search-tag-input">
+              <button @click="createTag">Создать</button>
             </div>
             </div>
         </div>
@@ -56,7 +57,7 @@
       const searchTagQuery = ref(null);
       const matchingTags = ref([]);
       const accessToken = localStorage.getItem('accessToken');
-     
+      const newTagName = ref('');
 
 
       onMounted(() => {
@@ -104,12 +105,7 @@
           selectedTags.value.splice(index, 1);
         }
       }
-      const addExistingTag = () => {
-        const selectedTag = existingTags.value.find(tag => tag.id === parseInt(selectedExistingTag.value));
-        if (selectedTag && !selectedTags.value.some(tag => tag.id === selectedTag.id)) {
-          selectedTags.value.push(selectedTag);
-        }
-      };
+      
 
       const handleScroll = () => {
         console.log('isScrollEnd' + isScrollEnd.value);
@@ -133,7 +129,6 @@
         if(pageNum === 0) {
           currentSearchResponsePage.value = 0;
         }
-        console.log(searchTagQuery.value);
         try {
           const response = await axios.get('http://194.152.37.7:8812/api/tags/search', {
             params: {
@@ -153,12 +148,33 @@
           console.error('Error fetching tags:', error);
         }
     };
+
+    const createTag = async () => {
+      if(newTagName.value === '' || (selectedTags.value.some(existingTag => existingTag.name === newTagName.value))) {
+        console.log(newTagName.value);
+        alert('тег ' + newTagName.value + ' уже добавлен')
+        return;
+      }
+      try {
+          const response = await axios.post('http://194.152.37.7:8812/api/tags', {
+            name: newTagName.value
+          }, {
+              headers: {
+                  'Authorization': `Bearer ${accessToken}`
+              }
+          });
+          selectedTags.value.push({ name: newTagName.value });
+          newTagName.value = '';
+        } catch (error) {
+          alert('Ошибка сохранения тега ');
+        }
+      
+    };
   
       return {
         selectedTags,
         existingTags,
         fetchExistingTags,
-        addExistingTag,
         selectedTag,
         toggleTagMenu,
         showTagMenu,
@@ -171,6 +187,8 @@
         searchTagQuery,
         matchingTags,
         loadTags,
+        newTagName,
+        createTag
       };
     }
   };
