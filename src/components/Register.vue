@@ -303,6 +303,15 @@ h2 {
   margin-right: 2px;
 }
 
+input[type=submit].fadeIn.fourth {
+  padding-left: 20px;
+  padding-right: 20px;
+  width: auto; /* Изменено на автоматическую ширину */
+  max-width: 100%; /* Максимальная ширина 100% */
+  margin: 20px 0; /* Добавлено небольшое отступание сверху и снизу */
+}
+
+
 .date-group input {
   width: 100%;
   background-color: transparent;
@@ -696,6 +705,7 @@ body {
   margin-top: 5px;
   font-size: 12px;
 }
+
 
 
 </style>
