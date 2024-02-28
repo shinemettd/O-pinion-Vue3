@@ -39,14 +39,13 @@
   </template>
   
   <script>
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, onUpdated } from 'vue';
   import axios from 'axios';
   
   export default {
     setup() {
       const selectedTags = ref([]);
       const existingTags = ref([]);
-      const selectedTag = ref('');
       const showTagMenu = ref(false);
       const page = ref(0); 
       const currentSearchResponsePage = ref(0);
@@ -62,6 +61,12 @@
 
       onMounted(() => {
         fetchExistingTags(page.value);
+        const storedTags = localStorage.getItem('selectedTags');
+        selectedTags.value = storedTags ? JSON.parse(storedTags) : [];
+      });
+
+      onUpdated(() => {
+        localStorage.setItem('selectedTags', JSON.stringify(selectedTags.value));
       });
 
       const fetchExistingTags = async (pageNumber) => {
@@ -189,7 +194,6 @@
         selectedTags,
         existingTags,
         fetchExistingTags,
-        selectedTag,
         toggleTagMenu,
         showTagMenu,
         pickTag, 

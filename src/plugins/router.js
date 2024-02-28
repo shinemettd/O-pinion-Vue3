@@ -46,11 +46,6 @@ const router = createRouter({
       component: About
     },
     {
-      path: '/tag-zone',
-      name: 'TagZone',
-      component: TagZone
-    },
-    {
       path: '/create-article',
       name: 'ArticleCreatePage',
       component: ArticleCreatePage

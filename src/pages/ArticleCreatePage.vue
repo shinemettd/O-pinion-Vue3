@@ -51,10 +51,8 @@
         </div>
         
         <h2>Содержание статьи :</h2>
-
-    
         <ArticleEditor ref="ArticleEditorComponentRef" :showModal="showModal" :isImageValid="isImageValid"/>
-
+        <TagZone/>
         <button class="btn" @click="submitArticle">Создать статью</button>
       </div>
     </div>
@@ -63,6 +61,7 @@
 <script>
 import ArticleEditor from "@/components/ArticleEditor.vue";
 import Editor from "@/components/Editor.vue";
+import TagZone from "@/components/TagZone.vue";
 import axios from "axios";
 import { ref , onMounted , onBeforeUnmount} from 'vue';
 import router from '@/plugins/router'; 
@@ -70,7 +69,8 @@ import router from '@/plugins/router';
 export default {
   components: {
     ArticleEditor,
-    Editor
+    Editor,
+    TagZone
   },
   setup() {
     const coverImageFile = ref(null);
