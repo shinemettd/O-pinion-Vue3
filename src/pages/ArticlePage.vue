@@ -1,6 +1,6 @@
 <script setup>
 import axios from "axios";
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import { useRoute } from 'vue-router';
 import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
 
@@ -10,16 +10,25 @@ const currentArticleCommentsReplies = ref('');
 const dataFetched = ref(false);
 
 const route = useRoute();
-const articleId = route.params.articleId;
+const articleId = ref(route.params.articleId); // Объявляем articleId как реактивную переменную
+
+// Обновляем данные статьи при изменении articleId
+watch(() => route.params.articleId, (newArticleId, oldArticleId) => {
+  if (newArticleId !== oldArticleId) {
+    articleId.value = newArticleId;
+    getArticle();
+    getComments();
+  }
+});
 
 const getArticle = async () => {
-  currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
+  currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId.value}`);
   dataFetched.value = true;
 }
 
 const getComments = async () => {
-  currentArticleComments.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId}`);
-  currentArticleCommentsReplies.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId}/replies`);
+  currentArticleComments.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId.value}`);
+  currentArticleCommentsReplies.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId.value}/replies`);
 }
 
 onBeforeMount(() => {
@@ -29,6 +38,8 @@ onBeforeMount(() => {
   }
 });
 </script>
+
+
 
 <template>
   <ArticlePageComponent
