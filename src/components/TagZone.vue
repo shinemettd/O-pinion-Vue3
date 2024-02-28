@@ -91,11 +91,10 @@
       };
 
       const pickTag = (tag) => {
-        // console.log('Выбран тег ' + tag.name);
         if (!selectedTags.value.some(existingTag => existingTag.id === tag.id)) {
           selectedTags.value.push(tag);
         } else {
-          console.log('Тег ' + tag.name + ' уже выбран');
+          alert('Тег ' + tag.name + ' уже выбран');
         }
       }
       
@@ -150,11 +149,20 @@
     };
 
     const createTag = async () => {
-      if(newTagName.value === '' || (selectedTags.value.some(existingTag => existingTag.name === newTagName.value))) {
-        console.log(newTagName.value);
-        alert('тег ' + newTagName.value + ' уже добавлен')
+      if(newTagName.value === '') {
+        alert('Прежде чем создать тег введите имя тега ');
         return;
       }
+
+      if(selectedTags.value.some(existingTag => existingTag.name.toLowerCase() === newTagName.value.toLowerCase())) {
+        alert('тег ' + newTagName.value + ' уже добавлен');
+        console.log('Выбранные теги :');
+        for (const tag of selectedTags.value) {
+            console.log(tag.name);
+        }
+        return;
+      }
+
       try {
           const response = await axios.post('http://194.152.37.7:8812/api/tags', {
             name: newTagName.value
@@ -163,7 +171,13 @@
                   'Authorization': `Bearer ${accessToken}`
               }
           });
-          selectedTags.value.push({ name: newTagName.value });
+          if(!selectedTags.value.some(existingTag => existingTag.name.toLowerCase() === response.data.name.toLowerCase())) {
+            selectedTags.value.push({ id: response.data.id, name: response.data.name});
+          }
+          console.log('Выбранные теги : ');
+          for (const tag of selectedTags.value) {
+            console.log(tag.name);
+          }
           newTagName.value = '';
         } catch (error) {
           alert('Ошибка сохранения тега ');
