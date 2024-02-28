@@ -1,47 +1,60 @@
 <template>
-  <nav :class="['navbar', { 'sticky': isSticky }]">
-    <div class="container">
-      <div class="navbar-menu">
-        <router-link to="/" class="navbar-brand" style="font-size: 25px ">O!pinion</router-link>
-        <div class="navbar-tabs">
+  <div>
+    <nav :class="['navbar', { 'sticky': isSticky }]">
+      <div class="container">
+        <div class="navbar-menu">
+          <router-link to="/" class="navbar-brand" style="font-size: 25px ">O!pinion</router-link>
+          <div class="navbar-tabs">
+          </div>
+        </div>
+        <div class="search-container">
+          <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery">
+          <button @click.prevent="search" class="search-button"><i class="fas fa-search elevation-24"></i></button>
+        </div>
+        <div>
+          <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
+          <router-link to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
+          <button @click="toggleMenu" class="burger-button1">☰</button>
+          <div :class="['menu', { 'is-open': isMenuOpen }]">
+            <p class="pb-2" v-if="store.state.isAuthorized">Вы авторизованы как:
+              <li>{{ store.state.nickname }}</li>
+            </p>
+            <p v-else>В данный момент вы не авторизованы</p>
+            <hr>
+            <router-link :to="'/user/' + store.state.nickname" class="menu-item" v-if="store.state.isAuthorized"
+                         @click="isMenuOpen = false"><i class="fas fa-user"></i>Моя страница
+            </router-link>
+            <router-link to="/" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-home"></i>Главная
+            </router-link>
+            <router-link v-if="!store.state.isAuthorized" to="/auth" class="menu-item" @click="isMenuOpen = false"><i
+              class="fas fa-sign-in-alt"></i>Войти
+            </router-link>
+            <router-link to="/about" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-info-circle"></i>О нас
+            </router-link>
+            <router-link to="/notification" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомление
+            </router-link>
+            <router-link to="/create-article" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-plus"></i>Создать
+              статью
+            </router-link>
+            <router-link v-if="store.state.isAuthorized" to="/" class="menu-item"
+                         @click="() => { isMenuOpen = false; store.commit('logout'); }"><i class="fas fa-sign-in-alt"></i>Выйти
+            </router-link>
+          </div>
         </div>
       </div>
-      <div class="search-container">
-        <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery">
-        <button @click.prevent="search" class="search-button"><i class="fas fa-search elevation-24"></i></button>
-      </div>
-      <div>
-        <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
-        <router-link to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
-        <button @click="toggleMenu" class="burger-button1">☰</button>
-        <div :class="['menu', { 'is-open': isMenuOpen }]">
-          <p class="pb-2" v-if="store.state.isAuthorized">Вы авторизованы как:
-            <li>{{ store.state.nickname }}</li>
-          </p>
-          <p v-else>В данный момент вы не авторизованы</p>
-          <hr>
-          <router-link :to="'/user/' + store.state.nickname" class="menu-item" v-if="store.state.isAuthorized"
-                       @click="isMenuOpen = false"><i class="fas fa-user"></i>Моя страница
-          </router-link>
-          <router-link to="/" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-home"></i>Главная
-          </router-link>
-          <router-link v-if="!store.state.isAuthorized" to="/auth" class="menu-item" @click="isMenuOpen = false"><i
-            class="fas fa-sign-in-alt"></i>Войти
-          </router-link>
-          <router-link to="/about" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-info-circle"></i>О нас
-          </router-link>
-          <router-link to="/notification" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомление
-          </router-link>
-          <router-link to="/create-article" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-plus"></i>Создать
-            статью
-          </router-link>
-          <router-link v-if="store.state.isAuthorized" to="/" class="menu-item"
-                       @click="() => { isMenuOpen = false; store.commit('logout'); }"><i class="fas fa-sign-in-alt"></i>Выйти
-          </router-link>
-        </div>
+    </nav>
+    <div class="search-modal" v-if="showSearchModal">
+      <div class="modal-content">
+        <span class="close" @click="showSearchModal = false">&times;</span>
+        <h3>Результаты поиска:</h3>
+        <ul>
+          <li v-for="result in searchResults" :key="result.id">
+            <router-link :to="'/article/' + result.id">{{ result.title }}</router-link>
+          </li>
+        </ul>
       </div>
     </div>
-  </nav>
+  </div>
 </template>
 
 <script>
@@ -59,7 +72,9 @@ export default {
     return {
       isMenuOpen: false,
       searchQuery: '',
-      isSticky: false
+      isSticky: false,
+      searchResults: [],
+      showSearchModal: false
     };
   },
   mounted() {
@@ -74,28 +89,29 @@ export default {
     },
     async search() {
       try {
+        if (this.searchQuery.trim() === '') {
+          return; // Если запрос поиска пуст, не выполнять поиск и отображение модального окна
+        }
+
         const response = await axios.get('http://194.152.37.7:8812/api/articles/search', {
           params: {
             query: this.searchQuery
           }
         });
-        console.log('Результаты поиска:', response.data);
 
         if (response.data.content && response.data.content.length > 0) {
-          const firstArticle = response.data.content[0];
-
-          this.$router.push(`/article/${firstArticle.id}`);
+          this.searchResults = response.data.content;
+          this.showSearchModal = true;
         } else {
           console.log('Нет результатов поиска');
+          this.searchResults = [];
+          this.showSearchModal = false;
         }
       } catch (error) {
         console.error('Ошибка при поиске статей:', error);
       }
     },
-    toggleFilter() {
-      console.log('Переключение фильтра');
-      // Логика фильтрации
-    },
+
     handleScroll() {
       this.isSticky = window.scrollY > 0;
     }
@@ -108,8 +124,6 @@ export default {
   width: 100%;
   z-index: 1000;
   background: linear-gradient(21deg, #6b1e6e, #5611ec);
-
-
   color: #f6f6f6;
   padding: 13px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -134,7 +148,7 @@ export default {
 .navbar-brand {
   padding-left: 12px;
   font-weight: bold;
-  font-size: 25px; /* Changed font size for mobile */
+  font-size: 25px;
 }
 
 .navbar-menu {
@@ -163,9 +177,7 @@ export default {
   padding: 10px;
   right: -250px;
   width: 250px;
-
   background: linear-gradient(21deg, #6b1e6e, #5611ec);
-
   transition: right 0.3s;
   z-index: 1000;
 }
@@ -216,6 +228,34 @@ export default {
   cursor: pointer;
 }
 
+.search-modal {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  background-color: #fff;
+  border-right: 1px solid #ccc;
+  box-shadow: -2px -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+.modal-content {
+  padding: 20px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
 
 @media (max-width: 768px) {
   .container {
@@ -240,17 +280,11 @@ export default {
 
   .burger-button1 {
     margin-left: 8px;
-
   }
 
-
-  @media (max-width: 768px) {
-
-    .menu.is-open .burger-button1 {
-      font-size: 16px;
-    }
+  .menu.is-open .burger-button1 {
+    font-size: 16px;
   }
-
 
   .menu {
     width: 80%;
