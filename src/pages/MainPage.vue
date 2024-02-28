@@ -56,7 +56,7 @@ const pageSize = ref(10);
 const articles = ref([]);
 const sortToggle = ref(0);
 const showToggle = ref(0);
-const sortBy = ref('dateTime,desc'); // Изменение сортировки на 'dateTime,desc'
+const sortBy = ref('dateTime,desc');
 const showContent = ref('articles');
 const totalPages = ref(0);
 
@@ -115,6 +115,7 @@ onBeforeMount(() => {
 
 <style scoped>
 .pagination {
+
   margin-top: 20px;
   display: flex;
   justify-content: center;
@@ -124,7 +125,7 @@ onBeforeMount(() => {
 .pagination button {
   margin: 0 5px;
   padding: 5px 10px;
-  background-color: #12c4e3;
+  background: linear-gradient(21deg, #86278a, #652ae5);
   color: white;
   border: none;
   cursor: pointer;
@@ -154,4 +155,5 @@ onBeforeMount(() => {
     width: 50%;
   }
 }
+
 </style>

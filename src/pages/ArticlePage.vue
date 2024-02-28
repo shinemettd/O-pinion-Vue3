@@ -1,6 +1,6 @@
 <script setup>
 import axios, {HttpStatusCode} from "axios";
-import {onBeforeMount, onMounted, ref} from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import { useRoute } from 'vue-router';
 import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
 import store from "@/store/store";
@@ -10,11 +10,23 @@ const currentArticleComments = ref('');
 const dataFetched = ref(false);
 
 const route = useRoute();
-const articleId = route.params.articleId;
+const articleId = ref(route.params.articleId); // Объявляем articleId как реактивную переменную
+
+// Обновляем данные статьи при изменении articleId
+watch(() => route.params.articleId, (newArticleId, oldArticleId) => {
+  if (newArticleId !== oldArticleId) {
+    articleId.value = newArticleId;
+    getArticle();
+    getComments();
+  }
+});
 
 const getArticle = async () => {
-  currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`, store.state.config);
-  dataFetched.value = true;
+  if (store.state.isAuthorized) {
+    currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`, store.state.config);
+  } else {
+    currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
+  }
 }
 
 const getComments = async () => {
@@ -56,6 +68,8 @@ onBeforeMount(() => {
 });
 </script>
 
+
+
 <template>
   <ArticlePageComponent
     :authors-avatar-url = "cutImagePath(currentArticle.data.author.avatar) || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
@@ -70,7 +84,6 @@ onBeforeMount(() => {
     :article-total-comments = "currentArticle.data.total_comments"
     :article-total-views = "currentArticle.data.total_views"
     :article-comments = "currentArticleComments.data"
-
   />
 
 </template>
