@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <Navbar :isUserAthorized = 'isUserAuthorized'/>
+      <Navbar :isUserAthorized = 'store.state.isAuthorized'/>
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -9,9 +9,5 @@
 
 <script setup>
   import Navbar from "@/components/Navbar.vue";
-  import {useStore} from 'vuex';
-
-  const store = useStore();
-
-  const isUserAuthorized = store.state.isAuthorized;
+  import store from "@/store/store";
 </script>
