@@ -99,7 +99,7 @@ function openReportDialog() {
 
           </router-link>
         </div>
-        <div :v-show = "(articleMainPictureUrl !== '' && articleMainPictureUrl !== null)" class = "article-picture">
+        <div v-if = "(articleMainPictureUrl !== '' && articleMainPictureUrl !== null)" class = "article-picture">
           <router-link :to="'/article/' + articleId">
             <img :src = "articleMainPictureUrl" alt = "Main picture of article preview">
           </router-link>

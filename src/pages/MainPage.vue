@@ -21,12 +21,12 @@
       <hr>
       <div v-if="articles.length > 0" v-for="article in articles" :key="article.id" class="scroll-content my-7">
         <ArticlePreviewComponent
-          :authors-nickname="article.author.nickname"
+          :authors-nickname="cutImagePath(article.author.nickname)"
           :authors-avatar-url="article.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
           :postedTimeAgo="article.date_time"
           :article-id="article.id"
           :article-title="article.title"
-          :article-main-picture-url="article.cover_image"
+          :article-main-picture-url="cutImagePath(article.cover_image)"
           :article-short-description="article.short_description"
           :article-rating="article.rating"
           :article-in-favourites="article.in_favourites"
@@ -49,6 +49,7 @@
 import axios from 'axios';
 import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
 import {onBeforeMount, ref} from "vue";
+import store from "@/store/store";
 
 const currentPage = ref(0);
 const pageSize = ref(10);
@@ -60,14 +61,22 @@ const showContent = ref('articles');
 const totalPages = ref(0);
 
 const getArticles = async () => {
+  const config = {
+    params: {
+      page: currentPage.value,
+      size: pageSize.value,
+      sort: sortBy.value,
+    }
+  };
+
+  if (store.state.isAuthorized) {
+    config.headers = {
+      'Authorization': `Bearer ${store.state.userToken}`
+    };
+  }
+
   try {
-    const response = await axios.get('http://194.152.37.7:8812/api/articles', {
-      params: {
-        page: currentPage.value,
-        size: pageSize.value,
-        sort: sortBy.value
-      }
-    });
+    const response = await axios.get('http://194.152.37.7:8812/api/articles', config);
     articles.value = response.data.content;
     totalPages.value = response.data.totalPages;
   } catch (error) {
@@ -88,6 +97,15 @@ const sortByPopularity = () => {
 const setPage = async (page) => {
   currentPage.value = page;
   await getArticles();
+}
+
+function cutImagePath(absolutePath) {
+  if (absolutePath === null) {
+    return null;
+  }
+  const shortPath = absolutePath.substring(absolutePath.indexOf("/images/"));
+  console.log(shortPath);
+  return shortPath;
 }
 
 onBeforeMount(() => {

@@ -1,11 +1,11 @@
 <script setup>
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import axios from "axios";
 import store from "@/store/store";
 
 const reaction = ref('');
 
-defineProps({
+const props = defineProps({
   authorsNickname: String,
   authorsAvatarUrl: {
     type: String,
@@ -47,6 +47,35 @@ async function deleteFromFavourites(articleId) {
   }
 }
 
+async function setLike() {
+  const articleId = props.articleId;
+  console.log(articleId);
+  const data = {
+    article_id: articleId,
+    reaction_type: "LIKE"
+  }
+  try {
+    await axios.post(`http://194.152.37.7:8812/api/article-reactions`, data, store.state.config);
+    console.log(`Пользователь ${store.state.nickname} оставил ${data.reaction_type} реакцию статье ${articleId}`);
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+async function setDislike() {
+  const articleId = props.articleId;
+  const data = {
+    article_id: articleId,
+    reaction_type: "DISLIKE"
+  }
+  try {
+    await axios.post(`http://194.152.37.7:8812/api/article-reactions`, data, store.state.config);
+    console.log(`Пользователь ${store.state.nickname} оставил ${data.reaction_type} реакцию статье ${articleId}`);
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 function formatDateTime(timeString) {
   const dateTime = new Date(timeString);
   const formattedDateTime = dateTime.toLocaleDateString('ru-RU', {
@@ -56,6 +85,10 @@ function formatDateTime(timeString) {
   });
   return formattedDateTime;
 }
+
+onMounted(() => {
+  console.log(props.articleInFavourites)
+})
 </script>
 
 <template>
@@ -92,21 +125,13 @@ function formatDateTime(timeString) {
         <div class = "article-footer">
           <div v-if = "store.state.isAuthorized" class = "article-rating">
             <div class = "article-rating-icon">
-              <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="() => {
-                if (reaction === 'disliked') { articleRating += 2; reaction = 'liked'; }
-                else if (reaction !== 'liked' && reaction !== 'disliked') { articleRating++; reaction = 'liked'; }
-                else { articleRating--; reaction = ''}
-              }">
+              <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="() => setDislike()">
             </div>
             <b v-if = "articleRating > 0" style="color: green">{{ articleRating }}</b>
             <b v-else-if="articleRating < 0" if = "articleRating>0" style="color: red">{{ articleRating }}</b>
             <b v-else style="color: black">{{ articleRating }}</b>
             <div class = "article-rating-icon ml-3">
-              <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="() => {
-                if (reaction === 'liked') { articleRating -= 2; reaction = 'disliked'; }
-                else if (reaction !== 'liked' && reaction !== 'disliked') { articleRating--; reaction = 'disliked'; }
-                else { articleRating++; reaction = ''}
-              }">
+              <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="() => setLike()">
             </div>
           </div>
           <div v-else class = "article-rating pl-1">
@@ -118,11 +143,11 @@ function formatDateTime(timeString) {
               <b v-else style="color: black">{{ articleRating }}</b>
           </div>
           <div class = "article-favourites">
-            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { console.log(articleInFavourites); deleteFromFavourites(articleId); articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
+            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { console.log(articleInFavourites); deleteFromFavourites(articleId); articleInFavourites = false; articleTotalFavourites--;}">
               <img src="/icons/star_icon.svg" alt = "Favourites Icon">
             </div>
             <div v-else class = article-not-in-favourites-icon>
-              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="() => { console.log(articleInFavourites); addToFavourites(articleId); articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
+              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="() => { console.log(articleInFavourites); addToFavourites(articleId); articleInFavourites = true; articleTotalFavourites++;}">
             </div>
             <b> {{ articleTotalFavourites }}</b>
           </div>
@@ -150,7 +175,7 @@ function formatDateTime(timeString) {
             <div class = "info-header">
               <div class = "user-avatar">
                 <router-link :to="`/user/${comment.user.nickname}`">
-                  <img :src="comment.user.avatar" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
+                  <img :src="comment.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
                 </router-link>
               </div>
               <div class = "comment-user-data">
@@ -161,7 +186,7 @@ function formatDateTime(timeString) {
                   <p v-else style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} </p>
               </div>
             </div>
-            <div class="my-2 ml-11">
+            <div class="my-2 ml-13">
               <div style = "font-size: 1.15em">
                 <p>
                   {{ comment.text }}
@@ -172,12 +197,12 @@ function formatDateTime(timeString) {
               </div>
             </div>
 
-          <div v-if = "comment.replies > 0">
-            <div class = "replies-list my-5 ml-11" v-for = "reply in articleCommentsReplies.content" :key="reply.id">
+          <div v-if = "comment.replies.length > 0">
+            <div class = "replies-list my-5 ml-11" v-for = "reply in comment.replies" :key="reply.id">
               <div class = "info-header">
                 <div class = "user-avatar">
                   <router-link :to="`/user/${reply.user.nickname}`">
-                    <img :src="reply.user.avatar" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
+                    <img :src="reply.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
                   </router-link>
                 </div>
                 <div class = "comment-user-data">
@@ -188,7 +213,7 @@ function formatDateTime(timeString) {
                   <p v-else style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(reply.date) }} </p>
                 </div>
               </div>
-              <div class="my-2 ml-11">
+              <div class="my-2 ml-13">
                 <div style = "font-size: 1.15em">
                   {{ reply.text }}
                 </div>
