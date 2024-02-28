@@ -80,6 +80,14 @@ export default {
           }
         });
         console.log('Результаты поиска:', response.data);
+
+        if (response.data.content && response.data.content.length > 0) {
+          const firstArticle = response.data.content[0];
+
+          this.$router.push(`/article/${firstArticle.id}`);
+        } else {
+          console.log('Нет результатов поиска');
+        }
       } catch (error) {
         console.error('Ошибка при поиске статей:', error);
       }
