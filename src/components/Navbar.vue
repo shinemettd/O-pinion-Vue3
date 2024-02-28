@@ -4,7 +4,6 @@
       <div class="navbar-menu">
         <router-link to="/" class="navbar-brand" style="font-size: 25px ">O!pinion</router-link>
         <div class="navbar-tabs">
-          <!-- Здесь могут быть другие элементы навигации -->
         </div>
       </div>
       <div class="search-container">
@@ -16,16 +15,29 @@
         <router-link to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
         <button @click="toggleMenu" class="burger-button1">☰</button>
         <div :class="['menu', { 'is-open': isMenuOpen }]">
-          <p class="pb-2" v-if="store.state.isAuthorized">Вы авторизованы как: <li>{{store.state.nickname}}</li></p>
+          <p class="pb-2" v-if="store.state.isAuthorized">Вы авторизованы как:
+            <li>{{ store.state.nickname }}</li>
+          </p>
           <p v-else>В данный момент вы не авторизованы</p>
           <hr>
-          <router-link :to="'/user/' + store.state.nickname" class="menu-item" v-if="store.state.isAuthorized" @click="isMenuOpen = false"><i class="fas fa-user"></i>Моя страница</router-link>
-          <router-link to="/" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-home"></i>Главная</router-link>
-          <router-link v-if="!store.state.isAuthorized" to="/auth" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-sign-in-alt"></i>Войти</router-link>
-          <router-link to="/about" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-info-circle"></i>О нас</router-link>
-          <router-link to="/notification" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомление</router-link>
-          <router-link to="/create-article" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-plus"></i>Создать статью</router-link>
-          <router-link v-if="store.state.isAuthorized" to="/" class="menu-item" @click="() => { isMenuOpen = false; store.commit('logout'); }"><i class="fas fa-sign-in-alt"></i>Выйти</router-link>
+          <router-link :to="'/user/' + store.state.nickname" class="menu-item" v-if="store.state.isAuthorized"
+                       @click="isMenuOpen = false"><i class="fas fa-user"></i>Моя страница
+          </router-link>
+          <router-link to="/" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-home"></i>Главная
+          </router-link>
+          <router-link v-if="!store.state.isAuthorized" to="/auth" class="menu-item" @click="isMenuOpen = false"><i
+            class="fas fa-sign-in-alt"></i>Войти
+          </router-link>
+          <router-link to="/about" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-info-circle"></i>О нас
+          </router-link>
+          <router-link to="/notification" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомление
+          </router-link>
+          <router-link to="/create-article" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-plus"></i>Создать
+            статью
+          </router-link>
+          <router-link v-if="store.state.isAuthorized" to="/" class="menu-item"
+                       @click="() => { isMenuOpen = false; store.commit('logout'); }"><i class="fas fa-sign-in-alt"></i>Выйти
+          </router-link>
         </div>
       </div>
     </div>
@@ -34,6 +46,7 @@
 
 <script>
 import store from "@/store/store";
+import axios from 'axios'
 
 export default {
   name: 'Navbar',
@@ -59,9 +72,17 @@ export default {
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
     },
-    search() {
-      console.log('Поиск по запросу:', this.searchQuery);
-      // Логика поиска
+    async search() {
+      try {
+        const response = await axios.get('http://194.152.37.7:8812/api/articles/search', {
+          params: {
+            query: this.searchQuery
+          }
+        });
+        console.log('Результаты поиска:', response.data);
+      } catch (error) {
+        console.error('Ошибка при поиске статей:', error);
+      }
     },
     toggleFilter() {
       console.log('Переключение фильтра');
@@ -81,9 +102,9 @@ export default {
   background: linear-gradient(21deg, #6b1e6e, #5611ec);
 
 
-color: #f6f6f6;
-  padding: 13px ;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: #f6f6f6;
+  padding: 13px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .sticky {
@@ -93,7 +114,7 @@ color: #f6f6f6;
   background: linear-gradient(21deg, #6b1e6e, #5611ec);
   color: white;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .container {
