@@ -2,6 +2,7 @@
 import {onMounted, ref} from "vue";
 import axios from "axios";
 import store from "@/store/store";
+import router from "@/plugins/router";
 
 const reaction = ref('');
 
@@ -21,8 +22,6 @@ const props = defineProps({
     default: false,
   },
   articleContent: String,
-  articleTotalLikes: Number,
-  articleTotalDislikes: Number,
   articleTotalComments: Number,
   articleTotalViews: Number,
   articleComments: String,
@@ -32,7 +31,6 @@ const props = defineProps({
 async function addToFavourites(articleId) {
   try {
     await axios.post(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, '', store.state.config);
-    console.log(`Статья ${articleId} добавлена в избранное пользователя ${store.state.nickname}`);
   } catch (e) {
     console.log(e)
   }
@@ -41,7 +39,6 @@ async function addToFavourites(articleId) {
 async function deleteFromFavourites(articleId) {
   try {
     await axios.delete(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, store.state.config);
-    console.log(`Статья ${articleId} удалена из избранного пользователя ${store.state.nickname}`);
   } catch (e) {
     console.log(e)
   }
@@ -49,14 +46,12 @@ async function deleteFromFavourites(articleId) {
 
 async function setLike() {
   const articleId = props.articleId;
-  console.log(articleId);
   const data = {
     article_id: articleId,
     reaction_type: "LIKE"
   }
   try {
     await axios.post(`http://194.152.37.7:8812/api/article-reactions`, data, store.state.config);
-    console.log(`Пользователь ${store.state.nickname} оставил ${data.reaction_type} реакцию статье ${articleId}`);
   } catch (e) {
     console.log(e)
   }
@@ -70,7 +65,6 @@ async function setDislike() {
   }
   try {
     await axios.post(`http://194.152.37.7:8812/api/article-reactions`, data, store.state.config);
-    console.log(`Пользователь ${store.state.nickname} оставил ${data.reaction_type} реакцию статье ${articleId}`);
   } catch (e) {
     console.log(e)
   }
@@ -86,9 +80,11 @@ function formatDateTime(timeString) {
   return formattedDateTime;
 }
 
-onMounted(() => {
-  console.log(props.articleInFavourites)
-})
+function redirectIfNotAuthorized() {
+  if (!(store.state.isAuthorized)) {
+    router.push('/auth');
+  }
+}
 </script>
 
 <template>
@@ -96,7 +92,7 @@ onMounted(() => {
     <div class = "scroll mx-auto border w-50 h-100 px-4 py-3">
       <hr>
       <div class = "article-header mt-3">
-        <p style = "font-size: 2em"> {{ articleTitle }} </p>
+        <p style = "font-size: 2em; word-wrap: break-word;"> {{ articleTitle }} </p>
         <div class = "article-header-data my-2" style = "display: flex">
           <div class = "user-avatar mr-3">
             <router-link :to="'/user/' + authorsNickname">
@@ -113,7 +109,7 @@ onMounted(() => {
         </div>
       </div>
       <!--   article content     -->
-      <p class = "my-3" style = "font-size: 1.25em"> {{ articleContent }} </p>
+      <p class = "my-3" style = "font-size: 1.25em; word-wrap: break-word;"> {{ articleContent }} </p>
 
 
       <div class="my-3">
@@ -125,13 +121,19 @@ onMounted(() => {
         <div class = "article-footer">
           <div v-if = "store.state.isAuthorized" class = "article-rating">
             <div class = "article-rating-icon">
-              <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="() => setDislike()">
+              <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="async () => {
+                await setLike();
+                articleRating = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`)).data.rating;
+              }">
             </div>
             <b v-if = "articleRating > 0" style="color: green">{{ articleRating }}</b>
             <b v-else-if="articleRating < 0" if = "articleRating>0" style="color: red">{{ articleRating }}</b>
             <b v-else style="color: black">{{ articleRating }}</b>
             <div class = "article-rating-icon ml-3">
-              <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="() => setLike()">
+              <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="async () => {
+                await setDislike();
+                articleRating = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`)).data.rating;
+              }">
             </div>
           </div>
           <div v-else class = "article-rating pl-1">
@@ -143,11 +145,19 @@ onMounted(() => {
               <b v-else style="color: black">{{ articleRating }}</b>
           </div>
           <div class = "article-favourites">
-            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { console.log(articleInFavourites); deleteFromFavourites(articleId); articleInFavourites = false; articleTotalFavourites--;}">
+            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
+              redirectIfNotAuthorized();
+              deleteFromFavourites(articleId);
+              articleInFavourites = false;
+              articleTotalFavourites--;}">
               <img src="/icons/star_icon.svg" alt = "Favourites Icon">
             </div>
             <div v-else class = article-not-in-favourites-icon>
-              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="() => { console.log(articleInFavourites); addToFavourites(articleId); articleInFavourites = true; articleTotalFavourites++;}">
+              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="() => {
+                redirectIfNotAuthorized();
+                addToFavourites(articleId);
+                articleInFavourites = true;
+                articleTotalFavourites++;}">
             </div>
             <b> {{ articleTotalFavourites }}</b>
           </div>
