@@ -1,39 +1,60 @@
 <script setup>
-import axios from "axios";
+import axios, {HttpStatusCode} from "axios";
 import { onBeforeMount, ref, watch } from "vue";
 import { useRoute } from 'vue-router';
 import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
+import store from "@/store/store";
 
 const currentArticle = ref('');
 const currentArticleComments = ref('');
-const currentArticleCommentsReplies = ref('');
 const dataFetched = ref(false);
 
 const route = useRoute();
-const articleId = ref(route.params.articleId); // Объявляем articleId как реактивную переменную
+const articleId = route.params.articleId;
 
-// Обновляем данные статьи при изменении articleId
-watch(() => route.params.articleId, (newArticleId, oldArticleId) => {
-  if (newArticleId !== oldArticleId) {
-    articleId.value = newArticleId;
-    getArticle();
-    getComments();
-  }
-});
 
 const getArticle = async () => {
-  currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId.value}`);
-  dataFetched.value = true;
+  if (store.state.isAuthorized) {
+    currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`, store.state.config);
+  } else {
+    currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
+  }
 }
 
 const getComments = async () => {
-  currentArticleComments.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId.value}`);
-  currentArticleCommentsReplies.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId.value}/replies`);
+  currentArticleComments.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId}`);
 }
 
+const isAuthorized = async () => {
+  if (store.state.nickname === null) {
+    return false;
+  }
+  try {
+    const response = await axios.get(`http://194.152.37.7:8812/api/users/nickname/${store.state.nickname}/profile`);
+    return response.status === HttpStatusCode.Ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+function cutImagePath(absolutePath) {
+  if (absolutePath === null) {
+    return null;
+  }
+  const shortPath = absolutePath.substring(absolutePath.indexOf("/images/"));
+  console.log(shortPath);
+  return shortPath;
+}
+
+
+
 onBeforeMount(() => {
+  if (!isAuthorized()) {
+    store.commit('logout');
+  }
   if (!dataFetched.value) {
     getArticle();
+    console.log(currentArticle);
     getComments();
   }
 });
@@ -43,7 +64,7 @@ onBeforeMount(() => {
 
 <template>
   <ArticlePageComponent
-    :authors-avatar-url = "currentArticle.data.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
+    :authors-avatar-url = "cutImagePath(currentArticle.data.author.avatar) || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
     :authors-nickname = "currentArticle.data.author.nickname"
     :posted-time-ago = "currentArticle.data.date_time"
     :article-id = "currentArticle.data.id"
@@ -55,7 +76,6 @@ onBeforeMount(() => {
     :article-total-comments = "currentArticle.data.total_comments"
     :article-total-views = "currentArticle.data.total_views"
     :article-comments = "currentArticleComments.data"
-    :article-comments-replies = "currentArticleCommentsReplies.data"
   />
 
 </template>

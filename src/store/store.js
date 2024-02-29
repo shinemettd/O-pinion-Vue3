@@ -48,6 +48,7 @@ export default createStore({
       state.nickname = null;
       state.id = null;
       state.email = null;
+      state.config = null;
     }
   },
   actions: {

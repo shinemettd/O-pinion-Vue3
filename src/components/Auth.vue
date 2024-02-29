@@ -34,7 +34,7 @@ export default {
           store.commit('setNickname', user.nickname)
           store.commit('setToken', accessToken);
           store.commit('setConfig', config);
-          router.push('/');
+          await router.push('/');
         } catch (error) {
           console.error('Ошибка при входе:', error);
         }
