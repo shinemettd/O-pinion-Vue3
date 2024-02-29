@@ -25,6 +25,15 @@ const getComments = async () => {
   currentArticleComments.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId}`);
 }
 
+function cutImagePath(absolutePath) {
+  if (absolutePath === null) {
+    return null;
+  }
+  const shortPath = absolutePath.substring(absolutePath.indexOf("/images/"));
+  console.log(shortPath);
+  return shortPath;
+}
+
 const isAuthorized = async () => {
   if (store.state.nickname === null) {
     return false;
@@ -37,24 +46,12 @@ const isAuthorized = async () => {
   }
 }
 
-function cutImagePath(absolutePath) {
-  if (absolutePath === null) {
-    return null;
-  }
-  const shortPath = absolutePath.substring(absolutePath.indexOf("/images/"));
-  console.log(shortPath);
-  return shortPath;
-}
-
-
-
 onBeforeMount(() => {
   if (!isAuthorized()) {
     store.commit('logout');
   }
   if (!dataFetched.value) {
     getArticle();
-    console.log(currentArticle);
     getComments();
   }
 });
