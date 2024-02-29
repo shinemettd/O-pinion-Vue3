@@ -39,20 +39,20 @@ const isAuthorized = async () => {
     return false;
   }
   try {
-    const response = await axios.get(`http://194.152.37.7:8812/api/users/nickname/${store.state.nickname}/profile`);
+    const response = await axios.get(`http://194.152.37.7:8812/api/users/my-profile`);
     return response.status === HttpStatusCode.Ok;
   } catch (e) {
     return false;
   }
 }
 
-onBeforeMount(() => {
-  if (!isAuthorized()) {
+onBeforeMount(async () => {
+  if (!(await isAuthorized())) {
     store.commit('logout');
   }
   if (!dataFetched.value) {
-    getArticle();
-    getComments();
+    await getArticle();
+    await getComments();
   }
 });
 </script>
