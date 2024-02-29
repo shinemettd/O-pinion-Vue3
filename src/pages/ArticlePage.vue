@@ -10,16 +10,8 @@ const currentArticleComments = ref('');
 const dataFetched = ref(false);
 
 const route = useRoute();
-const articleId = ref(route.params.articleId); // Объявляем articleId как реактивную переменную
+const articleId = route.params.articleId;
 
-// Обновляем данные статьи при изменении articleId
-watch(() => route.params.articleId, (newArticleId, oldArticleId) => {
-  if (newArticleId !== oldArticleId) {
-    articleId.value = newArticleId;
-    getArticle();
-    getComments();
-  }
-});
 
 const getArticle = async () => {
   if (store.state.isAuthorized) {

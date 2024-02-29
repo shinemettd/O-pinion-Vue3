@@ -1,8 +1,12 @@
 <script setup>
 import axios from "axios";
 import {useStore} from "vuex";
+import {ref} from "vue";
+import router from "@/plugins/router";
 
 const store = useStore();
+const reportReason = ref('');
+const reportReasonText = ref('');
 
 defineProps({
   showWithoutHeader: {
@@ -63,6 +67,17 @@ function openReportDialog() {
 }
 </script>
 
+<script>
+export default {
+  data () {
+    return {
+      reportReason: '',
+      reportReasonText: ''
+    }
+  },
+}
+</script>
+
 <template>
   <article class = "article-block">
     <div class = "article-content">
@@ -86,8 +101,80 @@ function openReportDialog() {
         </div>
         <div class = "article-header-report">
           <div class = "article-header-report-icon">
-            <img src="/icons/alert_circle_icon.svg" @click="openReportDialog" alt = "Report Icon">
-            <!-- instead of getNewArticles on click should be a method calling to show a window with report -->
+            <v-dialog max-width="500">
+              <template v-slot:activator="{ props: activatorProps }">
+                <img src="/icons/alert_circle_icon.svg" alt = "icon" v-bind="activatorProps" @click="() => {
+                  if (!(store.state.isAuthorized)) {
+                    router.push('/auth')
+                  }
+                }">
+              </template>
+
+              <template v-slot:default="{ isActive }">
+                <v-card title="Пожаловаться">
+                  <v-card-text>
+                    Что именно вам кажется недопустимым в этом материале?
+                  </v-card-text>
+                  <v-radio-group
+                    v-model="reportReason"
+                    column
+                    class = "pl-5"
+                  >
+                    <v-radio label="Спам"
+                             value="SPAM"
+                    ></v-radio>
+
+                    <v-radio label="Прочее"
+                             value="OTHER"
+                    ></v-radio>
+
+                  </v-radio-group>
+                <div class = "px-5">
+                  <div class="">Сообщение (необязательно) </div>
+
+                  <v-textarea
+                    :counter="500"
+                    class="mb-2"
+                    rows="2"
+                    variant="outlined"
+                    v-model="reportReasonText"
+                    persistent-counter
+                  ></v-textarea>
+                </div>
+
+
+                  <v-card-actions class = "mx-3 my-1">
+                    <v-btn
+                      color="surface-variant"
+                      text="Отправить"
+                      variant="flat"
+                      @click="async () => {
+                        if (store.state.isAuthorized) {
+                          const data = {
+                            reason: reportReason,
+                            text: reportReasonText
+                          }
+                          await axios.post(`http://194.152.37.7:8812/api/complaints/${articleId}`, data, store.state.config);
+                          console.log(`Жалоба на статью ${articleId} с причиной ${reportReason} и комментарием ${reportReasonText}`);
+                          isActive.value = false;
+                        } else {
+                          await router.push('/auth');
+                        }
+                      }"
+                    ></v-btn>
+
+                    <v-spacer>
+
+                    </v-spacer>
+
+                    <v-btn
+                      text="Закрыть"
+                      @click="isActive.value = false"
+                    ></v-btn>
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </v-dialog>
           </div>
         </div>
       </div>
@@ -123,10 +210,26 @@ function openReportDialog() {
               <b v-else style="color: black">{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
-                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => { deleteFromFavourites(articleId); articleInFavourites = !articleInFavourites; articleTotalFavourites--; }">
+                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
+                  if (store.state.isAuthorized) {
+                    deleteFromFavourites(articleId);
+                    articleInFavourites = false;
+                    articleTotalFavourites--;
+                  } else {
+                    router.push('/auth');
+                  }
+                }">
                   <img src="/icons/star_icon.svg" alt = "Favourites Icon">
                 </div>
-                <div v-else class = article-not-in-favourites-icon @click="() => { addToFavourites(articleId); articleInFavourites = !articleInFavourites; articleTotalFavourites++; }">
+                <div v-else class = article-not-in-favourites-icon @click="() => {
+                  if (store.state.isAuthorized) {
+                    addToFavourites(articleId);
+                    articleInFavourites = true;
+                    articleTotalFavourites++;
+                  } else {
+                    router.push('/auth');
+                  }
+                }">
                   <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
                 </div>
                 <b> {{ articleTotalFavourites }}</b>
