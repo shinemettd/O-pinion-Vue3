@@ -1,11 +1,11 @@
 <template>
     <div class="article-container">
       <div class="article-form">
-  
+
         <label for="title">Заголовок:</label>
         <input v-model="title" type="text" id="title" class="title-input" @input="limitInputLength" @paste="handlePaste" :maxlength="title.length >= 120 ? 120 : null" />
         <p :style="{ color: title.length > 120 ? 'red' : 'black' }">{{ title.length }}/120</p>
-        
+
         <div class="cover-image">
 
             <div
@@ -35,10 +35,10 @@
             </div>
           </div>
         </div>
-  
+
         <label for="short-description">Краткое описание:</label>
         <Editor  ref="EditorComponentRef" :showModal="showModal"/>
-  
+
         <div id="myModal" class="modal">
           <div class="modal-content">
             <div class="close">&times;</div>
@@ -49,10 +49,10 @@
             <img v-if="imageSrc !== null" :src="imageSrc" alt="image" id="warningImage">
           </div>
         </div>
-        
+
         <h2>Содержание статьи :</h2>
 
-    
+
         <ArticleEditor ref="ArticleEditorComponentRef" :showModal="showModal" :isImageValid="isImageValid"/>
 
         <button class="btn" @click="submitArticle">Создать статью</button>
@@ -63,9 +63,10 @@
 <script>
 import ArticleEditor from "@/components/ArticleEditor.vue";
 import Editor from "@/components/Editor.vue";
-import axios from "axios";
-import { ref , onMounted , onBeforeUnmount} from 'vue';
-import router from '@/plugins/router'; 
+import axios, {HttpStatusCode} from "axios";
+import {ref, onMounted, onBeforeUnmount, onBeforeMount} from 'vue';
+import router from '@/plugins/router';
+import store from "@/store/store";
 
 export default {
   components: {
@@ -81,7 +82,7 @@ export default {
 
     const title = ref('');
     const short_description = ref('');
-    
+
 
     const ArticleEditorComponentRef = ref(null);
     const EditorComponentRef = ref(null);
@@ -99,12 +100,12 @@ export default {
 
     });
 
-     
+
      onBeforeUnmount(() => {
       // saveTitleToLocalStorage();
     });
 
-    
+
     const loadTitleFromLocalStorage = () => {
       const savedTitle = localStorage.getItem('savedTitle');
       if (savedTitle) {
@@ -126,7 +127,7 @@ export default {
     const handlePaste = (event) => {
       const pastedText = event.clipboardData.getData('text/plain');
       if ((title.value.length + pastedText.length) > 120) {
-        event.preventDefault(); 
+        event.preventDefault();
       }
     }
 
@@ -146,7 +147,7 @@ export default {
       if (files.length < 0) {
         return;
       }
-      coverImageFile.value = null; // чтобы рендерились изменения 
+      coverImageFile.value = null; // чтобы рендерились изменения
       coverImageFile.value = files[0];
 
       if(await isImageValid(coverImageFile)) {
@@ -175,7 +176,7 @@ export default {
         showModal("/icons/too_much.jpg", 'Размер файла превышает 2МБ ');
         return false;
       }
-      
+
       try {
         const isSizeValid = await isRequiredSize(file.value);
         if (!isSizeValid) {
@@ -223,7 +224,7 @@ export default {
         return;
       }
 
-      coverImageFile.value = null; // чтобы рендерились изменения 
+      coverImageFile.value = null; // чтобы рендерились изменения
       coverImageFile.value = files[0];
 
       if(await isImageValid(coverImageFile)) {
@@ -247,7 +248,7 @@ export default {
       try {
           const formData = new FormData();
           formData.append('photo', coverImageFile.value);
-    
+
           const accessToken = localStorage.getItem('accessToken');
           const response = await axios.put(`http://194.152.37.7:8812/api/images/${articleId}`, formData, {
             headers: {
@@ -259,13 +260,13 @@ export default {
 
           const fileName = response.data.split('/').pop();
           coverImageSrc.value = '/images/articles_images/' + fileName;
-          
+
           return response.data;
         } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {
           const serverErrors = error.response.data.errors;
           showModal(null, serverErrors);
-         
+
           } else {
             console.error('Ошибка загрузки изображения ', error);
           }
@@ -280,24 +281,24 @@ export default {
 
     const showModal = (imgPath, text) => {
       var warningTextElement = document.getElementById("warningText");
-      
+
       imageSrc.value = imgPath;
       if (Array.isArray(text)) {
-        text = text.join(' . \n'); 
+        text = text.join(' . \n');
       }
       warningTextElement.textContent = text;
       document.getElementById('myModal').style.display = 'block';
     };
 
     const submitArticle = async () => {
-      
+
       try {
          const data = {
           title: title.value,
           short_description: getShortDescription(),
           content: getHTMLContent()
         };
-    
+
         const accessToken = localStorage.getItem('accessToken');
         const response = await axios.post('http://194.152.37.7:8812/api/articles', data, {
           headers: {
@@ -307,41 +308,41 @@ export default {
         });
 
         console.log('id = ' + response.data.id);
-        // теперь присваиваем картинку статье 
+        // теперь присваиваем картинку статье
         const imagePath = await loadCoverImageOnServer(response.data.id);
         console.log('cover image path :' + imagePath);
-        // удаляем данные из localStorage 
+        // удаляем данные из localStorage
         localStorage.removeItem('articleContent');
         localStorage.removeItem('savedTitle');
         localStorage.removeItem('savedShortDescription');
-        
-        // выдаем страницу успешного создания статьи 
-        
+
+        // выдаем страницу успешного создания статьи
+
         router.push('/create-article/success');
-        
+
       } catch (error) {
         if (error.response && error.response.data && error.response.data.errors) {
           const serverErrors = error.response.data.errors;
           showModal(null, serverErrors);
-         
+
         } else {
           console.error('Error submitting article:', error);
         }
       }
 
     };
-    
+
     const getHTMLContent = () => {
       if (ArticleEditorComponentRef.value) {
         return ArticleEditorComponentRef.value.getHTMLContent();
-        
+
       }
     }
 
     const getShortDescription = () => {
       if (EditorComponentRef.value) {
         return EditorComponentRef.value.getHTMLContent();
-        
+
       }
     }
 
@@ -364,13 +365,30 @@ export default {
       removeImage,
       limitInputLength,
       handlePaste,
-      ArticleEditorComponentRef, 
+      ArticleEditorComponentRef,
       EditorComponentRef,
     };
 
   }
 };
 
+const isAuthorized = async () => {
+  if (store.state.nickname === null) {
+    return false;
+  }
+  try {
+    const response = await axios.get(`http://194.152.37.7:8812/api/users/nickname/${store.state.nickname}/profile`);
+    return response.status === HttpStatusCode.Ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+onBeforeMount(() => {
+  if (!isAuthorized()) {
+    store.commit('logout');
+  }
+});
 </script>
 
 <style>
@@ -378,7 +396,7 @@ export default {
     background-color: #f8f8f8;
     padding: 20px;
 }
-  
+
 .article-form,
 .content-form {
     background-color: #ffffff;
