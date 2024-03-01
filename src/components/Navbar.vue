@@ -228,6 +228,14 @@ export default {
   cursor: pointer;
 }
 
+@media (max-width: 368px) {
+  .menu.is-open{
+    width: 40%; /* Уменьшаем ширину окна */
+    right: 10%; /* Располагаем окно ближе к правому краю экрана */
+    padding: 20px; /* Увеличиваем внутренний отступ окна */
+  }
+}
+
 .search-modal {
   position: fixed;
   left: 0;
@@ -287,13 +295,13 @@ export default {
   }
 
   .menu {
-    width: 80%;
-    right: -100%;
+    width: 50%;
+    right: -50%;
     padding: 20px;
   }
 
   .menu.is-open {
-    right: 10%;
+    right: 5%;
   }
 
   .menu-item {
