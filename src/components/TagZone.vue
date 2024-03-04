@@ -112,7 +112,6 @@
       
 
       const handleScroll = () => {
-        console.log('isScrollEnd' + isScrollEnd.value);
         if(!isScrollEnd.value) {
             const container = tagMenuRef.value;
             if (container.scrollHeight - container.clientHeight <= container.scrollTop + 100) {
@@ -161,10 +160,6 @@
 
       if(selectedTags.value.some(existingTag => existingTag.name.toLowerCase() === newTagName.value.toLowerCase())) {
         alert('тег ' + newTagName.value + ' уже добавлен');
-        console.log('Выбранные теги :');
-        for (const tag of selectedTags.value) {
-            console.log(tag.name);
-        }
         return;
       }
 
@@ -178,10 +173,6 @@
           });
           if(!selectedTags.value.some(existingTag => existingTag.name.toLowerCase() === response.data.name.toLowerCase())) {
             selectedTags.value.push({ id: response.data.id, name: response.data.name});
-          }
-          console.log('Выбранные теги : ');
-          for (const tag of selectedTags.value) {
-            console.log(tag.name);
           }
           newTagName.value = '';
         } catch (error) {

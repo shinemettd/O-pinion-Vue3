@@ -56,7 +56,7 @@
 
 
       <ArticleEditor ref="ArticleEditorComponentRef" :showModal="showModal" :isImageValid="isImageValid"/>
-
+      <TagZone/>
       <button class="btn" @click="submitArticle">Создать статью</button>
     </div>
   </div>
