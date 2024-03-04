@@ -34,7 +34,7 @@ export default {
           store.commit('setNickname', user.nickname)
           store.commit('setToken', accessToken);
           store.commit('setConfig', config);
-          router.push('/');
+          await router.push('/');
         } catch (error) {
           console.error('Ошибка при входе:', error);
         }
@@ -85,9 +85,6 @@ export default {
         Забыли пароль?
       </button>
 
-      <button type="button" class="login-with-google-btn" style="margin-bottom: 20px">
-        Войти через Google
-      </button>
 
     </div>
   </div>
@@ -100,7 +97,7 @@ input[type=text], input[type=password] {
   background-color: #f6f6f6;
   border: none;
   color: #0d0d0d;
-  padding: 15px 32px;
+  padding: 15px 20px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -216,7 +213,7 @@ input[type=button], input[type=submit], input[type=reset] {
   box-shadow: 0 10px 30px 0 rgba(95, 186, 233, 0.4);
   -webkit-border-radius: 5px 5px 5px 5px;
   border-radius: 5px 5px 5px 5px;
-  margin: 5px 20px 40px 20px;
+  margin: 5px 20px 17px 20px;
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
   -ms-transition: all 0.3s ease-in-out;

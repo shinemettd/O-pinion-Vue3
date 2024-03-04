@@ -72,9 +72,6 @@
         <input type="submit" class="fadeIn fourth" value="Зарегистрироваться">
       </form>
 
-      <button type="button" class="login-with-google-btn" style="margin-bottom: 20px">
-        Регистрация через Google
-      </button>
 
     </div>
   </div>
@@ -172,12 +169,24 @@ export default {
       }
 
 
-      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,100}$/;
-      if (!passwordRegex.test(password.value)) {
-        errors.value.password = 'Пожалуйста, введите корректный пароль (минимум 8 символов, 1 заглавная буква, 1 цифра).';
+      if (!password.value.trim()) {
+        errors.value.password = 'Пожалуйста, введите пароль.';
         isValid = false;
       }
 
+
+      if (password.value.length < 8 || password.value.length > 200) {
+        errors.value.password = 'Пароль должен содержать от 8 до 200 символов.';
+        isValid = false;
+      }
+
+      const uppercaseRegex = /[A-Z]/;
+      const digitRegex = /\d/;
+      const letterRegex = /[a-zA-Z]/;
+      if (!letterRegex.test(password.value) || !uppercaseRegex.test(password.value) || !digitRegex.test(password.value)) {
+        errors.value.password = 'Пароль должен содержать минимум 1 заглавную букву, 1 цифру и 1 букву.';
+        isValid = false;
+      }
       if (password.value !== confirm_password.value) {
         errors.value.confirm_password = 'Пароли не совпадают.';
         isValid = false;
@@ -219,7 +228,6 @@ export default {
 
 input[type=text], input[type=password] {
   background-color: #f6f6f6;
-  border: none;
   color: #0d0d0d;
   padding: 15px 32px;
   text-align: center;
@@ -286,12 +294,23 @@ h2 {
   border-radius: 5px;
 }
 
+
+
 .qwe {
   font-weight: bold;
   color: #1f42b2;
   font-size: 12px;
   margin-right: 2px;
 }
+
+input[type=submit].fadeIn.fourth {
+  padding-left: 20px;
+  padding-right: 20px;
+  width: auto; /* Изменено на автоматическую ширину */
+  max-width: 100%; /* Максимальная ширина 100% */
+  margin: 20px 0; /* Добавлено небольшое отступание сверху и снизу */
+}
+
 
 .date-group input {
   width: 100%;
@@ -686,6 +705,7 @@ body {
   margin-top: 5px;
   font-size: 12px;
 }
+
 
 
 </style>

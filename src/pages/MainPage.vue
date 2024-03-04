@@ -1,19 +1,19 @@
 <template>
   <main class="container mx-auto">
-    <div class="scroll mx-auto border w-50 h-100">
+    <div class="scroll mx-auto border w-full lg:w-2/3 xl:w-1/2 h-auto lg:h-100">
       <hr class="mt-5">
-      <div class="sorter w-20 h-20 my-5">
-        <div class="w-100 justify-between mb-5 text-center">
+      <div class="sorter w-full lg:w-1/2 h-auto my-5 flex flex-col lg:flex-row items-center justify-between">
+        <div class="w-full lg:w-auto mb-5 lg:mb-0 text-center lg:text-left">
           Отображать:
           <v-btn-toggle v-model="showToggle" color="#ff6347" class="ml-5" mandatory>
             <v-btn @click="showContent = 'articles'">Статьи</v-btn>
             <v-btn @click="showContent = 'announcements'">Объявления</v-btn>
           </v-btn-toggle>
         </div>
-        <div class="text-center">
+        <div class="w-full lg:w-auto text-center lg:text-right">
           Сортировка:
           <v-btn-toggle v-model="sortToggle" color="#20b2aa" class="ml-5" mandatory>
-            <v-btn @click="sortByDateTime">По дате</v-btn>
+            <v-btn @click="sortByDateTime">По новизне</v-btn>
             <v-btn @click="sortByPopularity">По популярности</v-btn>
           </v-btn-toggle>
         </div>
@@ -21,12 +21,12 @@
       <hr>
       <div v-if="articles.length > 0" v-for="article in articles" :key="article.id" class="scroll-content my-7">
         <ArticlePreviewComponent
-          :authors-nickname="article.author.nickname"
+          :authors-nickname="cutImagePath(article.author.nickname)"
           :authors-avatar-url="article.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
           :postedTimeAgo="article.date_time"
           :article-id="article.id"
           :article-title="article.title"
-          :article-main-picture-url="article.cover_image"
+          :article-main-picture-url="cutImagePath(article.cover_image)"
           :article-short-description="article.short_description"
           :article-rating="article.rating"
           :article-in-favourites="article.in_favourites"
@@ -46,37 +46,46 @@
 </template>
 
 <script setup>
-import axios from 'axios';
+import axios, {HttpStatusCode} from 'axios';
 import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
-import { onBeforeMount, ref } from "vue";
+import {onBeforeMount, ref} from "vue";
+import store from "@/store/store";
 
 const currentPage = ref(0);
 const pageSize = ref(10);
 const articles = ref([]);
 const sortToggle = ref(0);
 const showToggle = ref(0);
-const sortBy = ref('dateTime');
+const sortBy = ref('dateTime,desc');
 const showContent = ref('articles');
 const totalPages = ref(0);
 
 const getArticles = async () => {
+  const config = {
+    params: {
+      page: currentPage.value,
+      size: pageSize.value,
+      sort: sortBy.value,
+    }
+  };
+
+  if (store.state.isAuthorized) {
+    config.headers = {
+      'Authorization': `Bearer ${store.state.userToken}`
+    };
+  }
+
   try {
-    const response = await axios.get('http://194.152.37.7:8812/api/articles', {
-      params: {
-        page: currentPage.value,
-        size: pageSize.value,
-        sort: sortBy.value
-      }
-    });
+    const response = await axios.get('http://194.152.37.7:8812/api/articles', config);
     articles.value = response.data.content;
     totalPages.value = response.data.totalPages;
   } catch (error) {
-    console.error('Failed to fetch articles:', error);
+    console.error('Не удалось загрузить статьи:', error);
   }
 }
 
 const sortByDateTime = () => {
-  sortBy.value = 'dateTime';
+  sortBy.value = 'dateTime,desc';
   setPage(0);
 }
 
@@ -90,13 +99,38 @@ const setPage = async (page) => {
   await getArticles();
 }
 
-onBeforeMount(() => {
-  getArticles();
-})
+function cutImagePath(absolutePath) {
+  if (absolutePath === null) {
+    return null;
+  }
+  const shortPath = absolutePath.substring(absolutePath.indexOf("/images/"));
+  return shortPath;
+}
+
+const isAuthorized = async () => {
+  if (store.state.nickname === null) {
+    return false;
+  }
+  try {
+    const response = await axios.get(`http://194.152.37.7:8812/api/users/my-profile`, store.state.config);
+    return response.status === HttpStatusCode.Ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+onBeforeMount(async () => {
+  if (!(await isAuthorized())) {
+    store.commit('logout');
+  }
+  await getArticles();
+});
+
 </script>
 
 <style scoped>
 .pagination {
+
   margin-top: 20px;
   display: flex;
   justify-content: center;
@@ -106,7 +140,7 @@ onBeforeMount(() => {
 .pagination button {
   margin: 0 5px;
   padding: 5px 10px;
-  background-color: #12c4e3;
+  background: linear-gradient(21deg, #86278a, #652ae5);
   color: white;
   border: none;
   cursor: pointer;
@@ -116,4 +150,25 @@ onBeforeMount(() => {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+@media screen and (max-width: 767px) {
+  .sorter {
+    flex-direction: column;
+  }
+  .sorter div {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .sorter div:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@media screen and (min-width: 768px) {
+
+  .scroll {
+    width: 50%;
+  }
+}
+
 </style>

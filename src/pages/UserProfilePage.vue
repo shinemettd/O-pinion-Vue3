@@ -1,7 +1,7 @@
 <script setup>
 
 import UserProfileComponent from "@/components/UserProfileComponent.vue";
-import axios from "axios";
+import axios, {HttpStatusCode} from "axios";
 import {useRoute} from "vue-router";
 import {onBeforeMount, ref} from "vue";
 import PageNotFound from "@/pages/PageNotFound.vue";
@@ -26,8 +26,23 @@ const getUser = async () => {
   }
 }
 
-onBeforeMount(() => {
-  getUser()
+const isAuthorized = async () => {
+  if (store.state.nickname === null) {
+    return false;
+  }
+  try {
+    const response = await axios.get(`http://194.152.37.7:8812/api/users/my-profile`, store.state.config);
+    return response.status === HttpStatusCode.Ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+onBeforeMount(async () => {
+  if (!(await isAuthorized())) {
+    store.commit('logout');
+  }
+  await getUser();
 });
 </script>
 
