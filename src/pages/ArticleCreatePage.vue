@@ -56,7 +56,7 @@
 
 
       <ArticleEditor ref="ArticleEditorComponentRef" :showModal="showModal" :isImageValid="isImageValid"/>
-      <TagZone/>
+      <TagZone ref="TagZoneComponentRef"/>
       <button class="btn" @click="submitArticle">Создать статью</button>
     </div>
   </div>
@@ -92,6 +92,7 @@ export default {
 
     const ArticleEditorComponentRef = ref(null);
     const EditorComponentRef = ref(null);
+    const TagZoneComponentRef = ref(null);
 
     onMounted(() => {
       loadTitleFromLocalStorage();
@@ -302,7 +303,8 @@ export default {
         const data = {
           title: title.value,
           short_description: getShortDescription(),
-          content: getHTMLContent()
+          content: getHTMLContent(),
+          tags: getSelectedTags()
         };
 
         const accessToken = localStorage.getItem('accessToken');
@@ -321,6 +323,7 @@ export default {
         localStorage.removeItem('articleContent');
         localStorage.removeItem('savedTitle');
         localStorage.removeItem('savedShortDescription');
+        localStorage.removeItem('selectedTags');
 
         // выдаем страницу успешного создания статьи
 
@@ -352,6 +355,16 @@ export default {
       }
     }
 
+    const getSelectedTags = () => {
+      if(TagZoneComponentRef.value) {
+        console.log('Получили теги :' );
+        TagZoneComponentRef.value.getSelectedTags().forEach(function(tag) {
+            console.log(tag);
+        });
+        return TagZoneComponentRef.value.getSelectedTags();
+      }
+    }
+
     // Добавляем console.log перед передачей пропса showModal
     console.log('showModal is', typeof showModal);
 
@@ -373,6 +386,7 @@ export default {
       handlePaste,
       ArticleEditorComponentRef,
       EditorComponentRef,
+      TagZoneComponentRef, 
     };
 
   }

@@ -39,8 +39,9 @@
   </template>
   
   <script>
-  import { ref, onMounted, onUpdated } from 'vue';
+  import { ref, onMounted, onUpdated , toRaw} from 'vue';
   import axios from 'axios';
+
   
   export default {
     setup() {
@@ -180,6 +181,10 @@
         }
       
     };
+
+    const getSelectedTags = () => {
+        return toRaw(selectedTags.value);
+    }
   
       return {
         selectedTags,
@@ -197,7 +202,8 @@
         matchingTags,
         loadTags,
         newTagName,
-        createTag
+        createTag,
+        getSelectedTags
       };
     }
   };
