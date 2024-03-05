@@ -3,6 +3,7 @@ import {onMounted, ref} from "vue";
 import axios from "axios";
 import store from "@/store/store";
 import router from "@/plugins/router";
+import ContentRender from "@/components/ContentRender.vue";
 
 const reaction = ref('');
 
@@ -108,10 +109,10 @@ function redirectIfNotAuthorized() {
           </div>
         </div>
       </div>
-      <!--   article content     -->
-      <p class = "my-3" style = "font-size: 1.25em; word-wrap: break-word;"> {{ articleContent }} </p>
-
-
+      <div class="my-3">
+        <!--   article content     -->
+        <ContentRender :content="articleContent"/>
+      </div>
       <div class="my-3">
         Секция тегов
         <!--  tags  reactions etc    -->
