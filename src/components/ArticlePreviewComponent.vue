@@ -8,6 +8,9 @@ import ContentRender from "@/components/ContentRender.vue";
 const store = useStore();
 const reportReason = ref('');
 const reportReasonText = ref('');
+const shareBy = ref('link');
+const shareSortToggle = ref(0);
+const shareLink = ref('');
 
 defineProps({
   showWithoutHeader: {
@@ -62,9 +65,17 @@ async function deleteFromFavourites(articleId) {
     console.log(e)
   }
 }
+const shareArticle = async (articleId, shareType) => {
+  shareBy.value = shareType;
+  if (shareBy.value === 'link') {
+    shareLink.value = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}/share`)).data;
+  } else {
+    shareLink.value =  (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}/share?share-type=${shareType}`)).data;
+  }
+}
 
-function openReportDialog() {
-
+const copyText = (text) => {
+    navigator.clipboard.writeText(text);
 }
 </script>
 
@@ -75,7 +86,7 @@ export default {
       reportReason: '',
       reportReasonText: ''
     }
-  },
+  }
 }
 </script>
 
@@ -112,7 +123,7 @@ export default {
               </template>
 
               <template v-slot:default="{ isActive }">
-                <v-card title="Пожаловаться">
+                <v-card title="Жалоба">
                   <v-card-text>
                     Что именно вам кажется недопустимым в этом материале?
                   </v-card-text>
@@ -123,6 +134,26 @@ export default {
                   >
                     <v-radio label="Спам"
                              value="SPAM"
+                    ></v-radio>
+
+                    <v-radio label="Обман"
+                             value="FRAUD"
+                    ></v-radio>
+
+                    <v-radio label="Оскорбления"
+                             value="SWEAR_WORD"
+                    ></v-radio>
+
+                    <v-radio label="Запрещенные товары"
+                             value="BANNED_GOODS"
+                    ></v-radio>
+
+                    <v-radio label="Откровенное изображение"
+                             value="EXPLICIT_IMAGE"
+                    ></v-radio>
+
+                    <v-radio label="Враждебные высказывания"
+                             value="HATE_SPEECH"
                     ></v-radio>
 
                     <v-radio label="Прочее"
@@ -193,7 +224,6 @@ export default {
           </router-link>
         </div>
         <div class = "article-description">
-          <!-- <p> {{ articleShortDescription }} </p> -->
           <ContentRender :content="articleShortDescription"/>
         </div>
         <div class = "article-read-more">
@@ -237,9 +267,50 @@ export default {
                 <b> {{ articleTotalFavourites }}</b>
             </div>
             <div class = "article-share">
-                <div class = "article-share-icon">
-                  <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon">
-                </div>
+              <div class = "article-share-icon">
+                <v-dialog max-width="500">
+                  <template v-slot:activator="{ props: activatorProps }">
+                    <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon" v-bind="activatorProps" @click="async () => {
+                  shareLink = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}/share`)).data;
+                }">
+                  </template>
+
+                  <template v-slot:default="{ isActive }">
+                    <v-card title="Поделиться">
+                      <v-card-text>
+                        Выберите социальную сеть:
+                      </v-card-text>
+                      <v-btn-toggle v-model="shareSortToggle" color="#20b2aa" class="ml-2" mandatory>
+                        <v-btn @click="async () => { await shareArticle(articleId, 'link'); }">По ссылке</v-btn>
+                        <v-btn @click="async () => { await shareArticle(articleId, 'vk'); }">Вконтакте</v-btn>
+                        <v-btn @click="async () => { await shareArticle(articleId, 'telegram'); }">Телеграм</v-btn>
+                        <v-btn @click="async() => { await shareArticle(articleId, 'whatsapp'); }">Whatsapp</v-btn>
+                      </v-btn-toggle>
+                      <div class="d-flex">
+                          <v-text-field class = "pt-3 ml-3"
+                                        variant="outlined"
+                                        readonly
+                          >{{ shareLink }}</v-text-field>
+                        <v-btn @click="copyText(shareLink)" class = "mx-3 mt-5 vh-100"> копировать </v-btn>
+                      </div>
+                      <div class = "px-5">
+
+                      </div>
+
+                      <v-card-actions class = "mx-3 my-1">
+                        <v-spacer>
+
+                        </v-spacer>
+
+                        <v-btn
+                          text="Закрыть"
+                          @click="isActive.value = false"
+                        ></v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </template>
+                </v-dialog>
+              </div>
             </div>
             <div class = "article-comments">
                 <div class = "article-comments-icon">

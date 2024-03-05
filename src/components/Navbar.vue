@@ -14,7 +14,8 @@
         <div>
           <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
           <router-link to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
-          <button @click="toggleMenu" class="burger-button1">☰</button>
+          <button v-if="store.state.isAuthorized" @click="toggleMenu" class="burger-button1">☰</button>
+          <v-btn v-else class = "ml-4" @click="router.push('/auth')" variant="outlined"> Войти </v-btn>
           <div :class="['menu', { 'is-open': isMenuOpen }]">
             <p class="pb-2" v-if="store.state.isAuthorized">Вы авторизованы как:
               <li>{{ store.state.nickname }}</li>
@@ -57,6 +58,10 @@
   </div>
 </template>
 
+<script setup>
+import router from "@/plugins/router";
+</script>
+
 <script>
 import store from "@/store/store";
 import axios from 'axios'
@@ -84,6 +89,9 @@ export default {
     window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
+    router() {
+      return router
+    },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
     },
