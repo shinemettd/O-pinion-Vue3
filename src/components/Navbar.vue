@@ -12,10 +12,14 @@
           <button @click.prevent="search" class="search-button"><i class="fas fa-search elevation-24"></i></button>
         </div>
         <div>
-          <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
-          <router-link to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
-          <button v-if="store.state.isAuthorized" @click="toggleMenu" class="burger-button1">☰</button>
-          <v-btn v-else class = "ml-4" @click="router.push('/auth')" variant="outlined"> Войти </v-btn>
+          <div v-if="store.state.isAuthorized">
+            <router-link v-if="store.state.isAuthorized" to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
+            <router-link v-if="store.state.isAuthorized" to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
+            <button v-if="store.state.isAuthorized" @click="toggleMenu" class="burger-button1">☰</button>
+          </div>
+          <div v-else>
+            <v-btn class = "ml-4" @click="router.push('/auth')" variant="outlined"> Войти </v-btn>
+          </div>
           <div :class="['menu', { 'is-open': isMenuOpen }]">
             <p class="pb-2" v-if="store.state.isAuthorized">Вы авторизованы как:
               <li>{{ store.state.nickname }}</li>
