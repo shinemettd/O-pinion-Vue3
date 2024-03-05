@@ -3,6 +3,7 @@ import axios from "axios";
 import {useStore} from "vuex";
 import {ref} from "vue";
 import router from "@/plugins/router";
+import ContentRender from "@/components/ContentRender.vue";
 
 const store = useStore();
 const reportReason = ref('');
@@ -192,7 +193,8 @@ export default {
           </router-link>
         </div>
         <div class = "article-description">
-          <p> {{ articleShortDescription }} </p>
+          <!-- <p> {{ articleShortDescription }} </p> -->
+          <ContentRender :content="articleShortDescription"/>
         </div>
         <div class = "article-read-more">
           <router-link :to="'/article/' + articleId" class="navbar-item">
