@@ -1,6 +1,6 @@
 <script setup>
 import axios, {HttpStatusCode} from "axios";
-import { onBeforeMount, ref, watch } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { useRoute } from 'vue-router';
 import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
 import store from "@/store/store";
@@ -19,6 +19,7 @@ const getArticle = async () => {
   } else {
     currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
   }
+  dataFetched.value = true;
 }
 
 const getComments = async () => {
@@ -30,7 +31,6 @@ function cutImagePath(absolutePath) {
     return null;
   }
   const shortPath = absolutePath.substring(absolutePath.indexOf("/images/"));
-  console.log(shortPath);
   return shortPath;
 }
 
