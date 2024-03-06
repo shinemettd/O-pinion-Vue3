@@ -105,6 +105,7 @@ watch(() => props.userId, () => {
             :article-total-favourites = "article.total_favourites"
             :article-total-comments = "article.total_comments"
             :article-total-views = "article.total_views"
+            :article-status = "article.status"
           />
         </div>
       </div>
