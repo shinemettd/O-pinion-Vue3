@@ -1,7 +1,7 @@
 <script setup>
 import axios from "axios";
 import {useStore} from "vuex";
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
 
@@ -11,6 +11,14 @@ const reportReasonText = ref('');
 const shareBy = ref('link');
 const shareSortToggle = ref(0);
 const shareLink = ref('');
+const statusColors = computed(() => ({
+      'ON_MODERATION': 'orange',
+      'BLOCKED': 'red',
+      'DELETED': 'red',
+      'DRAFT': 'orange',
+      'NOT_APPROVED': 'red',
+      'APPROVED': 'green'
+    }));
 
 defineProps({
   showWithoutHeader: {
@@ -85,7 +93,7 @@ export default {
   data () {
     return {
       reportReason: '',
-      reportReasonText: ''
+      reportReasonText: '',
     }
   }
 }
@@ -213,8 +221,8 @@ export default {
       </div>
       <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
-        <div class="article-status">
-          <p> Статус : {{ articleStatus }}</p>
+        <div v-show="articleStatus !== null" class="article-status" >
+          <p> Статус : <span :style="{ color: statusColors[articleStatus] }">{{ articleStatus }}</span> </p>
         </div>
         <div class = "article-title">
           <router-link :to="'/article/' + articleId">
