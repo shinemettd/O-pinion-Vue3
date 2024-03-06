@@ -57,7 +57,10 @@
 
       <ArticleEditor ref="ArticleEditorComponentRef" :showModal="showModal" :isImageValid="isImageValid"/>
       <TagZone ref="TagZoneComponentRef"/>
-      <button class="btn" @click="submitArticle">Создать статью</button>
+       <div class="btn-options">
+        <button class="btn btn-create-article" @click="submitArticle">Создать статью</button>
+        <button class="btn btn-create-draft" @click="saveAsDraft">Сохранить как черновик</button>
+       </div>
     </div>
   </div>
 </template>
@@ -298,7 +301,14 @@ export default {
     };
 
     const submitArticle = async () => {
+      sendArticleOnServer('http://194.152.37.7:8812/api/articles');
+    };
 
+    const saveAsDraft = () => {
+      sendArticleOnServer('http://194.152.37.7:8812/api/articles/drafts');
+    }
+
+    const sendArticleOnServer = async(endpoint) => {
       try {
         const data = {
           title: title.value,
@@ -308,7 +318,7 @@ export default {
         };
 
         const accessToken = localStorage.getItem('accessToken');
-        const response = await axios.post('http://194.152.37.7:8812/api/articles', data, {
+        const response = await axios.post(endpoint, data, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json'
@@ -338,8 +348,7 @@ export default {
           console.error('Error submitting article:', error);
         }
       }
-
-    };
+    }
 
     const getHTMLContent = () => {
       if (ArticleEditorComponentRef.value) {
@@ -373,6 +382,7 @@ export default {
       short_description,
       handleFile,
       submitArticle,
+      saveAsDraft,
       showModal,
       isImageValid,
       openFileInput,
@@ -461,16 +471,35 @@ label {
   font-size: 16px;
 }
 
+.btn-options {
+  display: flex;
+  justify-content: space-around;
+}
+
 .btn:hover {
   background-color: #0056b3;
 }
 
-.reset {
-  background-color: #f42505;
+.btn-create-article {
+  background-color: #079843;
+  margin-bottom: 0;
+  font-size: 20px; 
+  font-weight: bold; 
 }
 
-.reset:hover {
-  background-color: #910707;
+.btn-create-draft {
+  background-color: #c52e0c;
+  margin-bottom: 0;
+  font-size: 20px; 
+  font-weight: bold; 
+}
+
+.btn-create-article:hover {
+  background-color: #03672d;
+}
+
+.btn-create-draft:hover {
+  background-color: #9c260b;
 }
 
 .warning {
