@@ -257,7 +257,7 @@ export default {
         formData.append('photo', coverImageFile.value);
 
         const accessToken = localStorage.getItem('accessToken');
-        const response = await axios.put(`http://194.152.37.7:8812/api/images/${articleId}`, formData, {
+        const response = await axios.put(`${store.state.API_URL}/api/images/${articleId}`, formData, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'multipart/form-data'
@@ -308,7 +308,7 @@ export default {
         };
 
         const accessToken = localStorage.getItem('accessToken');
-        const response = await axios.post('http://194.152.37.7:8812/api/articles', data, {
+        const response = await axios.post(`${store.state.API_URL}/api/articles`, data, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json'
@@ -386,7 +386,7 @@ export default {
       handlePaste,
       ArticleEditorComponentRef,
       EditorComponentRef,
-      TagZoneComponentRef, 
+      TagZoneComponentRef,
     };
 
   }
@@ -397,7 +397,7 @@ const isAuthorized = async () => {
     return false;
   }
   try {
-    const response = await axios.get(`http://194.152.37.7:8812/api/users/my-profile`, store.state.config);
+    const response = await axios.get(`${store.state.API_URL}/api/users/my-profile`, store.state.config);
     return response.status === HttpStatusCode.Ok;
   } catch (e) {
     return false;

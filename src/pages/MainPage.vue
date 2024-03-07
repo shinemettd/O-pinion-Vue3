@@ -76,7 +76,7 @@ const getArticles = async () => {
   }
 
   try {
-    const response = await axios.get('http://194.152.37.7:8812/api/articles', config);
+    const response = await axios.get(`${store.state.API_URL}/api/articles`, config);
     articles.value = response.data.content;
     totalPages.value = response.data.totalPages;
   } catch (error) {

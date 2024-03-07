@@ -31,7 +31,7 @@ const props = defineProps({
 
 async function addToFavourites(articleId) {
   try {
-    await axios.post(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, '', store.state.config);
+    await axios.post(`${store.state.API_URL}/api/saved-articles/${articleId}`, '', store.state.config);
   } catch (e) {
     console.log(e)
   }
@@ -39,7 +39,7 @@ async function addToFavourites(articleId) {
 
 async function deleteFromFavourites(articleId) {
   try {
-    await axios.delete(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, store.state.config);
+    await axios.delete(`${store.state.API_URL}/api/saved-articles/${articleId}`, store.state.config);
   } catch (e) {
     console.log(e)
   }
@@ -52,7 +52,7 @@ async function setLike() {
     reaction_type: "LIKE"
   }
   try {
-    await axios.post(`http://194.152.37.7:8812/api/article-reactions`, data, store.state.config);
+    await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
   } catch (e) {
     console.log(e)
   }
@@ -65,7 +65,7 @@ async function setDislike() {
     reaction_type: "DISLIKE"
   }
   try {
-    await axios.post(`http://194.152.37.7:8812/api/article-reactions`, data, store.state.config);
+    await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
   } catch (e) {
     console.log(e)
   }
@@ -124,7 +124,8 @@ function redirectIfNotAuthorized() {
             <div class = "article-rating-icon">
               <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="async () => {
                 await setLike();
-                articleRating = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`)).data.rating;
+                //TODO change request
+                articleRating = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}`)).data.rating;
               }">
             </div>
             <b v-if = "articleRating > 0" style="color: green">{{ articleRating }}</b>
@@ -133,7 +134,8 @@ function redirectIfNotAuthorized() {
             <div class = "article-rating-icon ml-3">
               <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="async () => {
                 await setDislike();
-                articleRating = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`)).data.rating;
+                //TODO change request
+                articleRating = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}`)).data.rating;
               }">
             </div>
           </div>

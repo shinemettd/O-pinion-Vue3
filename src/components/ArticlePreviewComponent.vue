@@ -50,7 +50,7 @@ function formatDateTime(timeString) {
 
 async function addToFavourites(articleId) {
   try {
-    await axios.post(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, '', store.state.config);
+    await axios.post(`${store.state.API_URL}/api/saved-articles/${articleId}`, '', store.state.config);
     console.log(`Статья ${articleId} добавлена в избранное пользователя ${store.state.nickname}`);
   } catch (e) {
     console.log(e)
@@ -59,7 +59,7 @@ async function addToFavourites(articleId) {
 
 async function deleteFromFavourites(articleId) {
   try {
-    await axios.delete(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, store.state.config);
+    await axios.delete(`${store.state.API_URL}/api/saved-articles/${articleId}`, store.state.config);
     console.log(`Статья ${articleId} удалена из избранного пользователя ${store.state.nickname}`);
   } catch (e) {
     console.log(e)
@@ -68,9 +68,9 @@ async function deleteFromFavourites(articleId) {
 const shareArticle = async (articleId, shareType) => {
   shareBy.value = shareType;
   if (shareBy.value === 'link') {
-    shareLink.value = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}/share`)).data;
+    shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
   } else {
-    shareLink.value =  (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}/share?share-type=${shareType}`)).data;
+    shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
   }
 }
 
@@ -186,7 +186,7 @@ export default {
                             reason: reportReason,
                             text: reportReasonText
                           }
-                          await axios.post(`http://194.152.37.7:8812/api/complaints/${articleId}`, data, store.state.config);
+                          await axios.post(`${store.state.API_URL}/api/complaints/${articleId}`, data, store.state.config);
                           console.log(`Жалоба на статью ${articleId} с причиной ${reportReason} и комментарием ${reportReasonText}`);
                           isActive.value = false;
                         } else {
@@ -270,9 +270,8 @@ export default {
               <div class = "article-share-icon">
                 <v-dialog max-width="500">
                   <template v-slot:activator="{ props: activatorProps }">
-                    <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon" v-bind="activatorProps" @click="async () => {
-                  shareLink = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}/share`)).data;
-                }">
+                    <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon" v-bind="activatorProps"
+                         @click="async () => {shareLink = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;}">
                   </template>
 
                   <template v-slot:default="{ isActive }">

@@ -80,6 +80,7 @@
 <script>
 import {ref} from 'vue';
 import axios from 'axios';
+import store from "@/store/store";
 
 export default {
   setup() {
@@ -100,7 +101,7 @@ export default {
 
       if (validateInputs()) {
         try {
-          const response = await axios.post('http://194.152.37.7:8812/api/auth/sign-up', {
+          const response = await axios.post(`${store.state.API_URL}/api/auth/sign-up`, {
             first_name: first_name.value,
             last_name: last_name.value,
             nickname: nickname.value,

@@ -29,6 +29,7 @@
 <script setup>
 import axios from 'axios';
 import {ref} from 'vue';
+import store from "@/store/store";
 
 const title = ref('');
 const shortDescription = ref('');
@@ -52,7 +53,7 @@ const submitArticle = async () => {
     formData.append('cover-image', coverImage.value);
     const accessToken = localStorage.getItem('accessToken');
 
-    const response = await axios.post('http://194.152.37.7:8812/api/articles', formData, {
+    const response = await axios.post(`${store.state.API_URL}/api/articles`, formData, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
@@ -66,7 +67,7 @@ const submitArticle = async () => {
 
 const submitContent = async () => {
   try {
-    await axios.post(`http://194.152.37.7:8812/api/articles/${articleId.value}/set-content`, {
+    await axios.post(`${store.state.API_URL}/api/articles/${articleId.value}/set-content`, {
       articleContent: articleContent.value,
     });
   } catch (error) {
