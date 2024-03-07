@@ -4,7 +4,7 @@ import createPersistedState from 'vuex-persistedstate';
 export default createStore({
   state () {
     return {
-      API_URL: 'http://143.110.182.202:1111',
+      API_URL: 'http://143.110.182.202:8888',
       userToken: null,
       isAuthorized: false,
       nickname: null,
