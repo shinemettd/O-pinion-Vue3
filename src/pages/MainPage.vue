@@ -21,7 +21,7 @@
       <hr>
       <div v-if="articles.length > 0" v-for="article in articles" :key="article.id" class="scroll-content my-7">
         <ArticlePreviewComponent
-          :authors-nickname="cutImagePath(article.author.nickname)"
+          :authors-nickname="article.author.nickname"
           :authors-avatar-url="article.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
           :postedTimeAgo="article.date_time"
           :article-id="article.id"
@@ -112,7 +112,7 @@ const isAuthorized = async () => {
     return false;
   }
   try {
-    const response = await axios.get(`http://194.152.37.7:8812/api/users/my-profile`, store.state.config);
+    const response = await axios.get(`${store.state.API_URL}/api/users/my-profile`, store.state.config);
     return response.status === HttpStatusCode.Ok;
   } catch (e) {
     return false;
