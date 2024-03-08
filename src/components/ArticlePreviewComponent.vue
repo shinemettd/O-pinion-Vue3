@@ -45,7 +45,9 @@ defineProps({
   },
   articleTotalComments: Number,
   articleTotalViews: Number,
-  articleStatus: String
+  articleStatus: {
+    type: String
+  }
 })
 
 function formatDateTime(timeString) {
@@ -221,7 +223,7 @@ export default {
       </div>
       <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
-        <div v-show="articleStatus !== null" class="article-status" >
+        <div v-show="articleStatus !== null && articleStatus !== undefined" class="article-status" >
           <p> Статус : <span :style="{ color: statusColors[articleStatus] }">{{ articleStatus }}</span> </p>
         </div>
         <div class = "article-title">
