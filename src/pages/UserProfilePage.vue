@@ -15,9 +15,9 @@ const getUser = async () => {
   try {
     let response;
     if (userLink === store.state.nickname) {
-      response = await axios.get(`http://194.152.37.7:8812/api/users/my-profile`, store.state.config);
+      response = await axios.get(`${store.state.API_URL}/api/users/my-profile`, store.state.config);
     } else {
-      response = await axios.get(`http://194.152.37.7:8812/api/users/nickname/${userLink}/profile`);
+      response = await axios.get(`${store.state.API_URL}/api/users/nickname/${userLink}/profile`);
     }
     user.value = response.data;
     isUserValid.value = true;
@@ -31,7 +31,7 @@ const isAuthorized = async () => {
     return false;
   }
   try {
-    const response = await axios.get(`http://194.152.37.7:8812/api/users/my-profile`, store.state.config);
+    const response = await axios.get(`${store.state.API_URL}/api/users/my-profile`, store.state.config);
     return response.status === HttpStatusCode.Ok;
   } catch (e) {
     return false;

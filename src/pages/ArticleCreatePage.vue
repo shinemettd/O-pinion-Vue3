@@ -260,7 +260,7 @@ export default {
         formData.append('photo', coverImageFile.value);
 
         const accessToken = localStorage.getItem('accessToken');
-        const response = await axios.put(`http://194.152.37.7:8812/api/images/${articleId}`, formData, {
+        const response = await axios.put(`${store.state.API_URL}/api/images/${articleId}`, formData, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'multipart/form-data'
@@ -301,11 +301,11 @@ export default {
     };
 
     const submitArticle = async () => {
-      sendArticleOnServer('http://194.152.37.7:8812/api/articles');
+      sendArticleOnServer(`${store.state.API_URL}/api/articles`);
     };
 
     const saveAsDraft = () => {
-      sendArticleOnServer('http://194.152.37.7:8812/api/articles/drafts');
+      sendArticleOnServer(`${store.state.API_URL}/api/articles/drafts`);
     }
 
     const sendArticleOnServer = async(endpoint) => {
@@ -349,6 +349,7 @@ export default {
         }
       }
     }
+
 
     const getHTMLContent = () => {
       if (ArticleEditorComponentRef.value) {
@@ -396,7 +397,7 @@ export default {
       handlePaste,
       ArticleEditorComponentRef,
       EditorComponentRef,
-      TagZoneComponentRef, 
+      TagZoneComponentRef,
     };
 
   }
@@ -407,7 +408,7 @@ const isAuthorized = async () => {
     return false;
   }
   try {
-    const response = await axios.get(`http://194.152.37.7:8812/api/users/my-profile`, store.state.config);
+    const response = await axios.get(`${store.state.API_URL}/api/users/my-profile`, store.state.config);
     return response.status === HttpStatusCode.Ok;
   } catch (e) {
     return false;
@@ -483,15 +484,15 @@ label {
 .btn-create-article {
   background-color: #079843;
   margin-bottom: 0;
-  font-size: 20px; 
-  font-weight: bold; 
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .btn-create-draft {
   background-color: #c52e0c;
   margin-bottom: 0;
-  font-size: 20px; 
-  font-weight: bold; 
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .btn-create-article:hover {

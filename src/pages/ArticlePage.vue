@@ -1,6 +1,6 @@
 <script setup>
 import axios, {HttpStatusCode} from "axios";
-import { onBeforeMount, ref } from "vue";
+import {onBeforeMount, onBeforeUnmount, onMounted, onUnmounted, ref} from "vue";
 import { useRoute } from 'vue-router';
 import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
 import store from "@/store/store";
@@ -15,15 +15,15 @@ const articleId = route.params.articleId;
 
 const getArticle = async () => {
   if (store.state.isAuthorized) {
-    currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`, store.state.config);
+    currentArticle.value = await axios.get(`${store.state.API_URL}/api/articles/${articleId}`, store.state.config);
   } else {
-    currentArticle.value = await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`);
+    currentArticle.value = await axios.get(`${store.state.API_URL}/api/articles/${articleId}`);
   }
   dataFetched.value = true;
 }
 
 const getComments = async () => {
-  currentArticleComments.value = await axios.get(`http://194.152.37.7:8812/api/article-comments/${articleId}`);
+  currentArticleComments.value = await axios.get(`${store.state.API_URL}/api/article-comments/${articleId}`);
 }
 
 function cutImagePath(absolutePath) {
@@ -39,7 +39,7 @@ const isAuthorized = async () => {
     return false;
   }
   try {
-    const response = await axios.get(`http://194.152.37.7:8812/api/users/my-profile`, store.state.config);
+    const response = await axios.get(`${store.state.API_URL}/api/users/my-profile`, store.state.config);
     return response.status === HttpStatusCode.Ok;
   } catch (e) {
     return false;

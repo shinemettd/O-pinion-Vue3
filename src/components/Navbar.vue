@@ -105,7 +105,7 @@ export default {
           return; // Если запрос поиска пуст, не выполнять поиск и отображение модального окна
         }
 
-        const response = await axios.get('http://194.152.37.7:8812/api/articles/search', {
+        const response = await axios.get(`${store.state.API_URL}/api/articles/search`, {
           params: {
             query: this.searchQuery
           }
