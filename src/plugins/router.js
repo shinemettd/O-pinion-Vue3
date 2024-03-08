@@ -13,27 +13,37 @@ import ArticleCreatePage from "@/pages/ArticleCreatePage.vue";
 import SuccessArticleCreationPage from "@/pages/SuccessArticleCreationPage";
 import PageNotFound from "@/pages/PageNotFound.vue";
 import store from "@/store/store";
-// потом удалить 
+// потом удалить
 import TagZone from "@/components/TagZone.vue";
+import SettingsPage from "@/pages/SettingsPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/',
-      component: MainPage
-    },
-    {
-      path: '/hello-world',
-      component: HelloWorldPage
+      component: MainPage,
+      meta: {
+        title: 'Главная'
+      }
     },
     {
       path: '/article/:articleId',
-      component: ArticlePage
+      component: ArticlePage,
+      meta: {
+        title: '{articleTitle}' //доделать
+      },
     },
     {
       path: '/user/:userNickname',
-      component: UserProfilePage
+      component: UserProfilePage,
+      meta: {
+        title: `Профиль`
+      },
+      beforeEnter: (to, from, next) => {
+        document.title = `Профиль ${to.params.userNickname}` || 'Профиль пользователя';
+        next();
+      }
     },
     {
       path: '/about',
@@ -41,43 +51,66 @@ const router = createRouter({
       component: About
     },
     {
-      path: '/user',
-      name: 'user',
-      component: About
-    },
-    {
       path: '/create-article',
       name: 'ArticleCreatePage',
-      component: ArticleCreatePage
+      component: ArticleCreatePage,
+      meta: {
+        title: 'Создание статьи'
+      }
     },
     {
       path: '/create-article/success',
       name: 'SuccessArticleCreationPage',
-      component: SuccessArticleCreationPage
+      component: SuccessArticleCreationPage,
+      meta: {
+        title: 'Статья создана'
+      }
     },
     {
       path: '/notification',
       name: 'Notification',
-      component: Notification
+      component: Notification,
+      meta: {
+        title: 'Уведомления'
+      }
     },
     {
       name: 'Auth',
       path: '/auth',
-      component: Auth
+      component: Auth,
+      meta: {
+        title: 'Вход'
+      }
     },
     {
       name: 'Register',
       path: '/register',
-      component: Register
+      component: Register,
+      meta: {
+        title: 'Регистрация'
+      }
+    },
+    {
+      name: 'Settings',
+      path: '/settings',
+      component: SettingsPage,
+      meta: {
+        title: 'Настройки'
+      }
     },
     {
       path: '/:catchAll(.*)',
-      component: PageNotFound
+      component: PageNotFound,
+      meta: {
+        title: 'Страница не найдена'
+      }
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
+  document.title = to.meta.title ?? 'O!pinion';
+
   const isAuthorized = store.state.isAuthorized;
 
   if (isAuthorized && (to.path === '/register' || to.path === '/auth' )) {
