@@ -88,6 +88,19 @@ const shareArticle = async (articleId, shareType) => {
 const copyText = (text) => {
     navigator.clipboard.writeText(text);
 }
+
+const getStatusText = (status) => {
+  const statusMap = {
+    'ON_MODERATION': 'На модерации',
+    'BLOCKED': 'Заблокировано',
+    'DELETED': 'Удалено',
+    'DRAFT': 'В черновиках',
+    'NOT_APPROVED': 'Не одобрено',
+    'APPROVED': 'Одобрено'
+  };
+  return statusMap[status] || status;
+};
+
 </script>
 
 <script>
@@ -224,7 +237,7 @@ export default {
       <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
         <div v-show="articleStatus !== null && articleStatus !== undefined" class="article-status" >
-          <p> Статус : <span :style="{ color: statusColors[articleStatus] }">{{ articleStatus }}</span> </p>
+          <p> Статус : <span :style="{ color: statusColors[articleStatus] }">{{ getStatusText(articleStatus) }}</span> </p>
         </div>
         <div class = "article-title">
           <router-link :to="'/article/' + articleId">

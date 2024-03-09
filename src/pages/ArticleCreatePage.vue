@@ -164,7 +164,7 @@ export default {
         console.log('valid image');
         isCoverImageValid.value = true;
         coverImageSrc.value = URL.createObjectURL(coverImageFile.value);
-
+        
 
       } else {
         isCoverImageValid.value = false;
