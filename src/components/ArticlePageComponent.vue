@@ -1,11 +1,18 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import axios from "axios";
 import store from "@/store/store";
 import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
 
 const reaction = ref('');
+const shareBy = ref('link');
+const shareSortToggle = ref(0);
+const shareLink = ref('');
+const showShareSnackMessage = ref(false);
+const isValidShareEmail = ref(true);
+const showEmailShareSnackMessage = ref(false);
+const shareEmailAddress = ref('');
 
 const props = defineProps({
   authorsNickname: String,
@@ -42,6 +49,25 @@ async function deleteFromFavourites(articleId) {
     await axios.delete(`${store.state.API_URL}/api/saved-articles/${articleId}`, store.state.config);
   } catch (e) {
     console.log(e)
+  }
+}
+
+const shareArticle = async (articleId, shareType) => {
+  shareBy.value = shareType;
+  if (shareBy.value === 'link') {
+    try {
+      shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
+    } catch (e) {
+      shareLink.value = undefined;
+      console.error(e);
+    }
+  } else {
+    try {
+      shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
+    } catch (e) {
+      shareLink.value = undefined;
+      console.error(e);
+    }
   }
 }
 
@@ -147,7 +173,7 @@ function redirectIfNotAuthorized() {
               <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
               <b v-else style="color: black">{{ articleRating }}</b>
           </div>
-          <div class = "article-favourites">
+          <div class = "article-favourites" style="margin-left: -1em">
             <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
               redirectIfNotAuthorized();
               deleteFromFavourites(articleId);
@@ -164,9 +190,132 @@ function redirectIfNotAuthorized() {
             </div>
             <b> {{ articleTotalFavourites }}</b>
           </div>
-          <div class = "article-share">
+          <div class = "article-share pb-1">
             <div class = "article-share-icon">
-              <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon">
+              <v-dialog max-width="500">
+                <template v-slot:activator="{ props: activatorProps }">
+                  <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon" v-bind="activatorProps"
+                       @click="async () => {shareLink = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;}">
+                </template>
+
+                <template v-slot:default="{ isActive }">
+                  <v-card title="Поделиться">
+                    <!--                      <v-card-text class = "text-center">-->
+                    <!--                        Выберите способ-->
+                    <!--                      </v-card-text>-->
+                    <div class="w-full my-3 text-center">
+                      <v-btn-toggle v-model="shareSortToggle" color="#20b2aa" class="ml-2" mandatory>
+                        <v-btn
+                          @click="async () => { await shareArticle(articleId, 'link'); }"
+                          icon
+                          size="large">
+                          <img src="/icons/share_link_icon.webp" style="height: 2.5em; width: 2.5em;">
+                        </v-btn>
+
+                        <v-btn @click="async () => { await shareArticle(articleId, 'vk'); }"
+                               icon
+                               size="large">
+                          <img src="/icons/share_vk_icon.png" style="height: 2.5em; width: 2.5em;">
+                        </v-btn>
+
+                        <v-btn
+                          @click="async () => { await shareArticle(articleId, 'telegram'); }"
+                          icon
+                          size="large">
+                          <img src="/icons/share_tg_icon.png" style="height: 2.5em; width: 2.5em;">
+                        </v-btn>
+
+                        <v-btn @click="async () => { await shareArticle(articleId, 'whatsapp'); }"
+                               icon
+                               size="large">
+                          <img src="/icons/share_wa_icon.png" style="height: 3em; width: 3em;">
+                        </v-btn>
+
+                        <v-btn
+                          v-if="store.state.isAuthorized"
+                          @click= "shareBy = 'email'"
+                          icon
+                          size="large">
+                          <img src="/icons/share_gmail_icon.webp" style="height: 3em; width: 3em;">
+                        </v-btn>
+                      </v-btn-toggle>
+                    </div>
+                    <v-row>
+                      <v-col cols="12" sm="12">
+                        <v-text-field
+                          v-if = "shareBy !== 'email'"
+                          class = "pt-3 mx-3"
+                          variant="outlined"
+                          readonly
+                        >{{ shareLink }}</v-text-field>
+                        <v-text-field
+                          v-else
+                          :error-messages="!isValidShareEmail ? 'Введена неверная почта' : ''"
+                          placeholder="Введите почту для отправки сообщения"
+                          label = "Почта"
+                          :model-value="shareEmailAddress"
+                          @update:model-value = "newValue => shareEmailAddress = newValue"
+                          class = "pt-3 mx-3"
+                          variant="outlined"
+                        >
+                        </v-text-field>
+                      </v-col>
+                    </v-row>
+
+                    <v-btn
+                      v-if = "shareBy !== 'email'"
+                      style="margin-left: 10em; margin-right: 10em;"
+                      @click="() =>
+                         {
+                           copyText(shareLink);
+                           showShareSnackMessage = true;
+                         }"> Копировать
+                    </v-btn>
+
+                    <v-btn
+                      v-else
+                      style="margin-left: 10em; margin-right: 10em;"
+                      @click="async () =>
+                             {
+                               let regex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+                                if (regex.test(shareEmailAddress)) {
+                                  console.log('valid')
+                                  isValidShareEmail = true;
+                                  try {
+                                    await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
+                                    showEmailShareSnackMessage = true;
+                                  } catch (e) {
+                                    console.error(e);
+                                  }
+                                } else {
+                                  console.log('invalid')
+                                  isValidShareEmail = false;
+                                }
+                             }"> Отправить
+                    </v-btn>
+
+                    <v-card-actions class = "mx-3 my-1">
+                      <v-spacer/>
+                      <v-btn
+                        text="Закрыть"
+                        @click="isActive.value = false"
+                      ></v-btn>
+                    </v-card-actions>
+                    <v-snackbar
+                      v-model="showShareSnackMessage"
+                      :timeout="3000"
+                    >
+                      Ссылка успешно скопирована
+                    </v-snackbar>
+                    <v-snackbar
+                      v-model="showEmailShareSnackMessage"
+                      :timeout="3000"
+                    >
+                      Сообщение успешно отправлено
+                    </v-snackbar>
+                  </v-card>
+                </template>
+              </v-dialog>
             </div>
           </div>
           <div class = "article-views-count">
@@ -297,6 +446,10 @@ function redirectIfNotAuthorized() {
 
 .article-share-icon {
   vertical-align: center;
+}
+
+.article-share-icon:hover {
+  cursor: pointer;
 }
 
 .article-views-count {
