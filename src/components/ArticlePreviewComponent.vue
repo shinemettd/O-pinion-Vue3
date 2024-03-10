@@ -4,6 +4,7 @@ import {useStore} from "vuex";
 import {ref, computed} from "vue";
 import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
+import ArticleMenuComponent from "@/components/ArticleMenuComponent.vue";
 
 const store = useStore();
 const reportReason = ref('');
@@ -19,7 +20,7 @@ const statusColors = computed(() => ({
       'NOT_APPROVED': 'red',
       'APPROVED': 'green'
     }));
-const articleMenuOpen = ref(false);
+
 
 
 defineProps({
@@ -103,17 +104,7 @@ const getStatusText = (status) => {
   return statusMap[status] || status;
 };
 
-const toggleMenu = () => {
-  articleMenuOpen.value = !articleMenuOpen.value;
-};
 
-const deleteArticle = () => {
-  console.log("delete article");
-};
-
-const restoreArticle = () => {
-  console.log("restore article");
-};
 
 </script>
 
@@ -149,7 +140,8 @@ export default {
             </router-link>
           </div>
         </div>
-        <div class = "article-header-report">
+        <ArticleMenuComponent :articleStatus="articleStatus" :authorsNickname="authorsNickname"></ArticleMenuComponent>
+        <div class = "article-header-report" v-if="store.state.isAuthorized && (store.state.nickname !== authorsNickname)">
           <div class = "article-header-report-icon">
             <v-dialog max-width="500">
               <template v-slot:activator="{ props: activatorProps }">
@@ -248,39 +240,8 @@ export default {
           </div>
         </div>
       </div>
-      <div class="article-menu" v-if="store.state.isAuthorized && (store.state.nickname === authorsNickname)">
-        <div class="menu-icon" @click="toggleMenu">
-          <img src="/icons/three-points-menu.svg" alt="Menu">
-        </div>
-        <transition name="fade">
-          <div class="menu-dropdown" v-if="articleMenuOpen">
-            <ul>
-              <li>
-                <router-link :to="'/edit-article'">
-                  <p>Редактировать статью</p>
-                </router-link>
-              </li>
-              <li>
-                <button 
-                  :disabled="articleStatus === 'DELETED'" 
-                  :class="{ 'inactive': articleStatus === 'DELETED' }" 
-                  @click="deleteArticle"
-                >
-                  Удалить статью
-                </button>
-              </li>
-              <li>
-                <button 
-                  v-if="articleStatus === 'DELETED'" 
-                  @click="restoreArticle"
-                >
-                  Восстановить статью
-                </button>
-              </li>
-            </ul>
-          </div>
-        </transition>
-      </div>
+      <ArticleMenuComponent v-show = "showWithoutHeader" :articleStatus="articleStatus" :authorsNickname="authorsNickname"></ArticleMenuComponent>
+
       <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
         <div v-show="articleStatus !== null && articleStatus !== undefined" class="article-status" >
@@ -566,53 +527,5 @@ article {
   word-wrap: break-word;
 }
 
-.inactive {
-    color: gray; 
-    cursor: not-allowed;
-}
-
-.menu-icon {
-  cursor: pointer;
-  float: right;
-  margin-left: 10px;
-  top: 0;
-  right: 0;
-  width: 25px;
-  height: 25px;
-}
-
-.menu-dropdown {
-  display: none; /* Изменено */
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  position: absolute;
-  top: calc(100% + 5px);
-  left: 0;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  z-index: 1;
-  min-width: 300px;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.menu-dropdown li {
-  padding: 8px 16px;
-  cursor: pointer;
-  max-height: 40px;
-}
-
-.menu-dropdown li:hover {
-  background-color: #ddd;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter, .fade-leave-to  {
-  opacity: 0;
-}
 
 </style>
