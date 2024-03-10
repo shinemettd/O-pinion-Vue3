@@ -279,7 +279,6 @@ function redirectIfNotAuthorized() {
                              {
                                let regex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
                                 if (regex.test(shareEmailAddress)) {
-                                  console.log('valid')
                                   isValidShareEmail = true;
                                   try {
                                     await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
@@ -288,7 +287,6 @@ function redirectIfNotAuthorized() {
                                     console.error(e);
                                   }
                                 } else {
-                                  console.log('invalid')
                                   isValidShareEmail = false;
                                 }
                              }"> Отправить

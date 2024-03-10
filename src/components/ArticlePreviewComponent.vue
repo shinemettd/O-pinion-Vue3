@@ -276,17 +276,17 @@ export default {
                 </router-link>
               </li>
               <li>
-                <button 
-                  :disabled="articleStatus === 'DELETED'" 
-                  :class="{ 'inactive': articleStatus === 'DELETED' }" 
+                <button
+                  :disabled="articleStatus === 'DELETED'"
+                  :class="{ 'inactive': articleStatus === 'DELETED' }"
                   @click="deleteArticle"
                 >
                   Удалить статью
                 </button>
               </li>
               <li>
-                <button 
-                  v-if="articleStatus === 'DELETED'" 
+                <button
+                  v-if="articleStatus === 'DELETED'"
                   @click="restoreArticle"
                 >
                   Восстановить статью
@@ -444,7 +444,6 @@ export default {
                              {
                                let regex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
                                 if (regex.test(shareEmailAddress)) {
-                                  console.log('valid')
                                   isValidShareEmail = true;
                                   try {
                                     await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
@@ -453,7 +452,6 @@ export default {
                                     console.error(e);
                                   }
                                 } else {
-                                  console.log('invalid')
                                   isValidShareEmail = false;
                                 }
                              }"> Отправить
@@ -670,7 +668,7 @@ article {
 }
 
 .inactive {
-    color: gray; 
+    color: gray;
     cursor: not-allowed;
 }
 
