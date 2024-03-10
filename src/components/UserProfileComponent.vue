@@ -94,6 +94,7 @@ watch(() => props.userId, () => {
         <div v-for="article in articles" :key="article.id" class = "scroll-content my-7">
           <ArticlePreviewComponent
             :show-without-header = "true"
+            :authors-nickname="article.author.nickname"
             :authors-avatar-url = "null"
             :postedTimeAgo = "article.date_time"
             :article-id = "article.id"
