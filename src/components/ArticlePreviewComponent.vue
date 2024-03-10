@@ -23,6 +23,8 @@ const statusColors = computed(() => ({
       'NOT_APPROVED': 'red',
       'APPROVED': 'green'
     }));
+const articleMenuOpen = ref(false);
+
 
 
 defineProps({
@@ -103,6 +105,31 @@ const shareArticle = async (articleId, shareType) => {
 const copyText = (text) => {
     navigator.clipboard.writeText(text);
 }
+
+const getStatusText = (status) => {
+  const statusMap = {
+    'ON_MODERATION': 'На модерации',
+    'BLOCKED': 'Заблокировано',
+    'DELETED': 'Удалено',
+    'DRAFT': 'В черновиках',
+    'NOT_APPROVED': 'Не одобрено',
+    'APPROVED': 'Одобрено'
+  };
+  return statusMap[status] || status;
+};
+
+const toggleMenu = () => {
+  articleMenuOpen.value = !articleMenuOpen.value;
+};
+
+const deleteArticle = () => {
+  console.log("delete article");
+};
+
+const restoreArticle = () => {
+  console.log("restore article");
+};
+
 </script>
 
 <script>
@@ -148,7 +175,7 @@ export default {
                 }">
               </template>
 
-              <template v-slot:default="{ isActive }">
+              <template v-slot:default="{ isActive }" >
                 <v-card title="Жалоба">
                   <v-card-text>
                     Что именно вам кажется недопустимым в этом материале?
@@ -236,10 +263,43 @@ export default {
           </div>
         </div>
       </div>
+      <div class="article-menu" v-if="store.state.isAuthorized && (store.state.nickname === authorsNickname)">
+        <div class="menu-icon" @click="toggleMenu">
+          <img src="/icons/three-points-menu.svg" alt="Menu">
+        </div>
+        <transition name="fade">
+          <div class="menu-dropdown" v-if="articleMenuOpen">
+            <ul>
+              <li>
+                <router-link :to="'/edit-article'">
+                  <p>Редактировать статью</p>
+                </router-link>
+              </li>
+              <li>
+                <button 
+                  :disabled="articleStatus === 'DELETED'" 
+                  :class="{ 'inactive': articleStatus === 'DELETED' }" 
+                  @click="deleteArticle"
+                >
+                  Удалить статью
+                </button>
+              </li>
+              <li>
+                <button 
+                  v-if="articleStatus === 'DELETED'" 
+                  @click="restoreArticle"
+                >
+                  Восстановить статью
+                </button>
+              </li>
+            </ul>
+          </div>
+        </transition>
+      </div>
       <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
         <div v-show="articleStatus !== null && articleStatus !== undefined" class="article-status" >
-          <p> Статус : <span :style="{ color: statusColors[articleStatus] }">{{ articleStatus }}</span> </p>
+          <p> Статус : <span :style="{ color: statusColors[articleStatus] }">{{ getStatusText(articleStatus) }}</span> </p>
         </div>
         <div class = "article-title">
           <router-link :to="'/article/' + articleId">
@@ -608,4 +668,54 @@ article {
   padding: 1.5em 1.5em 1.5em 1.5em;
   word-wrap: break-word;
 }
+
+.inactive {
+    color: gray; 
+    cursor: not-allowed;
+}
+
+.menu-icon {
+  cursor: pointer;
+  float: right;
+  margin-left: 10px;
+  top: 0;
+  right: 0;
+  width: 25px;
+  height: 25px;
+}
+
+.menu-dropdown {
+  display: none; /* Изменено */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  z-index: 1;
+  min-width: 300px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.menu-dropdown li {
+  padding: 8px 16px;
+  cursor: pointer;
+  max-height: 40px;
+}
+
+.menu-dropdown li:hover {
+  background-color: #ddd;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter, .fade-leave-to  {
+  opacity: 0;
+}
+
 </style>

@@ -271,10 +271,8 @@ export default {
             if (selection.node && selection.node.attrs && selection.node.attrs.src) {
                 const src = selection.node.attrs.src;
                 console.log("Путь к изображению:", src);
-                const imagePath = '/home/opinion/opinion-front' + src;
                 contentEditor.commands.deleteSelection();
-                console.log('Путь к картинке на сервере : ' + imagePath);
-                deleteImageFromServer(imagePath);
+                deleteImageFromServer(src);
             }
         };
 
@@ -486,14 +484,11 @@ export default {
                 });
 
                 if (response) {
-                    const imagePath = response.data;
-                    const fileName = imagePath.split('/').pop();
 
                     contentEditor.commands.focus(contentEditor.state.doc.content.size);
-                    contentEditor.chain().setImage({ src: '/images/articles_images/' + fileName }).run();
+                    contentEditor.chain().setImage({ src: response.data }).run();
 
                     console.log(response.data);
-                    console.log('/images/articles_images/' + fileName)
                     console.log('currentImNum = ' + countImagesInEditor());
                 }
 

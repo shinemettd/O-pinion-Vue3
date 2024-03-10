@@ -164,7 +164,7 @@ export default {
         console.log('valid image');
         isCoverImageValid.value = true;
         coverImageSrc.value = URL.createObjectURL(coverImageFile.value);
-
+        
 
       } else {
         isCoverImageValid.value = false;
@@ -267,9 +267,7 @@ export default {
           }
         });
         console.log('Изображение успешно загружено:');
-
-        const fileName = response.data.split('/').pop();
-        coverImageSrc.value = '/images/articles_images/' + fileName;
+        coverImageSrc.value = response.data;
 
         return response.data;
       } catch (error) {
@@ -378,6 +376,24 @@ export default {
     // Добавляем console.log перед передачей пропса showModal
     console.log('showModal is', typeof showModal);
 
+    onBeforeMount(async () => {
+      if (!(await isAuthorized())) {
+        store.commit('logout');
+      }
+    });
+
+    const isAuthorized = async () => {
+      if (store.state.nickname === null) {
+        return false;
+      }
+      try {
+        const response = await axios.get(`${store.state.API_URL}/api/users/my-profile`, store.state.config);
+        return response.status === HttpStatusCode.Ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
     return {
       title,
       short_description,
@@ -403,23 +419,7 @@ export default {
   }
 };
 
-const isAuthorized = async () => {
-  if (store.state.nickname === null) {
-    return false;
-  }
-  try {
-    const response = await axios.get(`${store.state.API_URL}/api/users/my-profile`, store.state.config);
-    return response.status === HttpStatusCode.Ok;
-  } catch (e) {
-    return false;
-  }
-}
 
-onBeforeMount(async () => {
-  if (!(await isAuthorized())) {
-    store.commit('logout');
-  }
-});
 </script>
 
 <style>
