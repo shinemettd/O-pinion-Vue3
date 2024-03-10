@@ -34,12 +34,12 @@
             <router-link v-if="!store.state.isAuthorized" to="/auth" class="menu-item" @click="isMenuOpen = false"><i
               class="fas fa-sign-in-alt"></i>Войти
             </router-link>
-            <router-link to="/about" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-info-circle"></i>О нас
-            </router-link>
-            <router-link to="/notification" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомление
+            <router-link to="/notification" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомления
             </router-link>
             <router-link to="/create-article" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-plus"></i>Создать
               статью
+            </router-link>
+            <router-link to="/settings" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-user-cog"></i>Настройки
             </router-link>
             <router-link v-if="store.state.isAuthorized" to="/" class="menu-item"
                          @click="() => { isMenuOpen = false; store.commit('logout'); }"><i class="fas fa-sign-in-alt"></i>Выйти
