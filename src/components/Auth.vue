@@ -81,12 +81,11 @@ export default {
                placeholder="Пароль">
         <input type="submit" class="fadeIn fourth" value="Войти">
       </form>
-
-      <button type="button" class="bbbd-btn" style="margin-bottom: 20px">
-        Забыли пароль?
-      </button>
-
-
+      <router-link to="/forgot-password">
+        <button type="button" class="bbbd-btn" style="margin-bottom: 20px">
+          Забыли пароль?
+        </button>
+      </router-link>
     </div>
   </div>
 </template>

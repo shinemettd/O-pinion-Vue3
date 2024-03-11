@@ -4,6 +4,7 @@ import axios from "axios";
 import store from "@/store/store";
 import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
+import ArticleMenuComponent from "@/components/ArticleMenuComponent.vue";
 
 const reaction = ref('');
 const shareBy = ref('link');
@@ -33,7 +34,8 @@ const props = defineProps({
   articleTotalComments: Number,
   articleTotalViews: Number,
   articleComments: String,
-  articleCommentsReplies: String
+  articleCommentsReplies: String,
+  articleStatus: String,
 })
 
 async function addToFavourites(articleId) {
@@ -121,18 +123,21 @@ function redirectIfNotAuthorized() {
       <div class = "article-header mt-3">
         <p style = "font-size: 2em; word-wrap: break-word;"> {{ articleTitle }} </p>
         <div class = "article-header-data my-2" style = "display: flex">
-          <div class = "user-avatar mr-3">
-            <router-link :to="'/user/' + authorsNickname">
-              <img :src = "authorsAvatarUrl" class = "my-1 mt-2" alt = "user avatar">
-            </router-link>
-          </div>
-          <div class = "">
-            <router-link :to="'/user/' + authorsNickname">
-              <p style = "font-size: 1.25em"> <strong> {{ authorsNickname }} </strong> </p>
-            </router-link>
+          <div class="article-header-data">
+            <div class = "user-avatar mr-3">
+              <router-link :to="'/user/' + authorsNickname">
+                <img :src = "authorsAvatarUrl" class = "my-1 mt-2" alt = "user avatar">
+              </router-link>
+            </div>
+            <div class = "">
+              <router-link :to="'/user/' + authorsNickname">
+                <p style = "font-size: 1.25em"> <strong> {{ authorsNickname }} </strong> </p>
+              </router-link>
 
-            <p> {{ formatDateTime(postedTimeAgo) }}</p>
+              <p> {{ formatDateTime(postedTimeAgo) }}</p>
+            </div>
           </div>
+          <ArticleMenuComponent  style="float: right;" :articleStatus="articleStatus" :authorsNickname="authorsNickname"></ArticleMenuComponent>
         </div>
       </div>
       <div class="my-3">
@@ -392,6 +397,13 @@ function redirectIfNotAuthorized() {
   height: 2.5em;
   border-radius: 50%;
   vertical-align: middle;
+}
+
+
+.article-header-data {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .article-footer div {

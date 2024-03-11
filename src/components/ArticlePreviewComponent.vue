@@ -4,6 +4,7 @@ import {useStore} from "vuex";
 import {ref, computed} from "vue";
 import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
+import ArticleMenuComponent from "@/components/ArticleMenuComponent.vue";
 
 const store = useStore();
 const reportReason = ref('');
@@ -16,14 +17,14 @@ const isValidShareEmail = ref(true);
 const showEmailShareSnackMessage = ref(false);
 const shareEmailAddress = ref('');
 const statusColors = computed(() => ({
-      'ON_MODERATION': 'orange',
-      'BLOCKED': 'red',
-      'DELETED': 'red',
-      'DRAFT': 'orange',
-      'NOT_APPROVED': 'red',
-      'APPROVED': 'green'
-    }));
-const articleMenuOpen = ref(false);
+  'ON_MODERATION': 'orange',
+  'BLOCKED': 'red',
+  'DELETED': 'red',
+  'DRAFT': 'orange',
+  'NOT_APPROVED': 'red',
+  'APPROVED': 'green'
+}));
+
 
 
 
@@ -103,7 +104,7 @@ const shareArticle = async (articleId, shareType) => {
 }
 
 const copyText = (text) => {
-    navigator.clipboard.writeText(text);
+  navigator.clipboard.writeText(text);
 }
 
 const getStatusText = (status) => {
@@ -118,17 +119,7 @@ const getStatusText = (status) => {
   return statusMap[status] || status;
 };
 
-const toggleMenu = () => {
-  articleMenuOpen.value = !articleMenuOpen.value;
-};
 
-const deleteArticle = () => {
-  console.log("delete article");
-};
-
-const restoreArticle = () => {
-  console.log("restore article");
-};
 
 </script>
 
@@ -164,7 +155,8 @@ export default {
             </router-link>
           </div>
         </div>
-        <div class = "article-header-report">
+        <ArticleMenuComponent :articleStatus="articleStatus" :authorsNickname="authorsNickname"></ArticleMenuComponent>
+        <div class = "article-header-report" v-if="store.state.nickname !== authorsNickname">
           <div class = "article-header-report-icon">
             <v-dialog max-width="500">
               <template v-slot:activator="{ props: activatorProps }">
@@ -214,18 +206,18 @@ export default {
                     ></v-radio>
 
                   </v-radio-group>
-                <div class = "px-5">
-                  <div class="">Сообщение (необязательно) </div>
+                  <div class = "px-5">
+                    <div class="">Сообщение (необязательно) </div>
 
-                  <v-textarea
-                    :counter="500"
-                    class="mb-2"
-                    rows="2"
-                    variant="outlined"
-                    v-model="reportReasonText"
-                    persistent-counter
-                  ></v-textarea>
-                </div>
+                    <v-textarea
+                      :counter="500"
+                      class="mb-2"
+                      rows="2"
+                      variant="outlined"
+                      v-model="reportReasonText"
+                      persistent-counter
+                    ></v-textarea>
+                  </div>
 
 
                   <v-card-actions class = "mx-3 my-1">
@@ -263,39 +255,8 @@ export default {
           </div>
         </div>
       </div>
-      <div class="article-menu" v-if="store.state.isAuthorized && (store.state.nickname === authorsNickname)">
-        <div class="menu-icon" @click="toggleMenu">
-          <img src="/icons/three-points-menu.svg" alt="Menu">
-        </div>
-        <transition name="fade">
-          <div class="menu-dropdown" v-if="articleMenuOpen">
-            <ul>
-              <li>
-                <router-link :to="'/edit-article'">
-                  <p>Редактировать статью</p>
-                </router-link>
-              </li>
-              <li>
-                <button
-                  :disabled="articleStatus === 'DELETED'"
-                  :class="{ 'inactive': articleStatus === 'DELETED' }"
-                  @click="deleteArticle"
-                >
-                  Удалить статью
-                </button>
-              </li>
-              <li>
-                <button
-                  v-if="articleStatus === 'DELETED'"
-                  @click="restoreArticle"
-                >
-                  Восстановить статью
-                </button>
-              </li>
-            </ul>
-          </div>
-        </transition>
-      </div>
+      <ArticleMenuComponent v-show = "showWithoutHeader" :articleStatus="articleStatus" :authorsNickname="authorsNickname"></ArticleMenuComponent>
+
       <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
         <div v-show="articleStatus !== null && articleStatus !== undefined" class="article-status" >
@@ -331,7 +292,7 @@ export default {
               <b v-else style="color: black">{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
-                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
+              <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
                   if (store.state.isAuthorized) {
                     deleteFromFavourites(articleId);
                     articleInFavourites = false;
@@ -340,9 +301,9 @@ export default {
                     router.push('/auth');
                   }
                 }">
-                  <img src="/icons/star_icon.svg" alt = "Favourites Icon">
-                </div>
-                <div v-else class = article-not-in-favourites-icon @click="() => {
+                <img src="/icons/star_icon.svg" alt = "Favourites Icon">
+              </div>
+              <div v-else class = article-not-in-favourites-icon @click="() => {
                   if (store.state.isAuthorized) {
                     addToFavourites(articleId);
                     articleInFavourites = true;
@@ -351,9 +312,9 @@ export default {
                     router.push('/auth');
                   }
                 }">
-                  <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
-                </div>
-                <b> {{ articleTotalFavourites }}</b>
+                <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
+              </div>
+              <b> {{ articleTotalFavourites }}</b>
             </div>
             <div class = "article-share pb-1">
               <div class = "article-share-icon">
@@ -365,9 +326,9 @@ export default {
 
                   <template v-slot:default="{ isActive }">
                     <v-card title="Поделиться">
-<!--                      <v-card-text class = "text-center">-->
-<!--                        Выберите способ-->
-<!--                      </v-card-text>-->
+                      <!--                      <v-card-text class = "text-center">-->
+                      <!--                        Выберите способ-->
+                      <!--                      </v-card-text>-->
                       <div class="w-full my-3 text-center">
                         <v-btn-toggle v-model="shareSortToggle" color="#20b2aa" class="ml-2" mandatory>
                           <v-btn
@@ -378,8 +339,8 @@ export default {
                           </v-btn>
 
                           <v-btn @click="async () => { await shareArticle(articleId, 'vk'); }"
-                            icon
-                            size="large">
+                                 icon
+                                 size="large">
                             <img src="/icons/share_vk_icon.png" style="height: 2.5em; width: 2.5em;">
                           </v-btn>
 
@@ -430,7 +391,7 @@ export default {
                       <v-btn
                         v-if = "shareBy !== 'email'"
                         style="margin-left: 10em; margin-right: 10em;"
-                         @click="() =>
+                        @click="() =>
                          {
                            copyText(shareLink);
                            showShareSnackMessage = true;
@@ -439,11 +400,12 @@ export default {
 
                       <v-btn
                         v-else
-                             style="margin-left: 10em; margin-right: 10em;"
-                             @click="async () =>
+                        style="margin-left: 10em; margin-right: 10em;"
+                        @click="async () =>
                              {
                                let regex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
                                 if (regex.test(shareEmailAddress)) {
+                                  console.log('valid')
                                   isValidShareEmail = true;
                                   try {
                                     await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
@@ -452,6 +414,7 @@ export default {
                                     console.error(e);
                                   }
                                 } else {
+                                  console.log('invalid')
                                   isValidShareEmail = false;
                                 }
                              }"> Отправить
@@ -482,12 +445,12 @@ export default {
               </div>
             </div>
             <div class = "article-comments">
-                <div class = "article-comments-icon">
-                  <router-link :to="'/article/' + articleId" class="navbar-item">
-                    <img src="/icons/message_square_icon.svg" alt="Comments Icon">
-                  </router-link>
-                </div>
-                <b>{{ articleTotalComments }}</b>
+              <div class = "article-comments-icon">
+                <router-link :to="'/article/' + articleId" class="navbar-item">
+                  <img src="/icons/message_square_icon.svg" alt="Comments Icon">
+                </router-link>
+              </div>
+              <b>{{ articleTotalComments }}</b>
             </div>
             <div class = "article-views-count">
               <div class = "article-views-icon">
@@ -667,53 +630,5 @@ article {
   word-wrap: break-word;
 }
 
-.inactive {
-    color: gray;
-    cursor: not-allowed;
-}
-
-.menu-icon {
-  cursor: pointer;
-  float: right;
-  margin-left: 10px;
-  top: 0;
-  right: 0;
-  width: 25px;
-  height: 25px;
-}
-
-.menu-dropdown {
-  display: none; /* Изменено */
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  position: absolute;
-  top: calc(100% + 5px);
-  left: 0;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  z-index: 1;
-  min-width: 300px;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.menu-dropdown li {
-  padding: 8px 16px;
-  cursor: pointer;
-  max-height: 40px;
-}
-
-.menu-dropdown li:hover {
-  background-color: #ddd;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter, .fade-leave-to  {
-  opacity: 0;
-}
 
 </style>
