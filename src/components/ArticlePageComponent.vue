@@ -246,8 +246,7 @@ function redirectIfNotAuthorized() {
             <div class = "article-rating-icon">
               <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="async () => {
                 await setLike();
-                //TODO change request
-                articleRating = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}`)).data.rating;
+                articleRating = await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`);
               }">
             </div>
             <b v-if = "articleRating > 0" style="color: green">{{ articleRating }}</b>
@@ -255,9 +254,7 @@ function redirectIfNotAuthorized() {
             <b v-else style="color: black">{{ articleRating }}</b>
             <div class = "article-rating-icon ml-3">
               <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="async () => {
-                await setDislike();
-                //TODO change request
-                articleRating = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}`)).data.rating;
+                articleRating = await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`);
               }">
             </div>
           </div>
@@ -422,10 +419,12 @@ function redirectIfNotAuthorized() {
       </div>
       <hr class = "my-3">
 
-      <div class="my-5">
-        <p style="font-size: 1.5em"> Комментарии <strong> {{articleTotalComments}}</strong> </p>
-        <div v-show = "articleTotalComments === 0" class = "px-5 pt-5" style = "font-style: italic">
-          Комментариев пока нет :(
+      <div class="my-5" style = "z-index: 1000">
+        <div style = "z-index: 100">
+          <p style="font-size: 1.5em"> Комментарии <strong> {{articleTotalComments}}</strong> </p>
+          <div v-show = "articleTotalComments === 0" class = "px-5 pt-5" style = "font-style: italic">
+            Комментариев пока нет :(
+          </div>
         </div>
         <div class = "comments-list my-5" v-for = "comment in articleComments.content" :key="comment.id">
             <div class = "info-header">
@@ -475,30 +474,33 @@ function redirectIfNotAuthorized() {
               </div>
           </div>
         </div>
-        <hr class = "mt-5 pb-2 сomment-field">
-        <div v-if="store.state.isAuthorized">
-              <div class = "mb-2" v-if="isCommentReply">
-                <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
-              </div>
-              <v-text-field
-                v-model="userComment"
-                :append-icon="'mdi-send'"
-                type="text"
-                variant="filled"
-                placeholder="Напишите комментарий"
-                :error-messages="sendEmptyComment ? 'Ну не пустой комментарий же отправлять...' : '' ||
-                                  sendTooShortComment ? 'Комментарий должен быть информативнее...' : '' ||
-                                  sendTooLongComment ? 'Комментарий должен быть не настолько информативным!' : ''"
-                :counter="255"
-                :variant="outlined"
-                clearable
-                @click:append="async() => { await sendComment(userComment, articleId); }"
-                @click:clear="clearComment"
-                @update:model-value="newComment => userComment = newComment"
-              ></v-text-field>
-        </div>
-        <div v-else>
-          Не авторизован падла
+        <div class = "сomment-field">
+          <hr class = "mt-5 pb-2">
+          <div v-if="store.state.isAuthorized" class="mt-2">
+                <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
+                  <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
+                </div>
+                <v-text-field
+                  v-model="userComment"
+                  :append-icon="'mdi-send'"
+                  type="text"
+                  variant="filled"
+                  placeholder="Напишите комментарий"
+                  :error-messages="sendEmptyComment ? 'Ну не пустой комментарий же отправлять...' : '' ||
+                                    sendTooShortComment ? 'Комментарий должен быть информативнее...' : '' ||
+                                    sendTooLongComment ? 'Комментарий должен быть не настолько информативным!' : ''"
+                  :counter="255"
+                  :variant="outlined"
+                  clearable
+                  @click:append="async() => { await sendComment(userComment, articleId); }"
+                  @click:clear="clearComment"
+                  @update:model-value="newComment => userComment = newComment"
+                ></v-text-field>
+            <hr>
+          </div>
+          <div v-else>
+            Не авторизован падла
+          </div>
         </div>
       </div>
     </div>
@@ -616,6 +618,6 @@ function redirectIfNotAuthorized() {
   position: sticky;
   bottom: 0;
   background-color: white;
-  z-index: 1000;
+  z-index: 1;
 }
 </style>
