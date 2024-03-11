@@ -421,8 +421,8 @@ function redirectIfNotAuthorized() {
 
       <div class="my-5" style = "z-index: 1000">
         <div style = "z-index: 100">
-          <p style="font-size: 1.5em"> Комментарии <strong> {{articleTotalComments}}</strong> </p>
-          <div v-show = "articleTotalComments === 0" class = "px-5 pt-5" style = "font-style: italic">
+          <p style="font-size: 1.5em"> Комментарии <strong> {{articleComments.numberOfElements}}</strong> </p>
+          <div v-show = "articleComments.numberOfElements === 0" class = "px-5 pt-5" style = "font-style: italic">
             Комментариев пока нет :(
           </div>
         </div>
@@ -446,7 +446,17 @@ function redirectIfNotAuthorized() {
                 <p v-html="comment.text"></p>
               </div>
               <div class = "my-2" style = "font-size: 0.85em">
-                  <span class = "comment-reply-text" @click="async() => await replyTo(comment.user.nickname, comment.id)"> Ответить </span>
+                  <span
+                    class = "comment-reply-text"
+                    @click="async () =>
+                    {
+                      if (store.state.isAuthorized) {
+                        await replyTo(comment.user.nickname, comment.id)
+                      } else {
+                         router.push('/auth')
+                       }
+                    }"
+                  > Ответить </span>
               </div>
             </div>
 
@@ -484,13 +494,12 @@ function redirectIfNotAuthorized() {
                   v-model="userComment"
                   :append-icon="'mdi-send'"
                   type="text"
-                  variant="filled"
                   placeholder="Напишите комментарий"
                   :error-messages="sendEmptyComment ? 'Ну не пустой комментарий же отправлять...' : '' ||
                                     sendTooShortComment ? 'Комментарий должен быть информативнее...' : '' ||
                                     sendTooLongComment ? 'Комментарий должен быть не настолько информативным!' : ''"
                   :counter="255"
-                  :variant="outlined"
+                  variant="outlined"
                   clearable
                   @click:append="async() => { await sendComment(userComment, articleId); }"
                   @click:clear="clearComment"
@@ -499,7 +508,13 @@ function redirectIfNotAuthorized() {
             <hr>
           </div>
           <div v-else>
-            Не авторизован падла
+            <v-text-field
+              readonly
+              :append-icon="'mdi-send'"
+              variant="outlined"
+              placeholder = "Для того чтобы оставить комментарий, авторизуйтесь"
+              @click:append="() => { router.push('/auth'); }"
+            ></v-text-field>
           </div>
         </div>
       </div>
