@@ -26,6 +26,7 @@ const sendTooLongComment = ref(false);
 const isCommentReply = ref(false);
 const replyCommentId = ref(undefined);
 const replyCommentAuthorsNickname = ref('');
+const successGetNewComments = ref(false);
 
 const icons = [
   'mdi-emoticon',
@@ -62,7 +63,6 @@ const props = defineProps({
   loadComments: {
     type: Function,
     default() {
-      console.log('comments loaded...')
     }
   }
 })
@@ -83,12 +83,15 @@ async function sendComment(comment, articleId) {
     let response;
     if (!isCommentReply.value) {
       response = await axios.post(`${store.state.API_URL}/api/article-comments/${articleId}`, {text: comment}, store.state.config);
+
     } else {
       response = await axios.post(`${store.state.API_URL}/api/article-comments/${replyCommentId.value}/replies`, {text: comment}, store.state.config);
     }
     await props.loadComments();
+    successGetNewComments.value = true;
   } catch (e) {
     console.error(e);
+    successGetNewComments.value = false;
   }
   clearComment();
 }
@@ -246,7 +249,7 @@ function redirectIfNotAuthorized() {
             <div class = "article-rating-icon">
               <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="async () => {
                 await setLike();
-                articleRating = await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`);
+                articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
               }">
             </div>
             <b v-if = "articleRating > 0" style="color: green">{{ articleRating }}</b>
@@ -254,7 +257,8 @@ function redirectIfNotAuthorized() {
             <b v-else style="color: black">{{ articleRating }}</b>
             <div class = "article-rating-icon ml-3">
               <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="async () => {
-                articleRating = await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`);
+                await setDislike();
+                articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
               }">
             </div>
           </div>
@@ -421,8 +425,8 @@ function redirectIfNotAuthorized() {
 
       <div class="my-5" style = "z-index: 1000">
         <div style = "z-index: 100">
-          <p style="font-size: 1.5em"> Комментарии <strong> {{articleComments.numberOfElements}}</strong> </p>
-          <div v-show = "articleComments.numberOfElements === 0" class = "px-5 pt-5" style = "font-style: italic">
+          <p style="font-size: 1.5em"> Комментарии <strong> {{ articleTotalComments }}</strong> </p>
+          <div v-show = "articleTotalComments === 0" class = "px-5 pt-5" style = "font-style: italic">
             Комментариев пока нет :(
           </div>
         </div>
@@ -501,7 +505,7 @@ function redirectIfNotAuthorized() {
                   :counter="255"
                   variant="outlined"
                   clearable
-                  @click:append="async() => { await sendComment(userComment, articleId); }"
+                  @click:append="async() => { await sendComment(userComment, articleId); if (successGetNewComments) {articleTotalComments++}}"
                   @click:clear="clearComment"
                   @update:model-value="newComment => userComment = newComment"
                 ></v-text-field>
