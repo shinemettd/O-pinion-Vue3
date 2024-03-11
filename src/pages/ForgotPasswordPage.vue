@@ -35,7 +35,7 @@ const sendRequest = async (email) => {
 </script>
 
 <template>
-    <div class = "grid border">
+    <div class = "grid border rounded-lg shadow-lg">
       <div v-if="!isMessageSend">
         <h1 class = "header-text mb-3"> Сброс пароля </h1>
         <p class = "simple-text mb-3"> На почту будет отправлена ссылка, по которой Вы сможете восстановить пароль </p>
@@ -70,6 +70,7 @@ const sendRequest = async (email) => {
   width: 30%;
   margin-top: 10%;
   padding: 2em 2em 2em 2em;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-text {
