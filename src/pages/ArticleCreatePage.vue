@@ -8,7 +8,6 @@
       <p :style="{ color: title.length > 120 ? 'red' : 'black' }">{{ title.length }}/120</p>
 
       <div class="cover-image">
-
         <div
           class="drop-zone"
           @drop="dropFile($event)"
@@ -29,7 +28,7 @@
         </div>
 
         <div v-if="isCoverImageValid">
-          <p>Главное изображение статьи: {{ coverImageFile.name }}</p>
+          <p>Главное изображение статьи: </p>
           <div class="image-container">
             <img :src="coverImageSrc" alt="uploaded-image" id="uploaded-image"/>
             <img src="/icons/trash-can.svg" class="delete-button" alt="delete-icon" @click="removeImage"/>
@@ -39,7 +38,11 @@
       </div>
 
       <label for="short-description">Краткое описание:</label>
-      <Editor ref="EditorComponentRef" :showModal="showModal"/>
+      <Editor ref="EditorComponentRef" 
+        :showModal="showModal" 
+        :isForArticleShortDescription="true" 
+        :editedArticleShortDescription="editedArticleShortDescription"
+      />
 
       <div id="myModal" class="modal">
         <div class="modal-content">
@@ -55,10 +58,16 @@
       <h2>Содержание статьи :</h2>
 
 
-      <ArticleEditor ref="ArticleEditorComponentRef" :showModal="showModal" :isImageValid="isImageValid"/>
-      <TagZone ref="TagZoneComponentRef"/>
+      <ArticleEditor ref="ArticleEditorComponentRef"
+        :showModal="showModal"
+        :isImageValid="isImageValid"
+        :editedArticleContent="editedArticleContent"
+        />
+      <TagZone v-if="!article" ref="ArticleCreateTagZoneRef" />
+      <TagZone v-if="article" ref="EditArticleTagZoneRef" :editedArticleTags="article.tags"/>
+      
        <div class="btn-options">
-        <button class="btn btn-create-article" @click="submitArticle">Создать статью</button>
+        <button class="btn btn-create-article" @click="submitArticle">Опубликовать</button>
         <button class="btn btn-create-draft" @click="saveAsDraft">Сохранить как черновик</button>
        </div>
     </div>
@@ -77,12 +86,20 @@ import store from "@/store/store";
 
 
 export default {
+  props: {
+    article: Object,
+    editedArticleId : Number,
+    editedArticleTitle : String,
+    editedArticleShortDescription: String,
+    editedArticleContent: String,
+    editedArticleCoverImage: String,
+  },
   components: {
     ArticleEditor,
     Editor,
     TagZone
   },
-  setup() {
+  setup(props) {
     const coverImageFile = ref(null);
     const coverImageinput = ref(null);
     const coverImageSrc = ref('');
@@ -95,11 +112,17 @@ export default {
 
     const ArticleEditorComponentRef = ref(null);
     const EditorComponentRef = ref(null);
-    const TagZoneComponentRef = ref(null);
+    const ArticleCreateTagZoneRef = ref(null);
+    const EditArticleTagZoneRef = ref(null);
 
     onMounted(() => {
       loadTitleFromLocalStorage();
-
+      if(props.editedArticleCoverImage) {
+        console.log("У статьи есть фотография");
+        coverImageSrc.value = props.editedArticleCoverImage;
+        isCoverImageValid.value = true;
+      }
+      
       coverImageinput.value = document.getElementById('addCoverImage');
 
       // Закрыть всплывающее окно при нажатии на "X"
@@ -110,13 +133,12 @@ export default {
 
     });
 
-
-    onBeforeUnmount(() => {
-      // saveTitleToLocalStorage();
-    });
-
-
     const loadTitleFromLocalStorage = () => {
+
+      if(props.editedArticleId) {
+        title.value = props.article.title;
+        return;
+      }
       const savedTitle = localStorage.getItem('savedTitle');
       if (savedTitle) {
         title.value = savedTitle;
@@ -124,7 +146,11 @@ export default {
     };
 
     const saveTitleToLocalStorage = () => {
-      localStorage.setItem('savedTitle', title.value);
+      // если не редактируем какую-то статью , а создаем новую 
+      if(!props.editedArticleId) {
+        localStorage.setItem('savedTitle', title.value);
+        return;
+      }
     };
 
     const limitInputLength = () => {
@@ -146,6 +172,9 @@ export default {
     };
 
     const removeImage = () => {
+      if (props.editedArticleId && ArticleEditorComponentRef.value) {
+        ArticleEditorComponentRef.value.addToContentImagesToDelete(coverImageSrc.value);
+      }
       coverImageFile.value = null;
       coverImageSrc.value = '';
       isCoverImageValid.value = false;
@@ -299,11 +328,81 @@ export default {
     };
 
     const submitArticle = async () => {
+      if(props.editedArticleId) {
+        console.log("Публикуем уже созданную отредактированную статью >>>");
+        await saveArticleChanges();
+        await undraftArticle();
+        return;
+      }
       sendArticleOnServer(`${store.state.API_URL}/api/articles`);
     };
 
     const saveAsDraft = () => {
+      if(props.editedArticleId) {
+        console.log("Редактируем уже созданную статью >>>");
+        saveArticleChanges();
+        return;
+      }
       sendArticleOnServer(`${store.state.API_URL}/api/articles/drafts`);
+    }
+
+    const undraftArticle = async() => {
+      try {
+        const accessToken = localStorage.getItem('accessToken');///////ПОМЕНЯТЬ
+        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}/undraft`,{
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        alert('Ваша статья опубликована успешно !')
+        router.push('/');
+
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.errors) {
+          const serverErrors = error.response.data.errors;
+          showModal(null, serverErrors);
+
+        } else {
+          console.error('Error submitting article:', error);
+        }
+      }
+    }
+
+    const saveArticleChanges = async() => {
+      try {
+        const data = {
+          title: title.value,
+          short_description: getShortDescription(),
+          content: getHTMLContent(),
+          tags: getSelectedTags()
+        };
+
+        const accessToken = localStorage.getItem('accessToken');///////ПОМЕНЯТЬ
+        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}`, data, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log('id = ' + response.data.id);
+        // теперь присваиваем картинку статье
+        const imagePath = await loadCoverImageOnServer(response.data.id);
+        console.log('cover image path :' + imagePath);
+        alert('Ваши изменения сохранены успешно !')
+        router.push('/');
+
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.errors) {
+          const serverErrors = error.response.data.errors;
+          showModal(null, serverErrors);
+
+        } else {
+          console.error('Error submitting article:', error);
+        }
+      }
     }
 
     const sendArticleOnServer = async(endpoint) => {
@@ -315,7 +414,7 @@ export default {
           tags: getSelectedTags()
         };
 
-        const accessToken = localStorage.getItem('accessToken');
+        const accessToken = localStorage.getItem('accessToken'); ///////ПОМЕНЯТЬ
         const response = await axios.post(endpoint, data, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -364,14 +463,23 @@ export default {
     }
 
     const getSelectedTags = () => {
-      if(TagZoneComponentRef.value) {
-        console.log('Получили теги :' );
-        TagZoneComponentRef.value.getSelectedTags().forEach(function(tag) {
+      if(props.editedArticleId && EditArticleTagZoneRef.value) {
+        console.log('Получили отредактированные теги :' );
+        EditArticleTagZoneRef.value.getSelectedTags().forEach(function(tag) {
             console.log(tag);
         });
-        return TagZoneComponentRef.value.getSelectedTags();
+        return EditArticleTagZoneRef.value.getSelectedTags();
+      }
+      if(ArticleCreateTagZoneRef.value) {
+        console.log('Получили теги :' );
+        ArticleCreateTagZoneRef.value.getSelectedTags().forEach(function(tag) {
+            console.log(tag);
+        });
+        return ArticleCreateTagZoneRef.value.getSelectedTags();
       }
     }
+
+
 
     // Добавляем console.log перед передачей пропса showModal
     console.log('showModal is', typeof showModal);
@@ -413,7 +521,8 @@ export default {
       handlePaste,
       ArticleEditorComponentRef,
       EditorComponentRef,
-      TagZoneComponentRef,
+      ArticleCreateTagZoneRef,
+      EditArticleTagZoneRef
     };
 
   }
@@ -453,7 +562,7 @@ label {
   min-width: 100%;
   max-width: 100%;
   height: 2em;
-  font-size: 2em; /* Размер текста в поле ввода */
+  font-size: 2em; 
   border: #333 solid 1px;
   padding: 10px;
   border-radius: 10px;
@@ -523,16 +632,16 @@ label {
 }
 
 .modal {
-  display: none; /* Скрыто по умолчанию */
-  position: fixed; /* Зафиксированное положение */
-  z-index: 1; /* Наверху */
+  display: none; 
+  position: fixed; 
+  z-index: 1; 
   left: 0;
   top: 0;
-  width: 100%; /* Ширина экрана */
-  height: 100%; /* Высота экрана */
-  overflow: auto; /* Разрешить прокрутку */
-  background-color: rgb(0, 0, 0); /* Черный фон */
-  background-color: rgba(0, 0, 0, 0.4); /* Черный фон с прозрачностью */
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgb(0, 0, 0); 
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {

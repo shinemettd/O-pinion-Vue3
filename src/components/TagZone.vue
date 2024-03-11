@@ -45,7 +45,13 @@
 
 
   export default {
-    setup() {
+    props: {
+      editedArticleTags: {
+        type: Array,
+        default: () => null
+      }
+    },
+    setup(props) {
       const selectedTags = ref([]);
       const existingTags = ref([]);
       const showTagMenu = ref(false);
@@ -63,12 +69,21 @@
 
       onMounted(() => {
         fetchExistingTags(page.value);
+        console.log("editedArticletags in tagzone " + props.editedArticleTags);
+        if(props.editedArticleTags !== null && props.editedArticleTags !== undefined) {
+          console.log("Есть теги у статьи которую редактрируют ");
+          console.log(props.editedArticleTags);
+          selectedTags.value = props.editedArticleTags;
+          return;
+        }
         const storedTags = localStorage.getItem('selectedTags');
         selectedTags.value = storedTags ? JSON.parse(storedTags) : [];
       });
 
       onUpdated(() => {
-        localStorage.setItem('selectedTags', JSON.stringify(selectedTags.value));
+        if(!props.editedArticleTags) {
+          localStorage.setItem('selectedTags', JSON.stringify(selectedTags.value));
+        }
       });
 
       const fetchExistingTags = async (pageNumber) => {

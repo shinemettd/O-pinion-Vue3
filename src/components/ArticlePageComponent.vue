@@ -137,7 +137,12 @@ function redirectIfNotAuthorized() {
               <p> {{ formatDateTime(postedTimeAgo) }}</p>
             </div>
           </div>
-          <ArticleMenuComponent  style="float: right;" :articleStatus="articleStatus" :authorsNickname="authorsNickname"></ArticleMenuComponent>
+          <ArticleMenuComponent
+            style="float: right;"
+            :articleStatus="articleStatus"
+            :authorsNickname="authorsNickname" 
+            :articleId="articleId"
+          />
         </div>
       </div>
       <div class="my-3">

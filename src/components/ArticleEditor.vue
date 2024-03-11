@@ -121,7 +121,11 @@ import axios from "axios";
 import store from "@/store/store";
 
 export default {
-    props: ['showModal', 'isImageValid'],
+    props: {
+        showModal: Function,
+        isImageValid : Function,
+        editedArticleContent: String,
+    },
     components: {
         EditorContent,
     },
@@ -131,6 +135,7 @@ export default {
         const contentLimit = ref(40000);
         const contentCharacterCountNumber = ref(0);
         const maxAcceptableImgNum = ref(3);
+        const contentImagesToDelete = ref([]);
 
         const imageInput = ref(null);
 
@@ -209,11 +214,13 @@ export default {
 
         // Функция, которая будет вызвана после монтирования элемента в DOM
         onMounted(() => {
-            const savedContent = localStorage.getItem('articleContent');
-            if (savedContent) {
-                contentEditor.commands.setContent(savedContent);
-                contentCharacterCountNumber.value = contentEditor.getHTML().length;
+            console.log("Картинки на удаление : " + contentImagesToDelete.value);
+            if(props.editedArticleContent) {
+                contentEditor.commands.setContent(props.editedArticleContent);
+            } else {
+                contentEditor.commands.setContent(localStorage.getItem('articleContent'));
             }
+            contentCharacterCountNumber.value = contentEditor.getHTML().length;
 
 
             contentEditor.on('update', ({  }) => {
@@ -243,7 +250,9 @@ export default {
         });
 
         onUpdated(() => {
-            localStorage.setItem('articleContent', contentEditor.getHTML());
+            if(!props.editedArticleContent) {
+                localStorage.setItem('articleContent', contentEditor.getHTML());
+            }
         });
 
 
@@ -272,10 +281,19 @@ export default {
                 const src = selection.node.attrs.src;
                 console.log("Путь к изображению:", src);
                 contentEditor.commands.deleteSelection();
+                if(props.editedArticleContent) {
+                    contentImagesToDelete.value.push(src);
+                    console.log("Картинки для удаления : " + contentImagesToDelete.value);
+                    return;
+                }
                 deleteImageFromServer(src);
             }
         };
 
+        const addToContentImagesToDelete =(src) => {
+            contentImagesToDelete.value.push(src);
+            console.log("Картинки для удаления " + contentImagesToDelete.value);
+        }
         const deleteImageFromServer = async(imagePath) => {
             try {
                 const accessToken = localStorage.getItem('accessToken');
@@ -298,6 +316,12 @@ export default {
                 }
             }
 
+        }
+
+        const deleteContentImages = async() => {
+            const promises = contentImagesToDelete.value.map(imagePath => deleteImageFromServer(imagePath));
+            // Выполнение всех запросов параллельно
+            await Promise.all(promises);
         }
 
         const getHTMLContent = () => {
@@ -538,6 +562,8 @@ export default {
             toggleOrderedList,
             toggleBlockquote,
             setTextAlign,
+            deleteContentImages,
+            addToContentImagesToDelete
         };
     },
 

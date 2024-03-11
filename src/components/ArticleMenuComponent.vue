@@ -3,10 +3,10 @@
             <img src="/icons/three-points-menu.svg" alt="Menu" @click="toggleArticleMenu" class="menu-icon">
             <ul class="article-menu" v-if="articleMenuOpen" @mouseleave="articleMenuOpen = false">
               <li v-if="articleStatus !== 'DELETED'">
-                <router-link :to="'/edit-article'">
+                <router-link :to="'/edit-article/' + articleId">
                   <p>Редактировать статью</p>
                 </router-link>
-                <router-link :to="'/edit-article'">
+                <router-link :to="'/edit-article/' + articleId">
                   <img src="/icons/edit-article.svg" class="menu-icons" alt="icon"  @click="">
                 </router-link>
               </li>
@@ -33,7 +33,8 @@ import {useStore} from "vuex";
 export default {
     props: {
         articleStatus: String,
-        authorsNickname: String
+        authorsNickname: String,
+        articleId : Number
     },
     setup(props) {
     const articleMenuOpen = ref(false);
