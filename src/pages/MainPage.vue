@@ -168,6 +168,7 @@ onBeforeMount(async () => {
 
   .scroll {
     width: 50%;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   }
 }
 
