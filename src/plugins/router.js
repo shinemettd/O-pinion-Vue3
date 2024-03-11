@@ -15,6 +15,7 @@ import SuccessArticleCreationPage from "@/pages/SuccessArticleCreationPage";
 import PageNotFound from "@/pages/PageNotFound.vue";
 import store from "@/store/store";
 import SettingsPage from "@/pages/SettingsPage.vue";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -98,6 +99,14 @@ const router = createRouter({
       }
     },
     {
+      name: 'ForgotPassword',
+      path: '/forgot-password',
+      component: ForgotPasswordPage,
+      meta: {
+        title: 'Сброс пароля'
+      }
+    },
+    {
       name: 'Settings',
       path: '/settings',
       component: SettingsPage,
@@ -120,7 +129,7 @@ router.beforeEach((to, from, next) => {
 
   const isAuthorized = store.state.isAuthorized;
 
-  if (isAuthorized && (to.path === '/register' || to.path === '/auth' )) {
+  if (isAuthorized && (to.path === '/register' || to.path === '/auth' || to.path === '/forgot-password')) {
     next('/');
   } else {
     next();

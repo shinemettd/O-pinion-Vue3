@@ -17,13 +17,13 @@ const isValidShareEmail = ref(true);
 const showEmailShareSnackMessage = ref(false);
 const shareEmailAddress = ref('');
 const statusColors = computed(() => ({
-      'ON_MODERATION': 'orange',
-      'BLOCKED': 'red',
-      'DELETED': 'red',
-      'DRAFT': 'orange',
-      'NOT_APPROVED': 'red',
-      'APPROVED': 'green'
-    }));
+  'ON_MODERATION': 'orange',
+  'BLOCKED': 'red',
+  'DELETED': 'red',
+  'DRAFT': 'orange',
+  'NOT_APPROVED': 'red',
+  'APPROVED': 'green'
+}));
 
 
 
@@ -104,7 +104,7 @@ const shareArticle = async (articleId, shareType) => {
 }
 
 const copyText = (text) => {
-    navigator.clipboard.writeText(text);
+  navigator.clipboard.writeText(text);
 }
 
 const getStatusText = (status) => {
@@ -161,6 +161,7 @@ export default {
           :articleId="articleId"
         />
         <div class = "article-header-report" v-if="store.state.isAuthorized && (store.state.nickname !== authorsNickname)">
+
           <div class = "article-header-report-icon">
             <v-dialog max-width="500">
               <template v-slot:activator="{ props: activatorProps }">
@@ -210,18 +211,18 @@ export default {
                     ></v-radio>
 
                   </v-radio-group>
-                <div class = "px-5">
-                  <div class="">Сообщение (необязательно) </div>
+                  <div class = "px-5">
+                    <div class="">Сообщение (необязательно) </div>
 
-                  <v-textarea
-                    :counter="500"
-                    class="mb-2"
-                    rows="2"
-                    variant="outlined"
-                    v-model="reportReasonText"
-                    persistent-counter
-                  ></v-textarea>
-                </div>
+                    <v-textarea
+                      :counter="500"
+                      class="mb-2"
+                      rows="2"
+                      variant="outlined"
+                      v-model="reportReasonText"
+                      persistent-counter
+                    ></v-textarea>
+                  </div>
 
 
                   <v-card-actions class = "mx-3 my-1">
@@ -301,7 +302,7 @@ export default {
               <b v-else style="color: black">{{ articleRating }}</b>
             </div>
             <div class = "article-favourites">
-                <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
+              <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
                   if (store.state.isAuthorized) {
                     deleteFromFavourites(articleId);
                     articleInFavourites = false;
@@ -310,9 +311,9 @@ export default {
                     router.push('/auth');
                   }
                 }">
-                  <img src="/icons/star_icon.svg" alt = "Favourites Icon">
-                </div>
-                <div v-else class = article-not-in-favourites-icon @click="() => {
+                <img src="/icons/star_icon.svg" alt = "Favourites Icon">
+              </div>
+              <div v-else class = article-not-in-favourites-icon @click="() => {
                   if (store.state.isAuthorized) {
                     addToFavourites(articleId);
                     articleInFavourites = true;
@@ -321,9 +322,9 @@ export default {
                     router.push('/auth');
                   }
                 }">
-                  <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
-                </div>
-                <b> {{ articleTotalFavourites }}</b>
+                <img src="/icons/star_icon.svg" alt = "Not Favourites Icon">
+              </div>
+              <b> {{ articleTotalFavourites }}</b>
             </div>
             <div class = "article-share pb-1">
               <div class = "article-share-icon">
@@ -335,9 +336,9 @@ export default {
 
                   <template v-slot:default="{ isActive }">
                     <v-card title="Поделиться">
-<!--                      <v-card-text class = "text-center">-->
-<!--                        Выберите способ-->
-<!--                      </v-card-text>-->
+                      <!--                      <v-card-text class = "text-center">-->
+                      <!--                        Выберите способ-->
+                      <!--                      </v-card-text>-->
                       <div class="w-full my-3 text-center">
                         <v-btn-toggle v-model="shareSortToggle" color="#20b2aa" class="ml-2" mandatory>
                           <v-btn
@@ -348,8 +349,8 @@ export default {
                           </v-btn>
 
                           <v-btn @click="async () => { await shareArticle(articleId, 'vk'); }"
-                            icon
-                            size="large">
+                                 icon
+                                 size="large">
                             <img src="/icons/share_vk_icon.png" style="height: 2.5em; width: 2.5em;">
                           </v-btn>
 
@@ -400,7 +401,7 @@ export default {
                       <v-btn
                         v-if = "shareBy !== 'email'"
                         style="margin-left: 10em; margin-right: 10em;"
-                         @click="() =>
+                        @click="() =>
                          {
                            copyText(shareLink);
                            showShareSnackMessage = true;
@@ -409,8 +410,8 @@ export default {
 
                       <v-btn
                         v-else
-                             style="margin-left: 10em; margin-right: 10em;"
-                             @click="async () =>
+                        style="margin-left: 10em; margin-right: 10em;"
+                        @click="async () =>
                              {
                                let regex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
                                 if (regex.test(shareEmailAddress)) {
@@ -454,12 +455,12 @@ export default {
               </div>
             </div>
             <div class = "article-comments">
-                <div class = "article-comments-icon">
-                  <router-link :to="'/article/' + articleId" class="navbar-item">
-                    <img src="/icons/message_square_icon.svg" alt="Comments Icon">
-                  </router-link>
-                </div>
-                <b>{{ articleTotalComments }}</b>
+              <div class = "article-comments-icon">
+                <router-link :to="'/article/' + articleId" class="navbar-item">
+                  <img src="/icons/message_square_icon.svg" alt="Comments Icon">
+                </router-link>
+              </div>
+              <b>{{ articleTotalComments }}</b>
             </div>
             <div class = "article-views-count">
               <div class = "article-views-icon">
