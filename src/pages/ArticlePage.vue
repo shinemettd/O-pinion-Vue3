@@ -74,6 +74,7 @@ onBeforeMount(async () => {
     :article-total-views = "currentArticle.data.total_views"
     :article-comments = "currentArticleComments.data"
     :article-status="currentArticle.data.status"
+    :load-comments="getComments"
   />
 
 </template>
