@@ -17,7 +17,7 @@
                         </li>
                     </ul>
                 </div>
-              
+
 
             </div>
             <div class="find-tag" >
@@ -37,21 +37,28 @@
         </div>
     </div>
   </template>
-  
+
   <script>
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, onUpdated , toRaw} from 'vue';
   import axios from 'axios';
-  
+  import store from "@/store/store";
+
+
   export default {
-    setup() {
+    props: {
+      editedArticleTags: {
+        type: Array,
+        default: () => null
+      }
+    },
+    setup(props) {
       const selectedTags = ref([]);
       const existingTags = ref([]);
-      const selectedTag = ref('');
       const showTagMenu = ref(false);
-      const page = ref(0); 
+      const page = ref(0);
       const currentSearchResponsePage = ref(0);
       const pageSize = ref(10);
-      const tagMenuRef = ref(null); 
+      const tagMenuRef = ref(null);
       const searchResponseContainer = ref(null);
       const isScrollEnd = ref(false);
       const searchTagQuery = ref(null);
@@ -62,11 +69,26 @@
 
       onMounted(() => {
         fetchExistingTags(page.value);
+        console.log("editedArticletags in tagzone " + props.editedArticleTags);
+        if(props.editedArticleTags !== null && props.editedArticleTags !== undefined) {
+          console.log("Есть теги у статьи которую редактрируют ");
+          console.log(props.editedArticleTags);
+          selectedTags.value = props.editedArticleTags;
+          return;
+        }
+        const storedTags = localStorage.getItem('selectedTags');
+        selectedTags.value = storedTags ? JSON.parse(storedTags) : [];
+      });
+
+      onUpdated(() => {
+        if(!props.editedArticleTags) {
+          localStorage.setItem('selectedTags', JSON.stringify(selectedTags.value));
+        }
       });
 
       const fetchExistingTags = async (pageNumber) => {
         try {
-            const response = await axios.get('http://194.152.37.7:8812/api/tags', {
+            const response = await axios.get(`${store.state.API_URL}/api/tags`, {
                 params: {
                     page: pageNumber,
                     size: pageSize.value
@@ -97,17 +119,16 @@
           alert('Тег ' + tag.name + ' уже выбран');
         }
       }
-      
+
       const removeTag = (tag) => {
         const index = selectedTags.value.indexOf(tag);
         if (index !== -1) {
           selectedTags.value.splice(index, 1);
         }
       }
-      
+
 
       const handleScroll = () => {
-        console.log('isScrollEnd' + isScrollEnd.value);
         if(!isScrollEnd.value) {
             const container = tagMenuRef.value;
             if (container.scrollHeight - container.clientHeight <= container.scrollTop + 100) {
@@ -120,7 +141,7 @@
       const handleSearchResponseScroll = () => {
         const container = searchResponseContainer.value;
         if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
-          loadTags(currentSearchResponsePage.value); 
+          loadTags(currentSearchResponsePage.value);
         }
       };
 
@@ -129,19 +150,19 @@
           currentSearchResponsePage.value = 0;
         }
         try {
-          const response = await axios.get('http://194.152.37.7:8812/api/tags/search', {
+          const response = await axios.get(`${store.state.API_URL}/api/tags/search`, {
             params: {
               name: searchTagQuery.value,
               page: pageNum,
               size: pageSize.value
-            }, 
+            },
             headers: {
               'Authorization': `Bearer ${accessToken}`
             }
           });
           if (response.data.content && response.data.content.length > 0) {
             matchingTags.value = response.data.content;
-            currentSearchResponsePage.value++; 
+            currentSearchResponsePage.value++;
           }
         } catch (error) {
           console.error('Error fetching tags:', error);
@@ -156,15 +177,11 @@
 
       if(selectedTags.value.some(existingTag => existingTag.name.toLowerCase() === newTagName.value.toLowerCase())) {
         alert('тег ' + newTagName.value + ' уже добавлен');
-        console.log('Выбранные теги :');
-        for (const tag of selectedTags.value) {
-            console.log(tag.name);
-        }
         return;
       }
 
       try {
-          const response = await axios.post('http://194.152.37.7:8812/api/tags', {
+          const response = await axios.post(`${store.state.API_URL}/api/tags`, {
             name: newTagName.value
           }, {
               headers: {
@@ -174,25 +191,24 @@
           if(!selectedTags.value.some(existingTag => existingTag.name.toLowerCase() === response.data.name.toLowerCase())) {
             selectedTags.value.push({ id: response.data.id, name: response.data.name});
           }
-          console.log('Выбранные теги : ');
-          for (const tag of selectedTags.value) {
-            console.log(tag.name);
-          }
           newTagName.value = '';
         } catch (error) {
           alert('Ошибка сохранения тега ');
         }
-      
+
     };
-  
+
+    const getSelectedTags = () => {
+        return toRaw(selectedTags.value);
+    }
+
       return {
         selectedTags,
         existingTags,
         fetchExistingTags,
-        selectedTag,
         toggleTagMenu,
         showTagMenu,
-        pickTag, 
+        pickTag,
         handleScroll,
         handleSearchResponseScroll,
         tagMenuRef,
@@ -202,12 +218,13 @@
         matchingTags,
         loadTags,
         newTagName,
-        createTag
+        createTag,
+        getSelectedTags
       };
     }
   };
   </script>
-  
+
   <style scoped>
   .tag-zone-wrapper {
     background-color: #f8f8f8;
@@ -220,7 +237,7 @@
     padding: 20px;
     margin: 20px 0;
   }
-  
+
   .selected-tags-container {
     margin-bottom: 20px;
     border: 1px solid #ccc;
@@ -229,7 +246,7 @@
     flex-wrap: wrap;
     min-height: 200px;
   }
-  
+
   .tag-functionality {
     display: flex;
     justify-content: space-between;
@@ -243,15 +260,15 @@
   padding: 5px 10px;
   margin-right: 5px;
   border-radius: 5px;
-  display: inline-block; 
-  white-space: nowrap; 
+  display: inline-block;
+  white-space: nowrap;
   height: 2rem;
 }
 
 .selected-tag .close-icon {
   cursor: pointer;
   margin-left: 5px;
- 
+
 }
 
 .selected-tag .close-icon:hover {
@@ -266,7 +283,7 @@
 
 .matching-tags {
   overflow-y: auto;
-  max-height: 200px; 
+  max-height: 200px;
 }
   .existing-tags {
     display: flex;
@@ -285,7 +302,7 @@
     z-index: 1;
     min-width: 300px;
     max-height: 400px;
-    overflow-y: auto; 
+    overflow-y: auto;
   }
 
   .tag-menu {
@@ -304,7 +321,7 @@
   .tag-menu li:hover {
     background-color: #ddd;
 }
-  
+
   button {
     background-color: #1e066e;
     color: #fff;
@@ -316,4 +333,3 @@
     font-size: 16px;
   }
   </style>
-  

@@ -8,7 +8,7 @@
                   <img src="/icons/type-italic.svg" class="btn-toolbar icon" alt="icon" @click="toggleItalic">
                   <img src="/icons/type-underline.svg" class="btn-toolbar icon" alt="icon" @click="toggleUnderline">
                   <img src="/icons/type-strikethrough.svg" class="btn-toolbar icon" alt="icon"  @click="toggleStrike">
-              
+
                   <div class="dropdown">
                     <img src="/icons/search-font.svg" class="btn-toolbar icon" alt="icon" @click="toggleFontMenu">
                     <ul v-if="showFontMenu  && contentCharacterCountNumber < contentLimit" class="toolbar-menu">
@@ -42,7 +42,7 @@
 
                   <img src="/icons/rm-image.svg" class="btn-toolbar icon" alt="icon"  @click="deleteSelection">
 
-                
+
                   <div class="dropdown">
                     <img src="/icons/math-sign.svg" class="btn-toolbar icon" alt="icon" @click="toggleMathMenu">
                     <ul v-if="showMathMenu && contentCharacterCountNumber < contentLimit" class="toolbar-menu">
@@ -61,12 +61,12 @@
                           </li>
                     </ul>
                   </div>
-                 
-                  
-                  
+
+
+
 
                 </div>
-                
+
                 <div class="undo-redo">
                   <img src="/icons/undo.svg" class="btn-toolbar icon" alt="icon"  @click="undoWithImages">
                   <img src="/icons/redo.svg" class="btn-toolbar icon" alt="icon"  @click="contentEditor.chain().focus().redo().run()" :disabled="!contentEditor.can().redo()">
@@ -81,7 +81,7 @@
                     {{ contentCharacterCountNumber }}/{{ contentLimit }} HTML characters
                 </div>
             </div>
-           
+
 
         </div>
     </div>
@@ -118,9 +118,14 @@ import CharacterCount from '@tiptap/extension-character-count'
 
 import { ref , onMounted, onUpdated } from 'vue';
 import axios from "axios";
+import store from "@/store/store";
 
 export default {
-    props: ['showModal', 'isImageValid'],
+    props: {
+        showModal: Function,
+        isImageValid : Function,
+        editedArticleContent: String,
+    },
     components: {
         EditorContent,
     },
@@ -130,6 +135,7 @@ export default {
         const contentLimit = ref(40000);
         const contentCharacterCountNumber = ref(0);
         const maxAcceptableImgNum = ref(3);
+        const contentImagesToDelete = ref([]);
 
         const imageInput = ref(null);
 
@@ -208,29 +214,31 @@ export default {
 
         // Функция, которая будет вызвана после монтирования элемента в DOM
         onMounted(() => {
-            const savedContent = localStorage.getItem('articleContent');
-            if (savedContent) {
-                contentEditor.commands.setContent(savedContent);
-                contentCharacterCountNumber.value = contentEditor.getHTML().length; 
+            console.log("Картинки на удаление : " + contentImagesToDelete.value);
+            if(props.editedArticleContent) {
+                contentEditor.commands.setContent(props.editedArticleContent);
+            } else {
+                contentEditor.commands.setContent(localStorage.getItem('articleContent'));
             }
+            contentCharacterCountNumber.value = contentEditor.getHTML().length;
 
 
             contentEditor.on('update', ({  }) => {
-                contentCharacterCountNumber.value = contentEditor.getHTML().length; 
+                contentCharacterCountNumber.value = contentEditor.getHTML().length;
                 if (contentCharacterCountNumber.value > contentLimit.value) {
                     contentEditor.chain().focus().undo().run();
                     props.showModal('/icons/risovach.ru.jpg', null);
                 }
                 if (contentCharacterCountNumber.value >= contentLimit.value) {
                     contentEditor.setOptions({ editable: false });
-                   
+
                 } else {
                     contentEditor.setOptions({ editable: true });
-                    
+
                 }
             });
 
-        
+
             imageInput.value = document.getElementById('addImage');
 
             const colorPickerButton = document.getElementById('colorPickerButton');
@@ -242,14 +250,16 @@ export default {
         });
 
         onUpdated(() => {
-            localStorage.setItem('articleContent', contentEditor.getHTML());
+            if(!props.editedArticleContent) {
+                localStorage.setItem('articleContent', contentEditor.getHTML());
+            }
         });
 
 
         const undoWithImages = () => {
             const imgNumBedoreUndo = ref(countImagesInEditor());
             contentEditor.chain().focus().undo().run();
-            if(imgNumBedoreUndo.value !== countImagesInEditor()) { // если удалили фотографию 
+            if(imgNumBedoreUndo.value !== countImagesInEditor()) { // если удалили фотографию
                 contentEditor.chain().focus().redo().run();
             }
         }
@@ -259,9 +269,9 @@ export default {
             if (!editor) {
                 return -1;
             }
-            
+
             var images = editor.querySelectorAll('img');
-            
+
             return images.length;
         }
 
@@ -270,18 +280,25 @@ export default {
             if (selection.node && selection.node.attrs && selection.node.attrs.src) {
                 const src = selection.node.attrs.src;
                 console.log("Путь к изображению:", src);
-                const imagePath = '/home/opinion/opinion-front' + src;
                 contentEditor.commands.deleteSelection();
-                console.log('Путь к картинке на сервере : ' + imagePath);
-                deleteImageFromServer(imagePath);
+                if(props.editedArticleContent) {
+                    contentImagesToDelete.value.push(src);
+                    console.log("Картинки для удаления : " + contentImagesToDelete.value);
+                    return;
+                }
+                deleteImageFromServer(src);
             }
         };
-        
+
+        const addToContentImagesToDelete =(src) => {
+            contentImagesToDelete.value.push(src);
+            console.log("Картинки для удаления " + contentImagesToDelete.value);
+        }
         const deleteImageFromServer = async(imagePath) => {
             try {
                 const accessToken = localStorage.getItem('accessToken');
 
-                const response = await axios.delete(`http://194.152.37.7:8812/api/images?image-path=${encodeURIComponent(imagePath)}`, {
+                const response = await axios.delete(`${store.state.API_URL}/api/images?image-path=${encodeURIComponent(imagePath)}`, {
                     headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }
@@ -293,12 +310,18 @@ export default {
                 if (error.response && error.response.data && error.response.data.errors) {
                     const serverErrors = error.response.data.errors;
                     showModal(null, serverErrors);
-                    
+
                 } else {
                     console.error('Ошибка удаления изображения:', error);
                 }
             }
 
+        }
+
+        const deleteContentImages = async() => {
+            const promises = contentImagesToDelete.value.map(imagePath => deleteImageFromServer(imagePath));
+            // Выполнение всех запросов параллельно
+            await Promise.all(promises);
         }
 
         const getHTMLContent = () => {
@@ -330,7 +353,7 @@ export default {
 
         const setFont = (font) => {
             contentEditor.chain().focus().setFontFamily(font).run();
-            toggleFontMenu(); 
+            toggleFontMenu();
         };
 
         const setLink = () => {
@@ -469,38 +492,35 @@ export default {
 
             }
         };
-        
+
 
         const loadImageOnServer = async(file) => {
             try {
                 const formData = new FormData();
                 formData.append('photo', file.value);
-            
+
                 const accessToken = localStorage.getItem('accessToken');
-                const response = await axios.post('http://194.152.37.7:8812/api/images', formData, {
+                const response = await axios.post(`${store.state.API_URL}/api/images`, formData, {
                     headers: {
                     'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'multipart/form-data'
                     }
                 });
-            
+
                 if (response) {
-                    const imagePath = response.data; 
-                    const fileName = imagePath.split('/').pop();
-                    
+
                     contentEditor.commands.focus(contentEditor.state.doc.content.size);
-                    contentEditor.chain().setImage({ src: '/images/articles_images/' + fileName }).run();
+                    contentEditor.chain().setImage({ src: response.data }).run();
 
                     console.log(response.data);
-                    console.log('/images/articles_images/' + fileName)
                     console.log('currentImNum = ' + countImagesInEditor());
                 }
-            
+
             } catch (error) {
                 if (error.response && error.response.data && error.response.data.errors) {
                     const serverErrors = error.response.data.errors;
                     showModal(null, serverErrors);
-                    
+
                 } else {
                     console.error('Ошибка загрузки  изображения:', error);
                 }
@@ -538,10 +558,12 @@ export default {
             undoWithImages,
             contentCharacterCountNumber,
             toggleCodeBlock,
-            toggleBulletList, 
-            toggleOrderedList, 
-            toggleBlockquote, 
-            setTextAlign, 
+            toggleBulletList,
+            toggleOrderedList,
+            toggleBlockquote,
+            setTextAlign,
+            deleteContentImages,
+            addToContentImagesToDelete
         };
     },
 
@@ -568,7 +590,7 @@ export default {
     background-color: #f2f2f2;
     padding: 10px;
     border: 1px solid #ccc;
-    
+
     display: flex;
     justify-content: space-between;
 }
@@ -591,7 +613,7 @@ export default {
 
 .icon  {
     display: inline;
-} 
+}
 
 .bold {
   font-weight: bold;
@@ -628,7 +650,7 @@ export default {
   z-index: 1;
   min-width: 300px;
   max-height: 150px;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
 .color-menu {
@@ -643,14 +665,14 @@ export default {
   z-index: 1;
   min-width: 200px;
   max-height: 60px;
-  overflow-x: auto; 
+  overflow-x: auto;
   display: flex;
 }
 .color-circle {
     width: 20px;
-    height: 20px; 
-    border-radius: 50%; 
-    display: inline-block; 
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
 }
 
 .toolbar-menu li, .color-menu li{
@@ -683,11 +705,11 @@ export default {
 .custom-editor {
     border: #000000 solid;
     height: 90vh;
-    max-height: 700px; 
+    max-height: 700px;
     overflow-y: auto;
     line-height: 2;
     padding: 20px;
-    
+
 }
 
 

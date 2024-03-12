@@ -1,10 +1,43 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import axios from "axios";
 import store from "@/store/store";
 import router from "@/plugins/router";
+import ContentRender from "@/components/ContentRender.vue";
+import ArticleMenuComponent from "@/components/ArticleMenuComponent.vue";
 
 const reaction = ref('');
+const shareBy = ref('link');
+const shareSortToggle = ref(0);
+const shareLink = ref('');
+const showShareSnackMessage = ref(false);
+const isValidShareEmail = ref(true);
+const showEmailShareSnackMessage = ref(false);
+const shareEmailAddress = ref('');
+
+const userComment = ref('');
+const stickyCommentWriterField = ref(true);
+
+const formattedComment = ref('');
+
+const sendEmptyComment = ref(false);
+const sendTooShortComment = ref(false);
+const sendTooLongComment = ref(false);
+const isCommentReply = ref(false);
+const replyCommentId = ref(undefined);
+const replyCommentAuthorsNickname = ref('');
+const successGetNewComments = ref(false);
+
+const icons = [
+  'mdi-emoticon',
+  'mdi-emoticon-cool',
+  'mdi-emoticon-dead',
+  'mdi-emoticon-excited',
+  'mdi-emoticon-happy',
+  'mdi-emoticon-neutral',
+  'mdi-emoticon-sad',
+  'mdi-emoticon-tongue',
+]
 
 const props = defineProps({
   authorsNickname: String,
@@ -25,22 +58,110 @@ const props = defineProps({
   articleTotalComments: Number,
   articleTotalViews: Number,
   articleComments: String,
-  articleCommentsReplies: String
+  articleCommentsReplies: String,
+  articleStatus: String,
+  loadComments: {
+    type: Function,
+    default() {
+    }
+  }
 })
+
+async function sendComment(comment, articleId) {
+  if (comment.length === 0) {
+    await setSendEmptyComment();
+    return;
+  } else if (comment.length > 255) {
+    await setSendTooLongComment();
+    return;
+  } else if (comment.length < 5) {
+    await setSendTooShortComment();
+    return;
+  }
+
+  try {
+    let response;
+    if (!isCommentReply.value) {
+      response = await axios.post(`${store.state.API_URL}/api/article-comments/${articleId}`, {text: comment}, store.state.config);
+
+    } else {
+      response = await axios.post(`${store.state.API_URL}/api/article-comments/${replyCommentId.value}/replies`, {text: comment}, store.state.config);
+    }
+    await props.loadComments();
+    successGetNewComments.value = true;
+  } catch (e) {
+    console.error(e);
+    successGetNewComments.value = false;
+  }
+  clearComment();
+}
+
+async function replyTo(commentAuthorNickname, commentId) {
+  isCommentReply.value = true;
+  replyCommentAuthorsNickname.value = commentAuthorNickname;
+  // userComment.value = `@${commentAuthorNickname}, ${userComment}`;
+  replyCommentId.value = commentId;
+}
+
+function cancelReply() {
+  isCommentReply.value = false;
+  replyCommentId.value = undefined;
+}
+
+const setSendEmptyComment = async () => {
+  sendEmptyComment.value = true;
+  sendTooLongComment.value = false;
+  sendTooShortComment.value = false;
+}
+
+const setSendTooShortComment = async () => {
+  sendEmptyComment.value = false;
+  sendTooLongComment.value = false;
+  sendTooShortComment.value = true;
+}
+
+const setSendTooLongComment = async () => {
+  sendEmptyComment.value = false;
+  sendTooLongComment.value = true;
+  sendTooShortComment.value = false;
+}
+function clearComment () {
+  userComment.value = ''
+  cancelReply();
+}
 
 async function addToFavourites(articleId) {
   try {
-    await axios.post(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, '', store.state.config);
+    await axios.post(`${store.state.API_URL}/api/saved-articles/${articleId}`, '', store.state.config);
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
 async function deleteFromFavourites(articleId) {
   try {
-    await axios.delete(`http://194.152.37.7:8812/api/saved-articles/${articleId}`, store.state.config);
+    await axios.delete(`${store.state.API_URL}/api/saved-articles/${articleId}`, store.state.config);
   } catch (e) {
-    console.log(e)
+    console.error(e)
+  }
+}
+
+const shareArticle = async (articleId, shareType) => {
+  shareBy.value = shareType;
+  if (shareBy.value === 'link') {
+    try {
+      shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
+    } catch (e) {
+      shareLink.value = undefined;
+      console.error(e);
+    }
+  } else {
+    try {
+      shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
+    } catch (e) {
+      shareLink.value = undefined;
+      console.error(e);
+    }
   }
 }
 
@@ -51,9 +172,9 @@ async function setLike() {
     reaction_type: "LIKE"
   }
   try {
-    await axios.post(`http://194.152.37.7:8812/api/article-reactions`, data, store.state.config);
+    await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
@@ -64,9 +185,9 @@ async function setDislike() {
     reaction_type: "DISLIKE"
   }
   try {
-    await axios.post(`http://194.152.37.7:8812/api/article-reactions`, data, store.state.config);
+    await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
@@ -76,6 +197,8 @@ function formatDateTime(timeString) {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
   });
   return formattedDateTime;
 }
@@ -94,24 +217,32 @@ function redirectIfNotAuthorized() {
       <div class = "article-header mt-3">
         <p style = "font-size: 2em; word-wrap: break-word;"> {{ articleTitle }} </p>
         <div class = "article-header-data my-2" style = "display: flex">
-          <div class = "user-avatar mr-3">
-            <router-link :to="'/user/' + authorsNickname">
-              <img :src = "authorsAvatarUrl" class = "my-1 mt-2" alt = "user avatar">
-            </router-link>
-          </div>
-          <div class = "">
-            <router-link :to="'/user/' + authorsNickname">
-              <p style = "font-size: 1.25em"> <strong> {{ authorsNickname }} </strong> </p>
-            </router-link>
+          <div class="article-header-data">
+            <div class = "user-avatar mr-3">
+              <router-link :to="'/user/' + authorsNickname">
+                <img :src = "authorsAvatarUrl" class = "my-1 mt-2" alt = "user avatar">
+              </router-link>
+            </div>
+            <div class = "">
+              <router-link :to="'/user/' + authorsNickname">
+                <p style = "font-size: 1.25em"> <strong> {{ authorsNickname }} </strong> </p>
+              </router-link>
 
-            <p> {{ formatDateTime(postedTimeAgo) }}</p>
+              <p> {{ formatDateTime(postedTimeAgo) }}</p>
+            </div>
           </div>
+          <ArticleMenuComponent
+            style="float: right;"
+            :articleStatus="articleStatus"
+            :authorsNickname="authorsNickname" 
+            :articleId="articleId"
+          />
         </div>
       </div>
-      <!--   article content     -->
-      <p class = "my-3" style = "font-size: 1.25em; word-wrap: break-word;"> {{ articleContent }} </p>
-
-
+      <div class="my-3">
+        <!--   article content     -->
+        <ContentRender :content="articleContent"/>
+      </div>
       <div class="my-3">
         Секция тегов
         <!--  tags  reactions etc    -->
@@ -123,7 +254,7 @@ function redirectIfNotAuthorized() {
             <div class = "article-rating-icon">
               <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="async () => {
                 await setLike();
-                articleRating = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`)).data.rating;
+                articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
               }">
             </div>
             <b v-if = "articleRating > 0" style="color: green">{{ articleRating }}</b>
@@ -132,7 +263,7 @@ function redirectIfNotAuthorized() {
             <div class = "article-rating-icon ml-3">
               <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="async () => {
                 await setDislike();
-                articleRating = (await axios.get(`http://194.152.37.7:8812/api/articles/${articleId}`)).data.rating;
+                articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
               }">
             </div>
           </div>
@@ -144,7 +275,7 @@ function redirectIfNotAuthorized() {
               <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
               <b v-else style="color: black">{{ articleRating }}</b>
           </div>
-          <div class = "article-favourites">
+          <div class = "article-favourites" style="margin-left: -1em">
             <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
               redirectIfNotAuthorized();
               deleteFromFavourites(articleId);
@@ -161,9 +292,130 @@ function redirectIfNotAuthorized() {
             </div>
             <b> {{ articleTotalFavourites }}</b>
           </div>
-          <div class = "article-share">
+          <div class = "article-share pb-1">
             <div class = "article-share-icon">
-              <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon">
+              <v-dialog max-width="500">
+                <template v-slot:activator="{ props: activatorProps }">
+                  <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon" v-bind="activatorProps"
+                       @click="async () => {shareLink = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;}">
+                </template>
+
+                <template v-slot:default="{ isActive }">
+                  <v-card title="Поделиться">
+                    <!--                      <v-card-text class = "text-center">-->
+                    <!--                        Выберите способ-->
+                    <!--                      </v-card-text>-->
+                    <div class="w-full my-3 text-center">
+                      <v-btn-toggle v-model="shareSortToggle" color="#20b2aa" class="ml-2" mandatory>
+                        <v-btn
+                          @click="async () => { await shareArticle(articleId, 'link'); }"
+                          icon
+                          size="large">
+                          <img src="/icons/share_link_icon.webp" style="height: 2.5em; width: 2.5em;">
+                        </v-btn>
+
+                        <v-btn @click="async () => { await shareArticle(articleId, 'vk'); }"
+                               icon
+                               size="large">
+                          <img src="/icons/share_vk_icon.png" style="height: 2.5em; width: 2.5em;">
+                        </v-btn>
+
+                        <v-btn
+                          @click="async () => { await shareArticle(articleId, 'telegram'); }"
+                          icon
+                          size="large">
+                          <img src="/icons/share_tg_icon.png" style="height: 2.5em; width: 2.5em;">
+                        </v-btn>
+
+                        <v-btn @click="async () => { await shareArticle(articleId, 'whatsapp'); }"
+                               icon
+                               size="large">
+                          <img src="/icons/share_wa_icon.png" style="height: 3em; width: 3em;">
+                        </v-btn>
+
+                        <v-btn
+                          v-if="store.state.isAuthorized"
+                          @click= "shareBy = 'email'"
+                          icon
+                          size="large">
+                          <img src="/icons/share_gmail_icon.webp" style="height: 3em; width: 3em;">
+                        </v-btn>
+                      </v-btn-toggle>
+                    </div>
+                    <v-row>
+                      <v-col cols="12" sm="12">
+                        <v-text-field
+                          v-if = "shareBy !== 'email'"
+                          class = "pt-3 mx-3"
+                          variant="outlined"
+                          readonly
+                        >{{ shareLink }}</v-text-field>
+                        <v-text-field
+                          v-else
+                          :error-messages="!isValidShareEmail ? 'Введена неверная почта' : ''"
+                          placeholder="Введите почту для отправки сообщения"
+                          label = "Почта"
+                          :model-value="shareEmailAddress"
+                          @update:model-value = "newValue => shareEmailAddress = newValue"
+                          class = "pt-3 mx-3"
+                          variant="outlined"
+                        >
+                        </v-text-field>
+                      </v-col>
+                    </v-row>
+
+                    <v-btn
+                      v-if = "shareBy !== 'email'"
+                      style="margin-left: 10em; margin-right: 10em;"
+                      @click="() =>
+                         {
+                           copyText(shareLink);
+                           showShareSnackMessage = true;
+                         }"> Копировать
+                    </v-btn>
+
+                    <v-btn
+                      v-else
+                      style="margin-left: 10em; margin-right: 10em;"
+                      @click="async () =>
+                             {
+                               let regex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+                                if (regex.test(shareEmailAddress)) {
+                                  isValidShareEmail = true;
+                                  try {
+                                    await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
+                                    showEmailShareSnackMessage = true;
+                                  } catch (e) {
+                                    console.error(e);
+                                  }
+                                } else {
+                                  isValidShareEmail = false;
+                                }
+                             }"> Отправить
+                    </v-btn>
+
+                    <v-card-actions class = "mx-3 my-1">
+                      <v-spacer/>
+                      <v-btn
+                        text="Закрыть"
+                        @click="isActive.value = false"
+                      ></v-btn>
+                    </v-card-actions>
+                    <v-snackbar
+                      v-model="showShareSnackMessage"
+                      :timeout="3000"
+                    >
+                      Ссылка успешно скопирована
+                    </v-snackbar>
+                    <v-snackbar
+                      v-model="showEmailShareSnackMessage"
+                      :timeout="3000"
+                    >
+                      Сообщение успешно отправлено
+                    </v-snackbar>
+                  </v-card>
+                </template>
+              </v-dialog>
             </div>
           </div>
           <div class = "article-views-count">
@@ -176,10 +428,12 @@ function redirectIfNotAuthorized() {
       </div>
       <hr class = "my-3">
 
-      <div class="my-5">
-        <p style="font-size: 1.5em"> Комментарии <strong> {{articleTotalComments}}</strong> </p>
-        <div v-show = "articleTotalComments === 0" class = "px-5 pt-5" style = "font-style: italic">
-          Комментариев пока нет :(
+      <div class="my-5" style = "z-index: 1000">
+        <div style = "z-index: 100">
+          <p style="font-size: 1.5em"> Комментарии <strong> {{ articleTotalComments }}</strong> </p>
+          <div v-show = "articleTotalComments === 0" class = "px-5 pt-5" style = "font-style: italic">
+            Комментариев пока нет :(
+          </div>
         </div>
         <div class = "comments-list my-5" v-for = "comment in articleComments.content" :key="comment.id">
             <div class = "info-header">
@@ -198,12 +452,20 @@ function redirectIfNotAuthorized() {
             </div>
             <div class="my-2 ml-13">
               <div style = "font-size: 1.15em">
-                <p>
-                  {{ comment.text }}
-                </p>
+                <p v-html="comment.text"></p>
               </div>
               <div class = "my-2" style = "font-size: 0.85em">
-                  <span> Ответить </span>
+                  <span
+                    class = "comment-reply-text"
+                    @click="async () =>
+                    {
+                      if (store.state.isAuthorized) {
+                        await replyTo(comment.user.nickname, comment.id)
+                      } else {
+                         router.push('/auth')
+                       }
+                    }"
+                  > Ответить </span>
               </div>
             </div>
 
@@ -225,10 +487,43 @@ function redirectIfNotAuthorized() {
               </div>
               <div class="my-2 ml-13">
                 <div style = "font-size: 1.15em">
-                  {{ reply.text }}
+                  <p v-html="reply.text"></p>
                 </div>
               </div>
               </div>
+          </div>
+        </div>
+        <div class = "сomment-field">
+          <hr class = "mt-5 pb-2">
+          <div v-if="store.state.isAuthorized" class="mt-2">
+                <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
+                  <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
+                </div>
+                <v-text-field
+                  v-model="userComment"
+                  :append-icon="'mdi-send'"
+                  type="text"
+                  placeholder="Напишите комментарий"
+                  :error-messages="sendEmptyComment ? 'Ну не пустой комментарий же отправлять...' : '' ||
+                                    sendTooShortComment ? 'Комментарий должен быть информативнее...' : '' ||
+                                    sendTooLongComment ? 'Комментарий должен быть не настолько информативным!' : ''"
+                  :counter="255"
+                  variant="outlined"
+                  clearable
+                  @click:append="async() => { await sendComment(userComment, articleId); if (successGetNewComments) {articleTotalComments++}}"
+                  @click:clear="clearComment"
+                  @update:model-value="newComment => userComment = newComment"
+                ></v-text-field>
+            <hr>
+          </div>
+          <div v-else>
+            <v-text-field
+              readonly
+              :append-icon="'mdi-send'"
+              variant="outlined"
+              placeholder = "Для того чтобы оставить комментарий, авторизуйтесь"
+              @click:append="() => { router.push('/auth'); }"
+            ></v-text-field>
           </div>
         </div>
       </div>
@@ -242,6 +537,12 @@ function redirectIfNotAuthorized() {
   height: 2.5em;
   border-radius: 50%;
   vertical-align: middle;
+}
+
+.article-header-data {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .article-footer div {
@@ -296,6 +597,10 @@ function redirectIfNotAuthorized() {
   vertical-align: center;
 }
 
+.article-share-icon:hover {
+  cursor: pointer;
+}
+
 .article-views-count {
   float: right;
   vertical-align: middle;
@@ -322,6 +627,7 @@ function redirectIfNotAuthorized() {
   color: black;
   transition: all 0.35s ease;
 }
+
 .comment-user-data a:hover {
   color: rgb(120, 194, 255);
 }

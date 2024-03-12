@@ -46,9 +46,9 @@ function isUserItself() {
 const getUserArticles = async () => {
   if (props.userId !== null) {
     if (isUserItself()) {
-      articles.value = (await axios.get('http://194.152.37.7:8812/api/articles/my-articles', store.state.config)).data.content;
+      articles.value = (await axios.get(`${store.state.API_URL}/api/articles/my-articles`, store.state.config)).data.content;
     } else {
-      articles.value = (await axios.get('http://194.152.37.7:8812/api/articles/' + props.userId + '/articles')).data.content;
+      articles.value = (await axios.get(`${store.state.API_URL}/api/articles/` + props.userId + '/articles')).data.content;
     }
     isArticlesFound.value = articles.value.length > 0;
   }
@@ -94,6 +94,7 @@ watch(() => props.userId, () => {
         <div v-for="article in articles" :key="article.id" class = "scroll-content my-7">
           <ArticlePreviewComponent
             :show-without-header = "true"
+            :authors-nickname="article.author.nickname"
             :authors-avatar-url = "null"
             :postedTimeAgo = "article.date_time"
             :article-id = "article.id"
@@ -105,6 +106,7 @@ watch(() => props.userId, () => {
             :article-total-favourites = "article.total_favourites"
             :article-total-comments = "article.total_comments"
             :article-total-views = "article.total_views"
+            :article-status = "article.status"
           />
         </div>
       </div>

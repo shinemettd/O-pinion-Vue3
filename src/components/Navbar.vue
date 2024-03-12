@@ -12,9 +12,14 @@
           <button @click.prevent="search" class="search-button"><i class="fas fa-search elevation-24"></i></button>
         </div>
         <div>
-          <router-link to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
-          <router-link to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
-          <button @click="toggleMenu" class="burger-button1">☰</button>
+          <div v-if="store.state.isAuthorized">
+            <router-link v-if="store.state.isAuthorized" to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
+            <router-link v-if="store.state.isAuthorized" to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
+            <button v-if="store.state.isAuthorized" @click="toggleMenu" class="burger-button1">☰</button>
+          </div>
+          <div v-else>
+            <v-btn class = "ml-4" @click="router.push('/auth')" variant="outlined"> Войти </v-btn>
+          </div>
           <div :class="['menu', { 'is-open': isMenuOpen }]">
             <p class="pb-2" v-if="store.state.isAuthorized">Вы авторизованы как:
               <li>{{ store.state.nickname }}</li>
@@ -29,12 +34,12 @@
             <router-link v-if="!store.state.isAuthorized" to="/auth" class="menu-item" @click="isMenuOpen = false"><i
               class="fas fa-sign-in-alt"></i>Войти
             </router-link>
-            <router-link to="/about" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-info-circle"></i>О нас
-            </router-link>
-            <router-link to="/notification" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомление
+            <router-link to="/notification" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомления
             </router-link>
             <router-link to="/create-article" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-plus"></i>Создать
               статью
+            </router-link>
+            <router-link to="/settings" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-user-cog"></i>Настройки
             </router-link>
             <router-link v-if="store.state.isAuthorized" to="/" class="menu-item"
                          @click="() => { isMenuOpen = false; store.commit('logout'); }"><i class="fas fa-sign-in-alt"></i>Выйти
@@ -56,6 +61,10 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import router from "@/plugins/router";
+</script>
 
 <script>
 import store from "@/store/store";
@@ -84,6 +93,9 @@ export default {
     window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
+    router() {
+      return router
+    },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
     },
@@ -93,7 +105,7 @@ export default {
           return; // Если запрос поиска пуст, не выполнять поиск и отображение модального окна
         }
 
-        const response = await axios.get('http://194.152.37.7:8812/api/articles/search', {
+        const response = await axios.get(`${store.state.API_URL}/api/articles/search`, {
           params: {
             query: this.searchQuery
           }

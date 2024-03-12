@@ -3,6 +3,7 @@ import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import axios from 'axios';
 import {useStore} from 'vuex';
+import store from "@/store/store";
 
 export default {
   setup() {
@@ -14,7 +15,7 @@ export default {
     const login = async () => {
       if (validateInputs()) {
         try {
-          const response = await axios.post('http://194.152.37.7:8812/api/auth/sign-in', {
+          const response = await axios.post(`${store.state.API_URL}/api/auth/sign-in`, {
             email: email.value,
             password: password.value,
           });
@@ -26,7 +27,7 @@ export default {
               'Authorization': `Bearer ${accessToken}`
             }
           };
-          const user = (await axios.get('http://194.152.37.7:8812/api/users/my-profile', config)).data;
+          const user = (await axios.get(`${store.state.API_URL}/api/users/my-profile`, config)).data;
           localStorage.setItem('user', JSON.stringify(user));
           store.commit('setAuthorized');
           store.commit('setEmail', user.email);
@@ -80,12 +81,11 @@ export default {
                placeholder="Пароль">
         <input type="submit" class="fadeIn fourth" value="Войти">
       </form>
-
-      <button type="button" class="bbbd-btn" style="margin-bottom: 20px">
-        Забыли пароль?
-      </button>
-
-
+      <router-link to="/forgot-password">
+        <button type="button" class="bbbd-btn" style="margin-bottom: 20px">
+          Забыли пароль?
+        </button>
+      </router-link>
     </div>
   </div>
 </template>

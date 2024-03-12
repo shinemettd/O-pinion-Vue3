@@ -70,7 +70,11 @@ import CharacterCount from '@tiptap/extension-character-count'
 import { ref , onMounted, onUpdated } from 'vue';
 
 export default {
-    props: ['showModal'],
+    props: {
+        showModal: Function,
+        isForArticleShortDescription : Boolean,
+        editedArticleShortDescription: String,
+    },
     components: {
         EditorContent,
     },
@@ -126,7 +130,6 @@ export default {
             CharacterCount.configure({
                 limit: 1000,
             }),
-            
             ],
             content: `
             <p>Введите текст ...</p>
@@ -135,11 +138,7 @@ export default {
 
         // Функция, которая будет вызвана после монтирования элемента в DOM
         onMounted(() => {
-            const savedShortDescription = localStorage.getItem('savedShortDescription');
-            if (savedShortDescription) {
-                editor.commands.setContent(savedShortDescription);
-            }
-
+            setContent();
 
             editor.on('update', ({  }) => {
                 characterCountNumber.value = editor.getHTML().length; 
@@ -159,9 +158,30 @@ export default {
         });
 
         onUpdated(() => {
-            localStorage.setItem('savedShortDescription', editor.getHTML());
+            if(!props.isForArticleShortDescription) {
+               ////
+                return;
+            }
+            if(!props.editedArticleShortDescription) {
+                localStorage.setItem('savedShortDescription', editor.getHTML());
+            }
+            
         });
 
+        const setContent = () => {
+            if(!props.isForArticleShortDescription) {
+                editor.commands.setContent('<p>Ваш комментарий ...<p/>');
+                return;
+            }
+            if(props.editedArticleShortDescription) {
+                editor.commands.setContent(props.editedArticleShortDescription);
+                return;
+            }
+            const savedShortDescription = localStorage.getItem('savedShortDescription');
+            if (savedShortDescription) {
+                editor.commands.setContent(savedShortDescription);
+            }
+        }
         const getHTMLContent = () => {
             return editor.getHTML();
         };
