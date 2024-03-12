@@ -171,38 +171,76 @@ export default {
       coverImageinput.value.click();
     };
 
-    const removeImage = () => {
-      if (props.editedArticleId && ArticleEditorComponentRef.value) {
-        ArticleEditorComponentRef.value.addToContentImagesToDelete(coverImageSrc.value);
+    const removeImage = async() => {
+      if(props.editedArticleId) {
+        await deleteArticleCoverImage(props.editedArticleId);
       }
       coverImageFile.value = null;
       coverImageSrc.value = '';
       isCoverImageValid.value = false;
     };
 
+    const deleteArticleCoverImage = async(articleId) => {
+      try {
+
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await axios.delete(`${store.state.API_URL}/api/images/${articleId}`,{
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          }
+        });
+        console.log('Главное изображение  успешно удалено :');
+
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.errors) {
+          const serverErrors = error.response.data.errors;
+          showModal(null, serverErrors);
+
+        } else {
+          console.error('Ошибка удаления главного  изображения статьи', error);
+        }
+      }
+    }
+
     const handleFile = async (event) => {
-      console.log("IN handle FILE");
       const files = event.target.files;
+      handleCoverImage(files);
+    };
+
+    const dropFile = async (event) => {
+      event.preventDefault();
+      const files = event.dataTransfer.files;
+      handleCoverImage(files);
+      
+    };
+
+    const handleCoverImage = async(files) => {
       if (files.length < 0) {
         return;
       }
       coverImageFile.value = null; // чтобы рендерились изменения
       coverImageFile.value = files[0];
 
+      // если это уже созданная статья и там была картинка 
+      if(props.editedArticleId && coverImageSrc.value !== '') {
+        await deleteArticleCoverImage(props.editedArticleId);
+      }
+
       if (await isImageValid(coverImageFile)) {
         console.log('valid image');
         isCoverImageValid.value = true;
         coverImageSrc.value = URL.createObjectURL(coverImageFile.value);
-        
+        // если это уже созданная статья отправляем запрос на изменение главной картинки 
+        if(props.editedArticleId) {
+          await loadCoverImageOnServer(props.editedArticleId);
+        }
 
       } else {
         isCoverImageValid.value = false;
         coverImageSrc.value = '';
         coverImageFile.value = null;
       }
-
-
-    };
+    }
 
     async function isImageValid(file) {
       if (!file) return;
@@ -254,29 +292,6 @@ export default {
         img.src = URL.createObjectURL(file);
       });
     }
-
-    const dropFile = async (event) => {
-      event.preventDefault();
-      console.log("IN DROP FILE");
-      const files = event.dataTransfer.files;
-      if (files.length < 0) {
-        return;
-      }
-
-      coverImageFile.value = null; // чтобы рендерились изменения
-      coverImageFile.value = files[0];
-
-      if (await isImageValid(coverImageFile)) {
-        console.log('valid image');
-        isCoverImageValid.value = true;
-        coverImageSrc.value = URL.createObjectURL(coverImageFile.value);
-      } else {
-        isCoverImageValid.value = false;
-        coverImageSrc.value = '';
-      }
-
-
-    };
 
 
     const loadCoverImageOnServer = async (articleId) => {
