@@ -118,7 +118,6 @@ export default {
     onMounted(() => {
       loadTitleFromLocalStorage();
       if(props.editedArticleCoverImage) {
-        console.log("У статьи есть фотография");
         coverImageSrc.value = props.editedArticleCoverImage;
         isCoverImageValid.value = true;
       }
@@ -172,9 +171,6 @@ export default {
     };
 
     const removeImage = async() => {
-      if(props.editedArticleId) {
-        await deleteArticleCoverImage(props.editedArticleId);
-      }
       coverImageFile.value = null;
       coverImageSrc.value = '';
       isCoverImageValid.value = false;
@@ -202,6 +198,15 @@ export default {
       }
     }
 
+    const saveCoverImageChanges = async() => {
+      // если пользователь меняет главное изображение 
+      if(props.editedArticleCoverImage !== coverImageSrc.value) {
+        // удаляем главнуб картинку 
+        await deleteArticleCoverImage(props.editedArticleId);
+        // сохраняем новую 
+        await loadCoverImageOnServer(props.editedArticleId);
+      }
+    }
     const handleFile = async (event) => {
       const files = event.target.files;
       handleCoverImage(files);
@@ -221,19 +226,10 @@ export default {
       coverImageFile.value = null; // чтобы рендерились изменения
       coverImageFile.value = files[0];
 
-      // если это уже созданная статья и там была картинка 
-      if(props.editedArticleId && coverImageSrc.value !== '') {
-        await deleteArticleCoverImage(props.editedArticleId);
-      }
-
       if (await isImageValid(coverImageFile)) {
         console.log('valid image');
         isCoverImageValid.value = true;
         coverImageSrc.value = URL.createObjectURL(coverImageFile.value);
-        // если это уже созданная статья отправляем запрос на изменение главной картинки 
-        if(props.editedArticleId) {
-          await loadCoverImageOnServer(props.editedArticleId);
-        }
 
       } else {
         isCoverImageValid.value = false;
@@ -386,6 +382,7 @@ export default {
     }
 
     const saveArticleChanges = async() => {
+      saveCoverImageChanges();
       try {
         const data = {
           title: title.value,
@@ -420,6 +417,7 @@ export default {
       }
     }
 
+    
     const sendArticleOnServer = async(endpoint) => {
       try {
         const data = {
