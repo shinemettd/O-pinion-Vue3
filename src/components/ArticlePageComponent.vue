@@ -89,7 +89,7 @@ function redirectIfNotAuthorized() {
 
 <template>
   <main class = "container mx-auto">
-    <div class = "scroll mx-auto border w-50 h-100 px-4 py-3">
+    <div class = "scroll mx-auto border scroll-container w-66 h-100 px-4 py-3">
       <hr>
       <div class = "article-header mt-3">
         <p style = "font-size: 2em; word-wrap: break-word;"> {{ articleTitle }} </p>
@@ -325,4 +325,27 @@ function redirectIfNotAuthorized() {
 .comment-user-data a:hover {
   color: rgb(120, 194, 255);
 }
+
+@media screen and (max-width: 720px) {
+  .scroll-container {
+    width: 100%;
+  }
+
+  .article-header {
+    text-align: center;
+  }
+
+  .article-header-data {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .article-footer-bar {
+    flex-direction: column;
+  }
+  .comment-user-data p {
+    text-align: center;
+  }
+}
+
 </style>
