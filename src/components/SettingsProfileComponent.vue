@@ -182,10 +182,9 @@
                 if (passwordValue !== '' && passwordValue === passwordConfirmationValue) {
                   try {
                     await axios.put(`${store.state.API_URL}/api/password/reset/${store.state.userToken}`, { password: passwordValue, confirm_password: passwordConfirmationValue});
-                    showSnackMessage = true;
+                    showSnackbarMessage('Данные успешно сохранены');
                   } catch (e) {
-                    console.error(e);
-                    showErrorSnackMessage = true;
+                    showSnackbarMessage('Произошла ошибка при сохранении');
                     return;
                   }
                 }
@@ -194,10 +193,9 @@
                   if (newAvatar !== null) {
                       await loadAvatarImageOnServer();
                   }
-                  showSnackMessage = true;
+                  showSnackbarMessage('Данные успешно сохранены');
                 } catch (e) {
-                  console.error(e);
-                  showErrorSnackMessage = true;
+                  showSnackbarMessage('Произошла ошибка при сохранении');
                 }
               }"
             >
@@ -207,29 +205,13 @@
               v-model="showSnackMessage"
               :timeout="3000"
             >
-             Данные были успешно сохранены
+              {{ snackMessageText }}
 
               <template v-slot:actions>
                 <v-btn
                   color="purple"
                   variant="text"
                   @click="showSnackMessage = false"
-                >
-                  Закрыть
-                </v-btn>
-              </template>
-            </v-snackbar>
-            <v-snackbar
-              v-model="showErrorSnackMessage"
-              :timeout="3000"
-            >
-              Произошла ошибка при сохранении
-
-              <template v-slot:actions>
-                <v-btn
-                  color="purple"
-                  variant="text"
-                  @click="showErrorSnackMessage = false"
                 >
                   Закрыть
                 </v-btn>
@@ -353,9 +335,9 @@
               @click = "async () => {
                 try {
                   await axios.put(`${store.state.API_URL}/api/privacy/change`, userPrivacySettings, store.state.config);
-                  showSnackMessage = true;
+                  showSnackbarMessage('Данные успешно сохранены');
                 } catch (e) {
-                  showErrorSnackMessage = true;
+                  showSnackbarMessage('Произошла ошибка при сохранении');
                   console.error(e);
                 }
               }"
@@ -366,29 +348,13 @@
               v-model="showSnackMessage"
               :timeout="3000"
             >
-              Данные были успешно сохранены
+              {{ snackMessageText }}
 
               <template v-slot:actions>
                 <v-btn
                   color="purple"
                   variant="text"
                   @click="showSnackMessage = false"
-                >
-                  Закрыть
-                </v-btn>
-              </template>
-            </v-snackbar>
-            <v-snackbar
-              v-model="showErrorSnackMessage"
-              :timeout="3000"
-            >
-              Произошла ошибка, попробуйте еще раз
-
-              <template v-slot:actions>
-                <v-btn
-                  color="purple"
-                  variant="text"
-                  @click="showErrorSnackMessage = false"
                 >
                   Закрыть
                 </v-btn>
@@ -411,7 +377,7 @@ import router from "@/plugins/router";
 const tab = ref('personal');
 const showToggle = ref(0);
 const showSnackMessage = ref(false);
-const showErrorSnackMessage = ref(false);
+const snackMessageText = ref('');
 
 defineProps({
   firstName: {
@@ -466,14 +432,43 @@ const openFileChooser = () => {
 const handleFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
+
+    if (!file.type.startsWith('image/')) {
+      showSnackbarMessage('Выбранный файл не является изображением.');
+      return;
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      showSnackbarMessage('Максимальный размер картинки 4 МБ');
+      return;
+    }
+
     const reader = new FileReader();
     reader.readAsDataURL(file);
+
     reader.onload = () => {
-      newAvatar.value = reader.result;
+      const img = new Image();
+      img.onload = () => {
+        if (img.width < 400 || img.height < 400) {
+          showSnackbarMessage('Картинка не может быть разрешения меньше 400х400');
+          return;
+        } else if (img.width > 2000 || img.height > 2000) {
+          showSnackbarMessage('Картинка не может быть разрешения больше 2000х2000');
+          return;
+        }
+        newAvatar.value = reader.result;
+      };
+      img.src = reader.result;
     };
+
     newAvatarAsFile.value = file;
   }
 };
+
+const showSnackbarMessage = (text) => {
+  showSnackMessage.value = true;
+  snackMessageText.value = text;
+}
 
 const distributeBirthdate = async (date) => {
   date = date.split('-').reverse();
@@ -565,9 +560,9 @@ const loadAvatarImageOnServer = async () => {
         'Content-Type': 'multipart/form-data'
       }
     });
-    console.log('Изображение успешно загружено:');
+    showSnackbarMessage('Изображение успешно загружено:');
   } catch (error) {
-      console.error('Ошибка загрузки изображения ', error);
+    showSnackbarMessage('При загрузки изображения произошла ошибка');
   }
 }
 
