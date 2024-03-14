@@ -45,7 +45,13 @@
 
 
   export default {
-    setup() {
+    props: {
+      editedArticleTags: {
+        type: Array,
+        default: () => null
+      }
+    },
+    setup(props) {
       const selectedTags = ref([]);
       const existingTags = ref([]);
       const showTagMenu = ref(false);
@@ -57,18 +63,27 @@
       const isScrollEnd = ref(false);
       const searchTagQuery = ref(null);
       const matchingTags = ref([]);
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = store.state.userToken;
       const newTagName = ref('');
 
 
       onMounted(() => {
         fetchExistingTags(page.value);
+        console.log("editedArticletags in tagzone " + props.editedArticleTags);
+        if(props.editedArticleTags !== null && props.editedArticleTags !== undefined) {
+          console.log("Есть теги у статьи которую редактрируют ");
+          console.log(props.editedArticleTags);
+          selectedTags.value = props.editedArticleTags;
+          return;
+        }
         const storedTags = localStorage.getItem('selectedTags');
         selectedTags.value = storedTags ? JSON.parse(storedTags) : [];
       });
 
       onUpdated(() => {
-        localStorage.setItem('selectedTags', JSON.stringify(selectedTags.value));
+        if(!props.editedArticleTags) {
+          localStorage.setItem('selectedTags', JSON.stringify(selectedTags.value));
+        }
       });
 
       const fetchExistingTags = async (pageNumber) => {
@@ -82,7 +97,6 @@
                     'Authorization': `Bearer ${accessToken}`
                 }
             });
-            // console.log('страница ' + pageNumber + ' response.data.content.length' + response.data.content.length);
             if (response.data.content.length === 0) {
                 isScrollEnd.value = true;
                 return;

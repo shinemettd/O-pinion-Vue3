@@ -10,11 +10,10 @@ import Auth from "@/components/Auth.vue";
 import ArticlePage from "@/pages/ArticlePage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
 import ArticleCreatePage from "@/pages/ArticleCreatePage.vue";
+import ArticleEditPage from "@/pages/ArticleEditPage.vue";
 import SuccessArticleCreationPage from "@/pages/SuccessArticleCreationPage";
 import PageNotFound from "@/pages/PageNotFound.vue";
 import store from "@/store/store";
-// потом удалить
-import TagZone from "@/components/TagZone.vue";
 import SettingsPage from "@/pages/SettingsPage.vue";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
 
@@ -57,6 +56,14 @@ const router = createRouter({
       component: ArticleCreatePage,
       meta: {
         title: 'Создание статьи'
+      }
+    },
+    {
+      path: '/edit-article/:articleId',
+      name: 'ArticleEditPage',
+      component: ArticleEditPage,
+      meta: {
+        title: 'Редактирование статьи'
       }
     },
     {

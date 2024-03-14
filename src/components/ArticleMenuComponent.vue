@@ -2,27 +2,25 @@
     <div class="dropdown" v-if="store.state.isAuthorized && (store.state.nickname === authorsNickname)">
             <img src="/icons/three-points-menu.svg" alt="Menu" @click="toggleArticleMenu" class="menu-icon">
             <ul class="article-menu" v-if="articleMenuOpen" @mouseleave="articleMenuOpen = false">
-              <li>
-                <router-link :to="'/edit-article'">
+              <li v-if="articleStatus !== 'DELETED'">
+                <router-link :to="'/edit-article/' + articleId">
                   <p>Редактировать статью</p>
                 </router-link>
+                <router-link :to="'/edit-article/' + articleId">
+                  <img src="/icons/edit-article.svg" class="menu-icons" alt="icon"  @click="">
+                </router-link>
               </li>
-              <li>
-                <button 
-                  :disabled="articleStatus === 'DELETED'" 
-                  :class="{ 'inactive': articleStatus === 'DELETED' }" 
-                  @click="deleteArticle"
-                >
+              <li v-if="articleStatus !== 'DELETED'">
+                <button  @click="deleteArticle" style="color: red;">
                   Удалить статью
                 </button>
+                <img src="/icons/delete-article.svg" class="menu-icons" alt="icon"  @click="deleteArticle">
               </li>
-              <li>
-                <button 
-                  v-if="articleStatus === 'DELETED'" 
-                  @click="restoreArticle"
-                >
+              <li v-if="articleStatus === 'DELETED'">
+                <button  @click="restoreArticle" style="color: green;">
                   Восстановить статью
                 </button>
+                <img  src="/icons/undelete-article.svg"  class="menu-icons undelete-icon" alt="icon"  @click="restoreArticle">
               </li>
             </ul>
     </div>
@@ -35,7 +33,8 @@ import {useStore} from "vuex";
 export default {
     props: {
         articleStatus: String,
-        authorsNickname: String
+        authorsNickname: String,
+        articleId : Number
     },
     setup(props) {
     const articleMenuOpen = ref(false);
@@ -105,7 +104,11 @@ export default {
 .article-menu li{
   padding: 8px 16px;
   cursor: pointer;
-  max-height: 40px;
+  max-height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
 }
 
 
@@ -113,5 +116,16 @@ export default {
   background-color: #ddd;
 }
 
+.menu-icons {
+  padding: 6px 10px;
+  cursor: pointer;
+  display: inline;
+  width: 45px;
+  height: 40px;
+}
 
+.undelete-icon {
+  width: 60px;
+  height: 50px;
+}
 </style>

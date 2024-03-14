@@ -160,8 +160,13 @@ export default {
             </router-link>
           </div>
         </div>
-        <ArticleMenuComponent :articleStatus="articleStatus" :authorsNickname="authorsNickname"></ArticleMenuComponent>
-        <div class = "article-header-report" v-if="store.state.nickname !== authorsNickname">
+        <ArticleMenuComponent
+          :articleStatus="articleStatus"
+          :authorsNickname="authorsNickname" 
+          :articleId="articleId"
+        />
+        <div class = "article-header-report" v-if="store.state.isAuthorized && (store.state.nickname !== authorsNickname)">
+
           <div class = "article-header-report-icon">
             <v-dialog max-width="500">
               <template v-slot:activator="{ props: activatorProps }">
@@ -272,7 +277,12 @@ export default {
           </div>
         </div>
       </div>
-      <ArticleMenuComponent v-show = "showWithoutHeader" :articleStatus="articleStatus" :authorsNickname="authorsNickname"></ArticleMenuComponent>
+      <ArticleMenuComponent
+          v-show = "showWithoutHeader"
+          :articleStatus="articleStatus"
+          :authorsNickname="authorsNickname" 
+          :articleId="articleId"
+        />
 
       <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
