@@ -177,14 +177,9 @@ export default {
     };
 
     const deleteArticleCoverImage = async(articleId) => {
+      
       try {
-
-        const accessToken = localStorage.getItem('accessToken');
-        const response = await axios.delete(`${store.state.API_URL}/api/images/${articleId}`,{
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          }
-        });
+        const response = await axios.delete(`${store.state.API_URL}/api/images/${articleId}`, store.state.config);
         console.log('Главное изображение  успешно удалено :');
 
       } catch (error) {
@@ -298,14 +293,15 @@ export default {
       try {
         const formData = new FormData();
         formData.append('photo', coverImageFile.value);
+        const accessToken = store.state.userToken;
+        const config = {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'multipart/form-data'
+            }
+        }; 
 
-        const accessToken = localStorage.getItem('accessToken');
-        const response = await axios.put(`${store.state.API_URL}/api/images/${articleId}`, formData, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+        const response = await axios.put(`${store.state.API_URL}/api/images/${articleId}`, formData, config);
         console.log('Изображение успешно загружено:');
         coverImageSrc.value = response.data;
 
@@ -359,14 +355,7 @@ export default {
 
     const undraftArticle = async() => {
       try {
-        const accessToken = localStorage.getItem('accessToken');///////ПОМЕНЯТЬ
-        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}/undraft`,{
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
+        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}/undraft`, store.state.config);
         alert('Ваша статья опубликована успешно !')
         router.push('/');
 
@@ -390,14 +379,7 @@ export default {
           content: getHTMLContent(),
           tags: getSelectedTags()
         };
-
-        const accessToken = localStorage.getItem('accessToken');///////ПОМЕНЯТЬ
-        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}`, data, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}`, data, store.state.config);
 
         console.log('id = ' + response.data.id);
         // теперь присваиваем картинку статье
@@ -427,13 +409,7 @@ export default {
           tags: getSelectedTags()
         };
 
-        const accessToken = localStorage.getItem('accessToken'); ///////ПОМЕНЯТЬ
-        const response = await axios.post(endpoint, data, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        const response = await axios.post(endpoint, data, store.state.config);
 
         console.log('id = ' + response.data.id);
         // теперь присваиваем картинку статье

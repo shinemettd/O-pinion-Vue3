@@ -63,7 +63,7 @@
       const isScrollEnd = ref(false);
       const searchTagQuery = ref(null);
       const matchingTags = ref([]);
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = store.state.userToken;
       const newTagName = ref('');
 
 
@@ -97,7 +97,6 @@
                     'Authorization': `Bearer ${accessToken}`
                 }
             });
-            // console.log('страница ' + pageNumber + ' response.data.content.length' + response.data.content.length);
             if (response.data.content.length === 0) {
                 isScrollEnd.value = true;
                 return;

@@ -142,7 +142,6 @@ export default {
 
             editor.on('update', ({  }) => {
                 characterCountNumber.value = editor.getHTML().length; 
-                // console.log('char in short description ' + characterCountNumber.value);
                 if (characterCountNumber.value > limit.value) {
                     editor.chain().focus().undo().run();
                     props.showModal('/icons/risovach.ru.jpg', null);
@@ -159,7 +158,6 @@ export default {
 
         onUpdated(() => {
             if(!props.isForArticleShortDescription) {
-               ////
                 return;
             }
             if(!props.editedArticleShortDescription) {

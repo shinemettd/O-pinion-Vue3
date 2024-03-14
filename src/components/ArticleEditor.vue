@@ -296,14 +296,7 @@ export default {
         }
         const deleteImageFromServer = async(imagePath) => {
             try {
-                const accessToken = localStorage.getItem('accessToken');
-
-                const response = await axios.delete(`${store.state.API_URL}/api/images?image-path=${encodeURIComponent(imagePath)}`, {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-
+                const response = await axios.delete(`${store.state.API_URL}/api/images?image-path=${encodeURIComponent(imagePath)}`, store.state.config);
                 console.log('Изображение успешно удалено');
 
             } catch (error) {
@@ -498,14 +491,14 @@ export default {
             try {
                 const formData = new FormData();
                 formData.append('photo', file.value);
-
-                const accessToken = localStorage.getItem('accessToken');
-                const response = await axios.post(`${store.state.API_URL}/api/images`, formData, {
+                const accessToken = store.state.userToken;
+                const config = {
                     headers: {
                     'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'multipart/form-data'
                     }
-                });
+                }; 
+                const response = await axios.post(`${store.state.API_URL}/api/images`, formData, config);
 
                 if (response) {
 
