@@ -64,6 +64,21 @@ const props = defineProps({
     type: Function,
     default() {
     }
+  },
+  loadTotalCommentsValue: {
+    type: Function,
+    default() {
+    }
+  },
+  loadTotalFavouritesValue: {
+    type: Function,
+    default() {
+    }
+  },
+  loadReactionType: {
+    type: Function,
+      default() {
+    }
   }
 })
 
@@ -83,7 +98,6 @@ async function sendComment(comment, articleId) {
     let response;
     if (!isCommentReply.value) {
       response = await axios.post(`${store.state.API_URL}/api/article-comments/${articleId}`, {text: comment}, store.state.config);
-
     } else {
       response = await axios.post(`${store.state.API_URL}/api/article-comments/${replyCommentId.value}/replies`, {text: comment}, store.state.config);
     }
