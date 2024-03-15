@@ -123,9 +123,9 @@ import store from "@/store/store";
 export default {
     props: {
         showModal: Function,
-        setHasUnsavedChanges: Function,
         isImageValid : Function,
         editedArticleContent: String,
+        setHasUnsavedChanges : Function
     },
     components: {
         EditorContent,
@@ -137,6 +137,7 @@ export default {
         const contentCharacterCountNumber = ref(0);
         const maxAcceptableImgNum = ref(3);
         const contentImagesToDelete = ref([]);
+        const newImages = ref([]);
 
         const imageInput = ref(null);
 
@@ -296,6 +297,7 @@ export default {
             contentImagesToDelete.value.push(src);
             console.log("Картинки для удаления " + contentImagesToDelete.value);
         }
+
         const deleteImageFromServer = async(imagePath) => {
             try {
                 const response = await axios.delete(`${store.state.API_URL}/api/images?image-path=${encodeURIComponent(imagePath)}`, store.state.config);
@@ -318,7 +320,19 @@ export default {
             // Выполнение всех запросов параллельно
             await Promise.all(promises);
         }
+        const deleteNewContentImages = async() => {
+            const promises = newImages.value.map(imagePath => deleteImageFromServer(imagePath));
+            // Выполнение всех запросов параллельно
+            await Promise.all(promises);
+        }
 
+        const saveContentImagesChanges = () => {
+            if(contentImagesToDelete.value) {
+                console.log("Пользователь удалял картинки в ходе редактирования");
+                deleteContentImages();
+            }
+            newImages.value = [];
+        }
         const getHTMLContent = () => {
             return contentEditor.getHTML();
         };
@@ -468,7 +482,6 @@ export default {
         };
 
         const openFileInput = () => {
-            console.log(countImagesInEditor());
             if(countImagesInEditor() >= maxAcceptableImgNum.value) {
                 props.showModal("/icons/limit_mem.jpg", 'Максимальное количество фотографий в статье ' + maxAcceptableImgNum.value);
                 return;
@@ -483,7 +496,12 @@ export default {
             const imageFile = ref(event.target.files[0]);
             if(await props.isImageValid(imageFile)) {
                 console.log('valid image');
-                loadImageOnServer(imageFile);
+                let imageURL = await loadImageOnServer(imageFile);
+                if(props.editedArticleContent && imageURL !== null) {
+                    newImages.value.push(imageURL);
+                    console.log("Новые картинки : " + newImages.value)
+                    props.setHasUnsavedChanges(true);
+                }
 
             }
         };
@@ -509,15 +527,18 @@ export default {
 
                     console.log(response.data);
                     console.log('currentImNum = ' + countImagesInEditor());
+                    return response.data;
                 }
 
             } catch (error) {
                 if (error.response && error.response.data && error.response.data.errors) {
                     const serverErrors = error.response.data.errors;
                     showModal(null, serverErrors);
+                    return null;
 
                 } else {
                     console.error('Ошибка загрузки  изображения:', error);
+                    return null;
                 }
             }
         }
@@ -557,8 +578,8 @@ export default {
             toggleOrderedList,
             toggleBlockquote,
             setTextAlign,
-            deleteContentImages,
-            addToContentImagesToDelete
+            saveContentImagesChanges,
+            deleteNewContentImages
         };
     },
 
