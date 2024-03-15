@@ -123,6 +123,7 @@ import store from "@/store/store";
 export default {
     props: {
         showModal: Function,
+        setHasUnsavedChanges: Function,
         isImageValid : Function,
         editedArticleContent: String,
     },
@@ -207,18 +208,6 @@ export default {
             Highlight.configure({ multicolor: true }),
             CharacterCount,
         ],
-        onUpdate: function({ transaction }) {
-            console.log("ON UPDATE ");
-            const imageCountBefore = countImages(transaction.before);
-            const imageCountAfter = countImages(transaction.doc);
-
-            console.log("img count before " + imageCountBefore);
-            console.log("img count after  " + imageCountAfter);
-            if (imageCountAfter < imageCountBefore) { // нужно учесть удаление картинок самим пользователем 
-                console.log("Image(s) about to be deleted. Preventing...");
-                contentEditor.commands.undo();
-            }
-        },
         content: `
         <p>Введите текст ...</p>
         `,
@@ -262,21 +251,10 @@ export default {
 
         });
 
-        function countImages(doc) {
-            let imageCount = 0;
-            doc.forEach(function(node) {
-                if (node.type.name === 'image') {
-                    imageCount++;
-                }
-            });
-            return imageCount;
-        }
-
         onUpdated(() => {
-            // console.log("ложим в localStorage контент");
-            // if(!props.editedArticleContent) {
-            //     localStorage.setItem('articleContent', contentEditor.getHTML());
-            // }
+            if(!props.editedArticleContent) {
+                localStorage.setItem('articleContent', contentEditor.getHTML());
+            }
         });
 
 

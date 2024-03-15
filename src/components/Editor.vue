@@ -74,6 +74,7 @@ export default {
         showModal: Function,
         isForArticleShortDescription : Boolean,
         editedArticleShortDescription: String,
+        
     },
     components: {
         EditorContent,
@@ -160,9 +161,10 @@ export default {
             if(!props.isForArticleShortDescription) {
                 return;
             }
-            if(!props.editedArticleShortDescription) {
-                localStorage.setItem('savedShortDescription', editor.getHTML());
+            if(props.editedArticleShortDescription) {
+                return;
             }
+            localStorage.setItem('savedShortDescription', editor.getHTML());
             
         });
 

@@ -42,6 +42,7 @@
         :showModal="showModal" 
         :isForArticleShortDescription="true" 
         :editedArticleShortDescription="editedArticleShortDescription"
+        
       />
 
       <div id="myModal" class="modal">
@@ -60,8 +61,10 @@
 
       <ArticleEditor ref="ArticleEditorComponentRef"
         :showModal="showModal"
+        :setHasUnsavedChanges="setHasUnsavedChanges"
         :isImageValid="isImageValid"
         :editedArticleContent="editedArticleContent"
+        
         />
       <TagZone v-if="!article" ref="ArticleCreateTagZoneRef" />
       <TagZone v-if="article" ref="EditArticleTagZoneRef" :editedArticleTags="article.tags"/>
@@ -89,6 +92,8 @@ export default {
   props: {
     article: Object,
     editedArticleId : Number,
+    editedArticleShortDescription : String,
+    editedArticleContent : String
   },
   components: {
     ArticleEditor,
@@ -131,11 +136,14 @@ export default {
 
     });
 
+
+    function setHasUnsavedChanges (value)  {
+      hasUnsavedChanges.value = value;
+    }
+
     const warnBeforeUnload = (event) => {
-      if (hasUnsavedChanges.value) {
-        event.preventDefault();
-        event.returnValue = ''; 
-      }
+      event.preventDefault();
+      event.returnValue = ''; 
     };
 
     if(props.editedArticleId) {
@@ -151,7 +159,7 @@ export default {
       
         // удаление картинок 
         if(hasUnsavedChanges.value) {
-          console.log("Удаляем все несохраненные изменения");
+          console.log("Удаляем все картинки которые загрузили в облако ");
         }
 
       }
@@ -179,7 +187,6 @@ export default {
 
     const limitInputLength = () => {
       saveTitleToLocalStorage();
-      hasUnsavedChanges.value = true;
       if (title.value.length > 120) {
         title.value = title.value.slice(0, 120); // Обрезаем текст до 120 символов
       }
@@ -538,6 +545,7 @@ export default {
       EditorComponentRef,
       ArticleCreateTagZoneRef,
       EditArticleTagZoneRef,
+      setHasUnsavedChanges
     };
 
   }

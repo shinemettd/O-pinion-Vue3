@@ -11,7 +11,6 @@ export default createStore({
       email: null,
       id: null,
       config: null,
-      acceptableNumOfOpenArticleEditors: 5, 
 
     }
   },
