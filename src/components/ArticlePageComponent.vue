@@ -137,6 +137,8 @@ async function sendEditComment(commentId, commentText) {
 }
 
 async function replyTo(commentAuthorNickname, commentId) {
+  isCommentEditing.value = false;
+  editingCommentId.value = undefined;
   isCommentReply.value = true;
   replyCommentAuthorsNickname.value = commentAuthorNickname;
   // userComment.value = `@${commentAuthorNickname}, ${userComment}`;
@@ -149,6 +151,8 @@ function cancelReply() {
 }
 
 async function editComment(commentId, newCommentText) {
+  isCommentReply.value = false;
+  replyCommentId.value = undefined;
   isCommentEditing.value = true;
   userComment.value = newCommentText;
   editingCommentId.value = commentId;
