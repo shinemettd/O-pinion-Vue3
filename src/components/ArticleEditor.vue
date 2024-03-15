@@ -172,7 +172,7 @@ export default {
                     { name: 'e', icon: null, value: 'e' },
                     { name: 'infinity', icon: '/icons/infinity.svg', value: '$\\infty$' }
                 ];
-
+        
         const contentEditor = new Editor({
             extensions: [
             Document,
@@ -205,12 +205,25 @@ export default {
                 depth: 10,
             }),
             Highlight.configure({ multicolor: true }),
-            CharacterCount
+            CharacterCount,
         ],
-            content: `
-            <p>Введите текст ...</p>
-            `,
+        onUpdate: function({ transaction }) {
+            console.log("ON UPDATE ");
+            const imageCountBefore = countImages(transaction.before);
+            const imageCountAfter = countImages(transaction.doc);
+
+            console.log("img count before " + imageCountBefore);
+            console.log("img count after  " + imageCountAfter);
+            if (imageCountAfter < imageCountBefore) { // нужно учесть удаление картинок самим пользователем 
+                console.log("Image(s) about to be deleted. Preventing...");
+                contentEditor.commands.undo();
+            }
+        },
+        content: `
+        <p>Введите текст ...</p>
+        `,
         });
+       
 
         // Функция, которая будет вызвана после монтирования элемента в DOM
         onMounted(() => {
@@ -249,10 +262,21 @@ export default {
 
         });
 
+        function countImages(doc) {
+            let imageCount = 0;
+            doc.forEach(function(node) {
+                if (node.type.name === 'image') {
+                    imageCount++;
+                }
+            });
+            return imageCount;
+        }
+
         onUpdated(() => {
-            if(!props.editedArticleContent) {
-                localStorage.setItem('articleContent', contentEditor.getHTML());
-            }
+            // console.log("ложим в localStorage контент");
+            // if(!props.editedArticleContent) {
+            //     localStorage.setItem('articleContent', contentEditor.getHTML());
+            // }
         });
 
 

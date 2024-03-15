@@ -89,16 +89,13 @@ export default {
   props: {
     article: Object,
     editedArticleId : Number,
-    editedArticleTitle : String,
-    editedArticleShortDescription: String,
-    editedArticleContent: String,
-    editedArticleCoverImage: String,
   },
   components: {
     ArticleEditor,
     Editor,
     TagZone
   },
+
   setup(props) {
     const coverImageFile = ref(null);
     const coverImageinput = ref(null);
@@ -114,8 +111,10 @@ export default {
     const EditorComponentRef = ref(null);
     const ArticleCreateTagZoneRef = ref(null);
     const EditArticleTagZoneRef = ref(null);
+    const hasUnsavedChanges = ref(false);
 
     onMounted(() => {
+
       loadTitleFromLocalStorage();
       if(props.editedArticleCoverImage) {
         coverImageSrc.value = props.editedArticleCoverImage;
@@ -132,8 +131,36 @@ export default {
 
     });
 
-    const loadTitleFromLocalStorage = () => {
+    const warnBeforeUnload = (event) => {
+      if (hasUnsavedChanges.value) {
+        event.preventDefault();
+        event.returnValue = ''; 
+      }
+    };
 
+    if(props.editedArticleId) {
+      window.addEventListener('beforeunload', warnBeforeUnload); // для перезагрузки страницы
+     
+    }
+    
+
+    onBeforeUnmount(() => {
+      if(props.editedArticleId) {
+        
+        window.removeEventListener('beforeunload', warnBeforeUnload);
+      
+        // удаление картинок 
+        if(hasUnsavedChanges.value) {
+          console.log("Удаляем все несохраненные изменения");
+        }
+
+      }
+      
+    });
+
+
+    const loadTitleFromLocalStorage = () => {
+      
       if(props.editedArticleId) {
         title.value = props.article.title;
         return;
@@ -145,15 +172,14 @@ export default {
     };
 
     const saveTitleToLocalStorage = () => {
-      // если не редактируем какую-то статью , а создаем новую 
       if(!props.editedArticleId) {
         localStorage.setItem('savedTitle', title.value);
-        return;
       }
     };
 
     const limitInputLength = () => {
       saveTitleToLocalStorage();
+      hasUnsavedChanges.value = true;
       if (title.value.length > 120) {
         title.value = title.value.slice(0, 120); // Обрезаем текст до 120 символов
       }
@@ -511,7 +537,7 @@ export default {
       ArticleEditorComponentRef,
       EditorComponentRef,
       ArticleCreateTagZoneRef,
-      EditArticleTagZoneRef
+      EditArticleTagZoneRef,
     };
 
   }
