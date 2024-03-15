@@ -42,6 +42,7 @@
         :showModal="showModal" 
         :isForArticleShortDescription="true" 
         :editedArticleShortDescription="editedArticleShortDescription"
+        
       />
 
       <div id="myModal" class="modal">
@@ -62,6 +63,7 @@
         :showModal="showModal"
         :isImageValid="isImageValid"
         :editedArticleContent="editedArticleContent"
+        :setHasUnsavedChanges="setHasUnsavedChanges"
         />
       <TagZone v-if="!article" ref="ArticleCreateTagZoneRef" />
       <TagZone v-if="article" ref="EditArticleTagZoneRef" :editedArticleTags="article.tags"/>
@@ -89,16 +91,15 @@ export default {
   props: {
     article: Object,
     editedArticleId : Number,
-    editedArticleTitle : String,
-    editedArticleShortDescription: String,
-    editedArticleContent: String,
-    editedArticleCoverImage: String,
+    editedArticleShortDescription : String,
+    editedArticleContent : String
   },
   components: {
     ArticleEditor,
     Editor,
     TagZone
   },
+
   setup(props) {
     const coverImageFile = ref(null);
     const coverImageinput = ref(null);
@@ -114,8 +115,10 @@ export default {
     const EditorComponentRef = ref(null);
     const ArticleCreateTagZoneRef = ref(null);
     const EditArticleTagZoneRef = ref(null);
+    const hasUnsavedChanges = ref(false);
 
     onMounted(() => {
+
       loadTitleFromLocalStorage();
       if(props.editedArticleCoverImage) {
         coverImageSrc.value = props.editedArticleCoverImage;
@@ -132,8 +135,38 @@ export default {
 
     });
 
-    const loadTitleFromLocalStorage = () => {
 
+    function setHasUnsavedChanges (value)  {
+      hasUnsavedChanges.value = value;
+    }
+
+    const warnBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = ''; 
+    };
+
+    if(props.editedArticleId) {
+      window.addEventListener('beforeunload', warnBeforeUnload); // для перезагрузки страницы
+     
+    }
+    
+
+    onBeforeUnmount(() => {
+      if(props.editedArticleId) {
+        
+        window.removeEventListener('beforeunload', warnBeforeUnload);
+      
+        // удаление картинок 
+        if(ArticleEditorComponentRef.value && hasUnsavedChanges.value) {
+          ArticleEditorComponentRef.value.deleteNewContentImages();
+        }
+      }
+      
+    });
+
+
+    const loadTitleFromLocalStorage = () => {
+      
       if(props.editedArticleId) {
         title.value = props.article.title;
         return;
@@ -145,10 +178,8 @@ export default {
     };
 
     const saveTitleToLocalStorage = () => {
-      // если не редактируем какую-то статью , а создаем новую 
       if(!props.editedArticleId) {
         localStorage.setItem('savedTitle', title.value);
-        return;
       }
     };
 
@@ -372,6 +403,7 @@ export default {
 
     const saveArticleChanges = async() => {
       saveCoverImageChanges();
+      saveContentImagesChanges();
       try {
         const data = {
           title: title.value,
@@ -385,7 +417,8 @@ export default {
         // теперь присваиваем картинку статье
         const imagePath = await loadCoverImageOnServer(response.data.id);
         console.log('cover image path :' + imagePath);
-        alert('Ваши изменения сохранены успешно !')
+        alert('Ваши изменения сохранены успешно !');
+        hasUnsavedChanges.value = false;
         router.push('/');
 
       } catch (error) {
@@ -399,6 +432,11 @@ export default {
       }
     }
 
+    const saveContentImagesChanges = () => {
+      if (ArticleEditorComponentRef.value) {
+        ArticleEditorComponentRef.value.saveContentImagesChanges();
+      }
+    }
     
     const sendArticleOnServer = async(endpoint) => {
       try {
@@ -468,11 +506,6 @@ export default {
       }
     }
 
-
-
-    // Добавляем console.log перед передачей пропса showModal
-    console.log('showModal is', typeof showModal);
-
     onBeforeMount(async () => {
       if (!(await isAuthorized())) {
         store.commit('logout');
@@ -511,7 +544,8 @@ export default {
       ArticleEditorComponentRef,
       EditorComponentRef,
       ArticleCreateTagZoneRef,
-      EditArticleTagZoneRef
+      EditArticleTagZoneRef,
+      setHasUnsavedChanges
     };
 
   }

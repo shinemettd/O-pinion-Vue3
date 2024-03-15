@@ -10,7 +10,8 @@ export default createStore({
       nickname: null,
       email: null,
       id: null,
-      config: null
+      config: null,
+
     }
   },
   mutations: {
@@ -50,8 +51,9 @@ export default createStore({
       state.id = null;
       state.email = null;
       state.config = null;
-    }
+    },
   },
+
   actions: {
     checkTokenExpiration({ commit, state }) {
       if (state.userToken && state.userToken.timestamp) {
