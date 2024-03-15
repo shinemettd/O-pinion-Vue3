@@ -12,9 +12,7 @@ const reportReasonText = ref('');
 const shareBy = ref('link');
 const shareSortToggle = ref(0);
 const shareLink = ref('');
-const showShareSnackMessage = ref(false);
 const isValidShareEmail = ref(true);
-const showEmailShareSnackMessage = ref(false);
 const shareEmailAddress = ref('');
 const statusColors = computed(() => ({
   'ON_MODERATION': 'orange',
@@ -24,9 +22,8 @@ const statusColors = computed(() => ({
   'NOT_APPROVED': 'red',
   'APPROVED': 'green'
 }));
-
-
-
+const showSnackMessage = ref(false);
+const snackMessageText = ref('');
 
 defineProps({
   showWithoutHeader: {
@@ -67,21 +64,29 @@ function formatDateTime(timeString) {
   });
 }
 
+const showSnackbarMessage = (text) => {
+  showSnackMessage.value = true;
+  snackMessageText.value = text;
+}
+
 async function addToFavourites(articleId) {
   try {
     await axios.post(`${store.state.API_URL}/api/saved-articles/${articleId}`, '', store.state.config);
-    console.log(`Статья ${articleId} добавлена в избранное пользователя ${store.state.nickname}`);
+    showSnackbarMessage('Статья успешно добавлено в избранное');
   } catch (e) {
     console.log(e)
+    showSnackbarMessage('При удалении из избранного произошла ошибка');
   }
 }
 
 async function deleteFromFavourites(articleId) {
   try {
     await axios.delete(`${store.state.API_URL}/api/saved-articles/${articleId}`, store.state.config);
-    console.log(`Статья ${articleId} удалена из избранного пользователя ${store.state.nickname}`);
+    showSnackbarMessage('Статья успешно удалена из избранного');
   } catch (e) {
     console.log(e)
+    showSnackbarMessage('При удалении из избранного произошла ошибка');
+
   }
 }
 const shareArticle = async (articleId, shareType) => {
@@ -212,9 +217,11 @@ export default {
 
                   </v-radio-group>
                   <div class = "px-5">
-                    <div class="">Сообщение (необязательно) </div>
+                    <div class="">Сообщение (обязательно) </div>
 
                     <v-textarea
+                      :error-messages="reportReasonText.length < 5 ? 'Сообщение должно содержать как минимум 5 символов' : '' ||
+                                       reportReasonText.length > 500 ? 'Превышен лимит, сообщение будет урезано до 500 символов.' : ''"
                       :counter="500"
                       class="mb-2"
                       rows="2"
@@ -231,13 +238,23 @@ export default {
                       text="Отправить"
                       variant="flat"
                       @click="async () => {
+                        if (reportReasonText.length < 5) {
+                          showSnackbarMessage('Ну написано же...');
+                          return;
+                        } else if (reportReasonText.length > 500) {
+                          reportReasonText = reportReasonText.slice(0, 500);
+                        }
                         if (store.state.isAuthorized) {
                           const data = {
                             reason: reportReason,
                             text: reportReasonText
                           }
-                          await axios.post(`${store.state.API_URL}/api/complaints/${articleId}`, data, store.state.config);
-                          console.log(`Жалоба на статью ${articleId} с причиной ${reportReason} и комментарием ${reportReasonText}`);
+                          try {
+                            await axios.post(`${store.state.API_URL}/api/complaints/${articleId}`, data, store.state.config);                            showSnackbarMessage('Произошла ошибка при отправке жалобы');
+                            showSnackbarMessage('Жалоба успешно отправлена');
+                          } catch (e) {
+                            showSnackbarMessage('Произошла ошибка при отправке жалобы');
+                          }
                           isActive.value = false;
                         } else {
                           await router.push('/auth');
@@ -404,7 +421,7 @@ export default {
                         @click="() =>
                          {
                            copyText(shareLink);
-                           showShareSnackMessage = true;
+                           showSnackbarMessage('Ссылка успешно скопирована');
                          }"> Копировать
                       </v-btn>
 
@@ -419,12 +436,11 @@ export default {
                                   isValidShareEmail = true;
                                   try {
                                     await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
-                                    showEmailShareSnackMessage = true;
+                                    showSnackbarMessage('Сообщение успешно отправлено');
                                   } catch (e) {
-                                    console.error(e);
+                                    showSnackbarMessage('При отправлении произошла ошибка');
                                   }
                                 } else {
-                                  console.log('invalid')
                                   isValidShareEmail = false;
                                 }
                              }"> Отправить
@@ -437,18 +453,6 @@ export default {
                           @click="isActive.value = false"
                         ></v-btn>
                       </v-card-actions>
-                      <v-snackbar
-                        v-model="showShareSnackMessage"
-                        :timeout="3000"
-                      >
-                        Ссылка успешно скопирована
-                      </v-snackbar>
-                      <v-snackbar
-                        v-model="showEmailShareSnackMessage"
-                        :timeout="3000"
-                      >
-                        Сообщение успешно отправлено
-                      </v-snackbar>
                     </v-card>
                   </template>
                 </v-dialog>
@@ -473,6 +477,22 @@ export default {
       </div>
     </div>
   </article>
+  <v-snackbar
+    v-model="showSnackMessage"
+    :timeout="3000"
+  >
+    {{ snackMessageText }}
+
+    <template v-slot:actions>
+      <v-btn
+        color="purple"
+        variant="text"
+        @click="showSnackMessage = false"
+      >
+        Закрыть
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <style scoped>

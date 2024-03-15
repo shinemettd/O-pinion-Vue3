@@ -26,7 +26,7 @@
           :postedTimeAgo="article.date_time"
           :article-id="article.id"
           :article-title="article.title"
-          :article-main-picture-url="cutImagePath(article.cover_image)"
+          :article-main-picture-url="article.cover_image"
           :article-short-description="article.short_description"
           :article-rating="article.rating"
           :article-in-favourites="article.in_favourites"
@@ -97,14 +97,6 @@ const sortByPopularity = () => {
 const setPage = async (page) => {
   currentPage.value = page;
   await getArticles();
-}
-
-function cutImagePath(absolutePath) {
-  if (absolutePath === null) {
-    return null;
-  }
-  const shortPath = absolutePath.substring(absolutePath.indexOf("/images/"));
-  return shortPath;
 }
 
 const isAuthorized = async () => {

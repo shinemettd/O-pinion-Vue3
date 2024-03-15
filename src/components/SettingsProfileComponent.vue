@@ -18,12 +18,18 @@
         <strong> <p class = "mt-3 ml-3"> Ваши общие данные: </p></strong>
         <v-container>
           <div class = "header border-collapse mb-5" style = "display: flex;">
-            <div class = "avatar mr-5">
-              <img :src = "avatarUrl"
+            <div class = "user-avatar mr-5">
+              <img :src = "newAvatar || avatarUrl"
                    alt="user avatar"
-                   style = "height: 9em;
-                   width: 9em;
-                   border-radius: 50%">
+                   @click="openFileChooser"
+              >
+              <input ref="fileInput"
+                     type="file"
+                     accept="image/*"
+                     style="display: none"
+                     @change="handleFileChange"
+              >
+              <p v-if="newAvatar" @click="newAvatar = null" class = "delete-avatar-text"> Очистить </p>
             </div>
             <div class = "user-data">
               <div class = "nickname-data">
@@ -165,8 +171,7 @@
               class="mb-2 mt-5"
               variant="tonal"
               color = "purple"
-              @click = "
-              async () => {
+              @click = "async () => {
                 const data = {
                     first_name: userData.firstName,
                     last_name: userData.lastName,
@@ -177,18 +182,20 @@
                 if (passwordValue !== '' && passwordValue === passwordConfirmationValue) {
                   try {
                     await axios.put(`${store.state.API_URL}/api/password/reset/${store.state.userToken}`, { password: passwordValue, confirm_password: passwordConfirmationValue});
-                    showSnackMessage = true;
+                    showSnackbarMessage('Данные успешно сохранены');
                   } catch (e) {
-                    console.error(e);
-                    showErrorSnackMessage = true;
+                    showSnackbarMessage('Произошла ошибка при сохранении');
                     return;
                   }
                 }
                 try {
                   await axios.put(`${store.state.API_URL}/api/users/change-data`, data, store.state.config);
-                  showSnackMessage = true;
+                  if (newAvatar !== null) {
+                      await loadAvatarImageOnServer();
+                  }
+                  showSnackbarMessage('Данные успешно сохранены');
                 } catch (e) {
-                  console.error(e);
+                  showSnackbarMessage('Произошла ошибка при сохранении');
                 }
               }"
             >
@@ -198,29 +205,13 @@
               v-model="showSnackMessage"
               :timeout="3000"
             >
-             Данные были успешно сохранены
+              {{ snackMessageText }}
 
               <template v-slot:actions>
                 <v-btn
                   color="purple"
                   variant="text"
                   @click="showSnackMessage = false"
-                >
-                  Закрыть
-                </v-btn>
-              </template>
-            </v-snackbar>
-            <v-snackbar
-              v-model="showErrorSnackMessage"
-              :timeout="3000"
-            >
-              Произошла ошибка при сохранении
-
-              <template v-slot:actions>
-                <v-btn
-                  color="purple"
-                  variant="text"
-                  @click="showErrorSnackMessage = false"
                 >
                   Закрыть
                 </v-btn>
@@ -344,9 +335,9 @@
               @click = "async () => {
                 try {
                   await axios.put(`${store.state.API_URL}/api/privacy/change`, userPrivacySettings, store.state.config);
-                  showSnackMessage = true;
+                  showSnackbarMessage('Данные успешно сохранены');
                 } catch (e) {
-                  showErrorSnackMessage = true;
+                  showSnackbarMessage('Произошла ошибка при сохранении');
                   console.error(e);
                 }
               }"
@@ -357,29 +348,13 @@
               v-model="showSnackMessage"
               :timeout="3000"
             >
-              Данные были успешно сохранены
+              {{ snackMessageText }}
 
               <template v-slot:actions>
                 <v-btn
                   color="purple"
                   variant="text"
                   @click="showSnackMessage = false"
-                >
-                  Закрыть
-                </v-btn>
-              </template>
-            </v-snackbar>
-            <v-snackbar
-              v-model="showErrorSnackMessage"
-              :timeout="3000"
-            >
-              Произошла ошибка, попробуйте еще раз
-
-              <template v-slot:actions>
-                <v-btn
-                  color="purple"
-                  variant="text"
-                  @click="showErrorSnackMessage = false"
                 >
                   Закрыть
                 </v-btn>
@@ -398,21 +373,11 @@ import {onBeforeMount, ref} from "vue";
 import store from "@/store/store";
 import axios, {HttpStatusCode} from "axios";
 import router from "@/plugins/router";
-import config from "tailwindcss/defaultConfig";
 
 const tab = ref('personal');
 const showToggle = ref(0);
 const showSnackMessage = ref(false);
-const showErrorSnackMessage = ref(false);
-
-const name = ref(true);
-
-const userPrivacy = {
-  is_first_name_visible: true,
-  is_last_name_visible: true,
-  is_email_visible: false,
-  is_birth_date_visible: true
-}
+const snackMessageText = ref('');
 
 defineProps({
   firstName: {
@@ -455,6 +420,55 @@ const userBirthdate = ref({
 })
 
 const userPrivacySettings = ref({});
+
+const avatarUrl = ref('https://cdn-icons-png.flaticon.com/512/10/10938.png');
+const fileInput = ref(null);
+const newAvatar = ref(null);
+const newAvatarAsFile = ref(File);
+const openFileChooser = () => {
+  fileInput.value.click();
+};
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+
+    if (!file.type.startsWith('image/')) {
+      showSnackbarMessage('Выбранный файл не является изображением.');
+      return;
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      showSnackbarMessage('Максимальный размер картинки 4 МБ');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width < 400 || img.height < 400) {
+          showSnackbarMessage('Картинка не может быть разрешения меньше 400х400');
+          return;
+        } else if (img.width > 2000 || img.height > 2000) {
+          showSnackbarMessage('Картинка не может быть разрешения больше 2000х2000');
+          return;
+        }
+        newAvatar.value = reader.result;
+      };
+      img.src = reader.result;
+    };
+
+    newAvatarAsFile.value = file;
+  }
+};
+
+const showSnackbarMessage = (text) => {
+  showSnackMessage.value = true;
+  snackMessageText.value = text;
+}
 
 const distributeBirthdate = async (date) => {
   date = date.split('-').reverse();
@@ -501,9 +515,6 @@ const autoValidateDateNumber = (dateNumber) => {
   return dateNumber;
 }
 
-const checkEmail = async (email) => {
-}
-
 const checkNickname = async (nickname) => {
   if (nickname === store.state.nickname) {
     isNicknameTaken.value = false;
@@ -524,6 +535,7 @@ const checkNickname = async (nickname) => {
 const getUserData = async () => {
   try {
     userData.value = (await axios.get(`${store.state.API_URL}/api/users/my-profile`, store.state.config)).data;
+    avatarUrl.value = userData._rawValue.avatar;
     await distributeBirthdate(userData._rawValue.birthDate);
   } catch (e) {
     console.error(e);
@@ -538,25 +550,19 @@ const getUserPrivacySettings = async () => {
   }
 }
 
-const setUserPrivacySettings = async () => {
-  console.log(userData.email);
-  if (store.state.email !== userData.email) {
-    try {
-      const response = await axios.put(`${store.state.API_URL}/api/users/change-email`, userData.email, store.state.config);
-      if (response.status === HttpStatusCode.Ok) {
-        store.commit('setEmail', userData.email);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
+const loadAvatarImageOnServer = async () => {
   try {
-    const response = await axios.put(`${store.state.API_URL}/api/users/change-data`, userData, store.state.config);
-    if (response.status === HttpStatusCode.Ok) {
-      console.log('changed')
-    }
-  } catch (e) {
-    console.error(e);
+    const formData = new FormData();
+    formData.append('photo', newAvatarAsFile._value);
+    await axios.put(`${store.state.API_URL}/api/images/change-avatar`, formData, {
+      headers: {
+        'Authorization': `Bearer ${store.state.userToken}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    showSnackbarMessage('Изображение успешно загружено:');
+  } catch (error) {
+    showSnackbarMessage('При загрузки изображения произошла ошибка');
   }
 }
 
@@ -579,7 +585,6 @@ onBeforeMount(async () => {
   }
   await getUserData();
   await getUserPrivacySettings();
-  console.log(userData)
 });
 
 </script>
@@ -587,13 +592,23 @@ onBeforeMount(async () => {
 <style scoped>
 
 .user-avatar img {
-  width: 8em;
-  height: 8em;
+  width: 9em;
+  height: 9em;
   border-radius: 50%;
 }
 
 .user-avatar img:hover {
-  border-radius: 0%;
+  filter: brightness(50%);
+  cursor: pointer;
+}
+
+.delete-avatar-text {
+  margin-left: 2.25em;
+}
+
+.delete-avatar-text:hover {
+  cursor: pointer;
+  color: red;
 }
 
 @media screen and (max-width: 767px) {
@@ -610,10 +625,8 @@ onBeforeMount(async () => {
 }
 
 @media screen and (min-width: 768px) {
-
   .scroll {
     width: 50%;
   }
 }
-
 </style>

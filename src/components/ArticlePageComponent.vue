@@ -16,9 +16,6 @@ const showEmailShareSnackMessage = ref(false);
 const shareEmailAddress = ref('');
 
 const userComment = ref('');
-const stickyCommentWriterField = ref(true);
-
-const formattedComment = ref('');
 
 const sendEmptyComment = ref(false);
 const sendTooShortComment = ref(false);
@@ -26,7 +23,14 @@ const sendTooLongComment = ref(false);
 const isCommentReply = ref(false);
 const replyCommentId = ref(undefined);
 const replyCommentAuthorsNickname = ref('');
+const isCommentEditing = ref(false);
+const editingCommentId = ref(-1);
 const successGetNewComments = ref(false);
+const deleteCommentDialog = ref(false);
+
+const snackMessageText = ref('');
+const showSnackMessage = ref(false);
+
 
 const icons = [
   'mdi-emoticon',
@@ -64,6 +68,21 @@ const props = defineProps({
     type: Function,
     default() {
     }
+  },
+  loadTotalCommentsValue: {
+    type: Function,
+    default() {
+    }
+  },
+  loadTotalFavouritesValue: {
+    type: Function,
+    default() {
+    }
+  },
+  loadReactionType: {
+    type: Function,
+      default() {
+    }
   }
 })
 
@@ -80,13 +99,34 @@ async function sendComment(comment, articleId) {
   }
 
   try {
-    let response;
     if (!isCommentReply.value) {
-      response = await axios.post(`${store.state.API_URL}/api/article-comments/${articleId}`, {text: comment}, store.state.config);
-
+      await axios.post(`${store.state.API_URL}/api/article-comments/${articleId}`, { text: comment }, store.state.config);
     } else {
-      response = await axios.post(`${store.state.API_URL}/api/article-comments/${replyCommentId.value}/replies`, {text: comment}, store.state.config);
+      await axios.post(`${store.state.API_URL}/api/article-comments/${replyCommentId.value}/replies`, { text: comment }, store.state.config);
     }
+    await props.loadComments();
+    successGetNewComments.value = true;
+  } catch (e) {
+    console.error(e);
+    successGetNewComments.value = false;
+  }
+  clearComment();
+}
+
+async function sendEditComment(commentId, commentText) {
+  if (commentText.length === 0) {
+    await setSendEmptyComment();
+    return;
+  } else if (commentText.length > 255) {
+    await setSendTooLongComment();
+    return;
+  } else if (commentText.length < 5) {
+    await setSendTooShortComment();
+    return;
+  }
+
+  try {
+    await axios.put(`${store.state.API_URL}/api/article-comments/${commentId}`, { text: commentText }, store.state.config);
     await props.loadComments();
     successGetNewComments.value = true;
   } catch (e) {
@@ -106,6 +146,17 @@ async function replyTo(commentAuthorNickname, commentId) {
 function cancelReply() {
   isCommentReply.value = false;
   replyCommentId.value = undefined;
+}
+
+async function editComment(commentId, newCommentText) {
+  isCommentEditing.value = true;
+  userComment.value = newCommentText;
+  editingCommentId.value = commentId;
+}
+
+function cancelEdit() {
+  isCommentEditing.value = false;
+  editingCommentId.value = undefined;
 }
 
 const setSendEmptyComment = async () => {
@@ -128,13 +179,29 @@ const setSendTooLongComment = async () => {
 function clearComment () {
   userComment.value = ''
   cancelReply();
+  cancelEdit();
+}
+
+const deleteComment = async (commentId) => {
+  try {
+    await axios.delete(`${store.state.API_URL}/api/article-comments/${commentId}`, store.state.config);
+    await props.loadComments();
+    showSnackbarMessage('Комментарий удален');
+  } catch (e) {
+    showSnackbarMessage('Произошла ошибка при удалении комментария');
+  }
+}
+
+const showSnackbarMessage = (text) => {
+  showSnackMessage.value = true;
+  snackMessageText.value = text;
 }
 
 async function addToFavourites(articleId) {
   try {
     await axios.post(`${store.state.API_URL}/api/saved-articles/${articleId}`, '', store.state.config);
   } catch (e) {
-    console.error(e)
+    showSnackbarMessage('Произошла ошибка при добавлении в избранное');
   }
 }
 
@@ -142,7 +209,7 @@ async function deleteFromFavourites(articleId) {
   try {
     await axios.delete(`${store.state.API_URL}/api/saved-articles/${articleId}`, store.state.config);
   } catch (e) {
-    console.error(e)
+    showSnackbarMessage('Произошла ошибка при удалении комментария');
   }
 }
 
@@ -153,14 +220,12 @@ const shareArticle = async (articleId, shareType) => {
       shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
     } catch (e) {
       shareLink.value = undefined;
-      console.error(e);
     }
   } else {
     try {
       shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
     } catch (e) {
       shareLink.value = undefined;
-      console.error(e);
     }
   }
 }
@@ -174,7 +239,7 @@ async function setLike() {
   try {
     await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
   } catch (e) {
-    console.error(e)
+    showSnackbarMessage('Произошла ошибка при попытке подключиться к серверу');
   }
 }
 
@@ -187,7 +252,7 @@ async function setDislike() {
   try {
     await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
   } catch (e) {
-    console.error(e)
+    showSnackbarMessage('Произошла ошибка при попытке подключиться к серверу');
   }
 }
 
@@ -234,7 +299,7 @@ function redirectIfNotAuthorized() {
           <ArticleMenuComponent
             style="float: right;"
             :articleStatus="articleStatus"
-            :authorsNickname="authorsNickname" 
+            :authorsNickname="authorsNickname"
             :articleId="articleId"
           />
         </div>
@@ -435,7 +500,7 @@ function redirectIfNotAuthorized() {
             Комментариев пока нет :(
           </div>
         </div>
-        <div class = "comments-list my-5" v-for = "comment in articleComments.content" :key="comment.id">
+        <div class = "comments-list my-5 ml-1" v-for = "comment in articleComments.content" :key="comment.id">
             <div class = "info-header">
               <div class = "user-avatar">
                 <router-link :to="`/user/${comment.user.nickname}`">
@@ -456,21 +521,35 @@ function redirectIfNotAuthorized() {
               </div>
               <div class = "my-2" style = "font-size: 0.85em">
                   <span
-                    class = "comment-reply-text"
+                    class = "comment-reply-text mr-2"
                     @click="async () =>
                     {
                       if (store.state.isAuthorized) {
-                        await replyTo(comment.user.nickname, comment.id)
+                          await replyTo(comment.user.nickname, comment.id);
                       } else {
-                         router.push('/auth')
+                         await router.push('/auth')
                        }
                     }"
-                  > Ответить </span>
+                  > <strong> Ответить </strong> </span>
+                <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                      class = "comment-edit-text mr-2"
+                      @click="async () =>
+                      {
+                        await editComment(comment.id, comment.text);
+                      }"
+                > <strong> Редактировать </strong> </span>
+                <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                      class = "comment-delete-text"
+                      @click="async () =>
+                      {
+                        await deleteComment(comment.id);
+                      }"
+                > <strong> Удалить </strong> </span>
               </div>
             </div>
 
           <div v-if = "comment.replies.length > 0">
-            <div class = "replies-list my-5 ml-11" v-for = "reply in comment.replies" :key="reply.id">
+            <div class = "replies-list my-5 ml-13" v-for = "reply in comment.replies" :key="reply.id">
               <div class = "info-header">
                 <div class = "user-avatar">
                   <router-link :to="`/user/${reply.user.nickname}`">
@@ -489,6 +568,33 @@ function redirectIfNotAuthorized() {
                 <div style = "font-size: 1.15em">
                   <p v-html="reply.text"></p>
                 </div>
+                <div class = "my-2" style = "font-size: 0.85em">
+                  <span
+                    class = "comment-reply-text mr-2"
+                    @click="async () =>
+                    {
+                      if (store.state.isAuthorized) {
+                          await replyTo(reply.user.nickname, comment.id);
+                      } else {
+                         await router.push('/auth')
+                       }
+                    }"
+                  > <strong> Ответить </strong> </span>
+                  <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                        class = "comment-edit-text mr-2"
+                        @click="async () =>
+                      {
+                        await editComment(reply.id, reply.text);
+                      }"
+                  > <strong> Редактировать </strong> </span>
+                  <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                        class = "comment-delete-text"
+                        @click="async () =>
+                      {
+                        await deleteComment(reply.id);
+                      }"
+                  > <strong> Удалить </strong> </span>
+                </div>
               </div>
               </div>
           </div>
@@ -498,6 +604,9 @@ function redirectIfNotAuthorized() {
           <div v-if="store.state.isAuthorized" class="mt-2">
                 <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
                   <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
+                </div>
+                <div class = "mb-2" v-if="isCommentEditing" style = "margin-top: -0.314em">
+                  <span> Изменение комментария </span> <v-icon @click="cancelEdit" style="margin-top: -0.17em;">mdi-close</v-icon>
                 </div>
                 <v-text-field
                   v-model="userComment"
@@ -510,7 +619,14 @@ function redirectIfNotAuthorized() {
                   :counter="255"
                   variant="outlined"
                   clearable
-                  @click:append="async() => { await sendComment(userComment, articleId); if (successGetNewComments) {articleTotalComments++}}"
+                  @click:append="
+                  async () => {
+                    if (!isCommentEditing) {
+                      await sendComment(userComment, articleId);
+                    } else {
+                      await sendEditComment(editingCommentId, userComment);
+                    }
+                  }"
                   @click:clear="clearComment"
                   @update:model-value="newComment => userComment = newComment"
                 ></v-text-field>
@@ -528,6 +644,22 @@ function redirectIfNotAuthorized() {
         </div>
       </div>
     </div>
+    <v-snackbar
+      v-model="showSnackMessage"
+      :timeout="3000"
+    >
+      {{ snackMessageText }}
+
+      <template v-slot:actions>
+        <v-btn
+          color="purple"
+          variant="text"
+          @click="showSnackMessage = false"
+        >
+          Закрыть
+        </v-btn>
+      </template>
+    </v-snackbar>
   </main>
 </template>
 
@@ -630,6 +762,25 @@ function redirectIfNotAuthorized() {
 
 .comment-user-data a:hover {
   color: rgb(120, 194, 255);
+}
+
+.comment-reply-text:hover, .comment-edit-text:hover {
+  cursor: pointer;
+  color: mediumpurple;
+  transition: all 0.35s ease;
+}
+
+.comment-delete-text:hover {
+  cursor: pointer;
+  color: red;
+  transition: all 0.35s ease;
+}
+
+.сomment-field {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  z-index: 1;
 }
 
 @media screen and (max-width: 720px) {
