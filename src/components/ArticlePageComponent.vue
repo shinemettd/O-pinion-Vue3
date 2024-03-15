@@ -500,7 +500,7 @@ function redirectIfNotAuthorized() {
             Комментариев пока нет :(
           </div>
         </div>
-        <div class = "comments-list my-5" v-for = "comment in articleComments.content" :key="comment.id">
+        <div class = "comments-list my-5 ml-1" v-for = "comment in articleComments.content" :key="comment.id">
             <div class = "info-header">
               <div class = "user-avatar">
                 <router-link :to="`/user/${comment.user.nickname}`">
@@ -549,7 +549,7 @@ function redirectIfNotAuthorized() {
             </div>
 
           <div v-if = "comment.replies.length > 0">
-            <div class = "replies-list my-5 ml-11" v-for = "reply in comment.replies" :key="reply.id">
+            <div class = "replies-list my-5 ml-13" v-for = "reply in comment.replies" :key="reply.id">
               <div class = "info-header">
                 <div class = "user-avatar">
                   <router-link :to="`/user/${reply.user.nickname}`">
