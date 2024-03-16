@@ -332,7 +332,7 @@ function redirectIfNotAuthorized() {
               }">
             </div>
           </div>
-          <div v-else class = "article-rating pl-1">
+          <div v-else class = "article-rating pl-1 pr-3">
               <div class = "article-rating-icon">
                 <img src="/icons/zap_icon.svg" alt="Rating Icon">
               </div>
