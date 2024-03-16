@@ -1,35 +1,49 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import HelloWorldPage from "@/pages/HelloWorldPage.vue";
 import MainPage from "@/pages/MainPage.vue";
-import TestArticle from "@/pages/TestArticle.vue";
-import Technology from '@/components/Technology.vue';
 import About from '@/components/About.vue';
-import Person from '@/components/Person.vue';
-import ArticleCreate from "@/components/ArticleCreate.vue";
-import Notification from "@/components/Notification.vue";
-import Science from "@/components/Science.vue";
-import Popular from "@/components/Popular.vue";
 
-export default createRouter({
+
+import Notification from "@/components/Notification.vue";
+import Register from "@/components/Register.vue";
+import Auth from "@/components/Auth.vue";
+import ArticlePage from "@/pages/ArticlePage.vue";
+import UserProfilePage from "@/pages/UserProfilePage.vue";
+import ArticleCreatePage from "@/pages/ArticleCreatePage.vue";
+import ArticleEditPage from "@/pages/ArticleEditPage.vue";
+import SuccessArticleCreationPage from "@/pages/SuccessArticleCreationPage";
+import PageNotFound from "@/pages/PageNotFound.vue";
+import store from "@/store/store";
+import SettingsPage from "@/pages/SettingsPage.vue";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
+
+const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/',
-      component: MainPage
+      component: MainPage,
+      meta: {
+        title: 'Главная'
+      }
     },
     {
-      path: '/hello-world',
-      component: HelloWorldPage
+      path: '/article/:articleId',
+      component: ArticlePage,
+      meta: {
+        title: '{articleTitle}' //доделать
+      },
     },
     {
-      path: '/test-article',
-      component: TestArticle
-    },
-
-    {
-      path: '/technology',
-      name: 'Technology',
-      component: Technology
+      path: '/user/:userNickname',
+      component: UserProfilePage,
+      meta: {
+        title: `Профиль`
+      },
+      beforeEnter: (to, from, next) => {
+        document.title = `Профиль ${to.params.userNickname}` || 'Профиль пользователя';
+        next();
+      }
     },
     {
       path: '/about',
@@ -37,29 +51,89 @@ export default createRouter({
       component: About
     },
     {
-      path: '/person',
-      name: 'Person',
-      component: Person
+      path: '/create-article',
+      name: 'ArticleCreatePage',
+      component: ArticleCreatePage,
+      meta: {
+        title: 'Создание статьи'
+      }
     },
     {
-      path: '/create-Article',
-      name: 'ArticleCreate',
-      component: ArticleCreate
+      path: '/edit-article/:articleId',
+      name: 'ArticleEditPage',
+      component: ArticleEditPage,
+      meta: {
+        title: 'Редактирование статьи'
+      }
+    },
+    {
+      path: '/create-article/success',
+      name: 'SuccessArticleCreationPage',
+      component: SuccessArticleCreationPage,
+      meta: {
+        title: 'Статья создана'
+      }
     },
     {
       path: '/notification',
       name: 'Notification',
-      component: Notification
+      component: Notification,
+      meta: {
+        title: 'Уведомления'
+      }
     },
     {
-      path: '/science',
-      name: 'Science',
-      component: Science
+      name: 'Auth',
+      path: '/auth',
+      component: Auth,
+      meta: {
+        title: 'Вход'
+      }
     },
     {
-      path: '/popular',
-      name: 'Popular',
-      component: Popular
+      name: 'Register',
+      path: '/register',
+      component: Register,
+      meta: {
+        title: 'Регистрация'
+      }
+    },
+    {
+      name: 'ForgotPassword',
+      path: '/forgot-password',
+      component: ForgotPasswordPage,
+      meta: {
+        title: 'Сброс пароля'
+      }
+    },
+    {
+      name: 'Settings',
+      path: '/settings',
+      component: SettingsPage,
+      meta: {
+        title: 'Настройки'
+      }
+    },
+    {
+      path: '/:catchAll(.*)',
+      component: PageNotFound,
+      meta: {
+        title: 'Страница не найдена'
+      }
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title ?? 'O!pinion';
+
+  const isAuthorized = store.state.isAuthorized;
+
+  if (isAuthorized && (to.path === '/register' || to.path === '/auth' || to.path === '/forgot-password')) {
+    next('/');
+  } else {
+    next();
+  }
+});
+
+export default router;
