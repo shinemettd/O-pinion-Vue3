@@ -358,8 +358,12 @@ export default {
       if(props.editedArticleId) {
         clearInterval(intervalId);
         console.log("Публикуем уже созданную отредактированную статью >>>");
-        await saveArticleChanges();
-        await undraftArticle();
+        await updateArticleOnServer();
+        const isSuccess = await undraftArticle();
+        if(isSuccess) {
+          alert('Ваша статья опубликована успешно !')
+          router.push('/');
+        }
         return;
       }
       sendArticleOnServer(`${store.state.API_URL}/api/articles`);
@@ -378,25 +382,22 @@ export default {
     const undraftArticle = async() => {
       try {
         const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}/undraft`, null, store.state.config);
-        if(response.status === HttpStatusCode.ok) {
-          alert('Ваша статья опубликована успешно !')
-          router.push('/');
-        }
-        
+        return true;
 
       } catch (error) {
         if (error.response && error.response.data && error.response.data.errors) {
           const serverErrors = error.response.data.errors;
           showModal(null, serverErrors);
+          return false;
 
         } else {
           console.error('Error submitting article:', error);
+          return false;
         }
       }
     }
 
     async function saveArticleChanges () {
-      saveCoverImageChanges();
       await updateArticleOnServer();
       alert('Ваши изменения сохранены успешно !');
       router.push('/');
@@ -405,6 +406,7 @@ export default {
     
 
     async function updateArticleOnServer() {
+      saveCoverImageChanges();
         try {
           const data = {
             title: title.value,
