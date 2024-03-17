@@ -1,12 +1,14 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import axios from "axios";
 import store from "@/store/store";
 import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
 import ArticleMenuComponent from "@/components/ArticleMenuComponent.vue";
 
-const reaction = ref('');
+const reaction = ref('NOTHING');
+const reactionLikeIconPath = ref('/icons/chevron_up_icon.svg');
+const reactionDislikeIconPath = ref('/icons/chevron_down_icon.svg');
 const shareBy = ref('link');
 const shareSortToggle = ref(0);
 const shareLink = ref('');
@@ -26,22 +28,9 @@ const replyCommentAuthorsNickname = ref('');
 const isCommentEditing = ref(false);
 const editingCommentId = ref(-1);
 const successGetNewComments = ref(false);
-const deleteCommentDialog = ref(false);
 
 const snackMessageText = ref('');
 const showSnackMessage = ref(false);
-
-
-const icons = [
-  'mdi-emoticon',
-  'mdi-emoticon-cool',
-  'mdi-emoticon-dead',
-  'mdi-emoticon-excited',
-  'mdi-emoticon-happy',
-  'mdi-emoticon-neutral',
-  'mdi-emoticon-sad',
-  'mdi-emoticon-tongue',
-]
 
 const props = defineProps({
   authorsNickname: String,
@@ -81,7 +70,7 @@ const props = defineProps({
   },
   loadReactionType: {
     type: Function,
-      default() {
+    default() {
     }
   }
 })
@@ -137,6 +126,8 @@ async function sendEditComment(commentId, commentText) {
 }
 
 async function replyTo(commentAuthorNickname, commentId) {
+  cancelEdit();
+  cancelReply();
   isCommentReply.value = true;
   replyCommentAuthorsNickname.value = commentAuthorNickname;
   // userComment.value = `@${commentAuthorNickname}, ${userComment}`;
@@ -146,9 +137,12 @@ async function replyTo(commentAuthorNickname, commentId) {
 function cancelReply() {
   isCommentReply.value = false;
   replyCommentId.value = undefined;
+  props.loadTotalCommentsValue();
 }
 
 async function editComment(commentId, newCommentText) {
+  cancelReply();
+  cancelEdit();
   isCommentEditing.value = true;
   userComment.value = newCommentText;
   editingCommentId.value = commentId;
@@ -241,6 +235,21 @@ async function setLike() {
   } catch (e) {
     showSnackbarMessage('Произошла ошибка при попытке подключиться к серверу');
   }
+
+  try {
+    reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${articleId}`, store.state.config)).data;
+    console.log(reaction.value);
+  } catch (e) {
+    reaction.value = 'NOTHING';
+  }
+
+  if (reaction.value === 'LIKE') {
+    reactionLikeIconPath.value = '/icons/chevron_up_icon_green.png';
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+  } else if (reaction.value === 'DISLIKE' || reaction.value === 'NOTHING') {
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+  }
 }
 
 async function setDislike() {
@@ -253,6 +262,20 @@ async function setDislike() {
     await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
   } catch (e) {
     showSnackbarMessage('Произошла ошибка при попытке подключиться к серверу');
+  }
+
+  try {
+    reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${articleId}`, store.state.config)).data;
+  } catch (e) {
+    reaction.value = 'NOTHING';
+  }
+
+  if (reaction.value === 'DISLIKE') {
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon_red.png';
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
+  } else if (reaction.value === 'LIKE' || reaction.value === 'NOTHING') {
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
   }
 }
 
@@ -273,6 +296,21 @@ function redirectIfNotAuthorized() {
     router.push('/auth');
   }
 }
+
+onMounted(async () => {
+  reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${props.articleId}`, store.state.config)).data;
+
+  if (reaction.value === 'LIKE') {
+    reactionLikeIconPath.value = '/icons/chevron_up_icon_green.png';
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+  } else if (reaction.value === 'DISLIKE') {
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon_red.png';
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
+  } else {
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
+  }
+})
 </script>
 
 <template>
@@ -317,7 +355,7 @@ function redirectIfNotAuthorized() {
         <div class = "article-footer">
           <div v-if = "store.state.isAuthorized" class = "article-rating">
             <div class = "article-rating-icon">
-              <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="async () => {
+              <img class = "article-reaction" :src="reactionLikeIconPath" alt="Rating Icon" @click="async () => {
                 await setLike();
                 articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
               }">
@@ -326,34 +364,42 @@ function redirectIfNotAuthorized() {
             <b v-else-if="articleRating < 0" if = "articleRating>0" style="color: red">{{ articleRating }}</b>
             <b v-else style="color: black">{{ articleRating }}</b>
             <div class = "article-rating-icon ml-3">
-              <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="async () => {
+              <img class = "article-reaction" :src="reactionDislikeIconPath" alt="Rating Icon" @click="async () => {
                 await setDislike();
                 articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
               }">
             </div>
           </div>
           <div v-else class = "article-rating pl-1 pr-3">
-              <div class = "article-rating-icon">
-                <img src="/icons/zap_icon.svg" alt="Rating Icon">
-              </div>
-              <b v-if = "articleRating>0" style="color: green">{{ articleRating }}</b>
-              <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
-              <b v-else style="color: black">{{ articleRating }}</b>
+            <div class = "article-rating-icon">
+              <img src="/icons/zap_icon.svg" alt="Rating Icon">
+            </div>
+            <b v-if = "articleRating>0" style="color: green">{{ articleRating }}</b>
+            <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
+            <b v-else style="color: black">{{ articleRating }}</b>
           </div>
           <div class = "article-favourites" style="margin-left: -1em">
-            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
+            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="async () => {
               redirectIfNotAuthorized();
-              deleteFromFavourites(articleId);
+              await deleteFromFavourites(articleId);
               articleInFavourites = false;
-              articleTotalFavourites--;}">
+              try {
+                articleTotalFavourites = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/total-favourites`)).data;
+              } catch (e) {
+                articleTotalFavourites--;
+              }}">
               <img src="/icons/star_icon.svg" alt = "Favourites Icon">
             </div>
             <div v-else class = article-not-in-favourites-icon>
-              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="() => {
+              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="async () => {
                 redirectIfNotAuthorized();
-                addToFavourites(articleId);
+                await addToFavourites(articleId);
                 articleInFavourites = true;
-                articleTotalFavourites++;}">
+                try {
+                  articleTotalFavourites = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/total-favourites`)).data;
+                } catch (e) {
+                  articleTotalFavourites++;
+                }}">
             </div>
             <b> {{ articleTotalFavourites }}</b>
           </div>
@@ -367,9 +413,6 @@ function redirectIfNotAuthorized() {
 
                 <template v-slot:default="{ isActive }">
                   <v-card title="Поделиться">
-                    <!--                      <v-card-text class = "text-center">-->
-                    <!--                        Выберите способ-->
-                    <!--                      </v-card-text>-->
                     <div class="w-full my-3 text-center">
                       <v-btn-toggle v-model="shareSortToggle" color="#20b2aa" class="ml-2" mandatory>
                         <v-btn
@@ -501,25 +544,25 @@ function redirectIfNotAuthorized() {
           </div>
         </div>
         <div class = "comments-list my-5 ml-1" v-for = "comment in articleComments.content" :key="comment.id">
-            <div class = "info-header">
-              <div class = "user-avatar">
-                <router-link :to="`/user/${comment.user.nickname}`">
-                  <img :src="comment.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
-                </router-link>
-              </div>
-              <div class = "comment-user-data">
-                <router-link :to="`/user/${comment.user.nickname}`">
-                  <p style = "font-weight: 700;"> {{ comment.user.nickname }}</p>
-                </router-link>
-                  <p v-if = "comment.altered" style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} (Изменено) </p>
-                  <p v-else style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} </p>
-              </div>
+          <div class = "info-header">
+            <div class = "user-avatar">
+              <router-link :to="`/user/${comment.user.nickname}`">
+                <img :src="comment.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
+              </router-link>
             </div>
-            <div class="my-2 ml-13">
-              <div style = "font-size: 1.15em">
-                <p v-html="comment.text"></p>
-              </div>
-              <div class = "my-2" style = "font-size: 0.85em">
+            <div class = "comment-user-data">
+              <router-link :to="`/user/${comment.user.nickname}`">
+                <p style = "font-weight: 700;"> {{ comment.user.nickname }}</p>
+              </router-link>
+              <p v-if = "comment.altered" style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} (Изменено) </p>
+              <p v-else style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} </p>
+            </div>
+          </div>
+          <div class="my-2 ml-13">
+            <div style = "font-size: 1.15em">
+              <p v-html="comment.text"></p>
+            </div>
+            <div class = "my-2" style = "font-size: 0.85em">
                   <span
                     class = "comment-reply-text mr-2"
                     @click="async () =>
@@ -531,22 +574,22 @@ function redirectIfNotAuthorized() {
                        }
                     }"
                   > <strong> Ответить </strong> </span>
-                <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
-                      class = "comment-edit-text mr-2"
-                      @click="async () =>
+              <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                    class = "comment-edit-text mr-2"
+                    @click="async () =>
                       {
                         await editComment(comment.id, comment.text);
                       }"
-                > <strong> Редактировать </strong> </span>
-                <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
-                      class = "comment-delete-text"
-                      @click="async () =>
+              > <strong> Редактировать </strong> </span>
+              <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                    class = "comment-delete-text"
+                    @click="async () =>
                       {
                         await deleteComment(comment.id);
                       }"
-                > <strong> Удалить </strong> </span>
-              </div>
+              > <strong> Удалить </strong> </span>
             </div>
+          </div>
 
           <div v-if = "comment.replies.length > 0">
             <div class = "replies-list my-5 ml-13" v-for = "reply in comment.replies" :key="reply.id">
@@ -596,40 +639,45 @@ function redirectIfNotAuthorized() {
                   > <strong> Удалить </strong> </span>
                 </div>
               </div>
-              </div>
+            </div>
           </div>
         </div>
         <div class = "сomment-field">
           <hr class = "mt-5 pb-2">
           <div v-if="store.state.isAuthorized" class="mt-2">
-                <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
-                  <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
-                </div>
-                <div class = "mb-2" v-if="isCommentEditing" style = "margin-top: -0.314em">
-                  <span> Изменение комментария </span> <v-icon @click="cancelEdit" style="margin-top: -0.17em;">mdi-close</v-icon>
-                </div>
-                <v-text-field
-                  v-model="userComment"
-                  :append-icon="'mdi-send'"
-                  type="text"
-                  placeholder="Напишите комментарий"
-                  :error-messages="sendEmptyComment ? 'Ну не пустой комментарий же отправлять...' : '' ||
+            <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
+              <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
+            </div>
+            <div class = "mb-2" v-if="isCommentEditing" style = "margin-top: -0.314em">
+              <span> Изменение комментария </span> <v-icon @click="cancelEdit" style="margin-top: -0.17em;">mdi-close</v-icon>
+            </div>
+            <v-text-field
+              v-model="userComment"
+              :append-icon="'mdi-send'"
+              type="text"
+              placeholder="Напишите комментарий"
+              :error-messages="sendEmptyComment ? 'Ну не пустой комментарий же отправлять...' : '' ||
                                     sendTooShortComment ? 'Комментарий должен быть информативнее...' : '' ||
                                     sendTooLongComment ? 'Комментарий должен быть не настолько информативным!' : ''"
-                  :counter="255"
-                  variant="outlined"
-                  clearable
-                  @click:append="
+              :counter="255"
+              variant="outlined"
+              clearable
+              @click:append="
                   async () => {
                     if (!isCommentEditing) {
                       await sendComment(userComment, articleId);
                     } else {
                       await sendEditComment(editingCommentId, userComment);
                     }
+                    try {
+                      articleTotalComments = await axios.get(`${store.state.API_URL}/api/article-comments/${articleId}/total-comments`);
+                    } catch (e) {
+                      showSnackbarMessage('Произошла ошибка при подсчете комментариев');
+                    }
                   }"
-                  @click:clear="clearComment"
-                  @update:model-value="newComment => userComment = newComment"
-                ></v-text-field>
+              @click:clear="clearComment"
+              @update:model-value="newComment => userComment = newComment"
+            ></v-text-field>
             <hr>
           </div>
           <div v-else>
@@ -700,8 +748,16 @@ function redirectIfNotAuthorized() {
   opacity: 100%;
 }
 
+
 .article-reaction {
   cursor: pointer;
+  max-width: 1.51em;
+}
+
+.article-reaction:hover {
+  background-color: gray;
+  opacity: 40%;
+  border-radius: 50%;
 }
 
 .article-in-favourites-icon {

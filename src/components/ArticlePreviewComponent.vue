@@ -108,10 +108,6 @@ const shareArticle = async (articleId, shareType) => {
   }
 }
 
-const copyText = (text) => {
-  navigator.clipboard.writeText(text);
-}
-
 const getStatusText = (status) => {
   const statusMap = {
     'ON_MODERATION': 'На модерации',
@@ -123,8 +119,6 @@ const getStatusText = (status) => {
   };
   return statusMap[status] || status;
 };
-
-
 
 </script>
 
@@ -162,7 +156,7 @@ export default {
         </div>
         <ArticleMenuComponent
           :articleStatus="articleStatus"
-          :authorsNickname="authorsNickname" 
+          :authorsNickname="authorsNickname"
           :articleId="articleId"
         />
         <div class = "article-header-report" v-if="store.state.isAuthorized && (store.state.nickname !== authorsNickname)">
@@ -280,7 +274,7 @@ export default {
       <ArticleMenuComponent
           v-show = "showWithoutHeader"
           :articleStatus="articleStatus"
-          :authorsNickname="authorsNickname" 
+          :authorsNickname="authorsNickname"
           :articleId="articleId"
         />
 
@@ -353,9 +347,6 @@ export default {
 
                   <template v-slot:default="{ isActive }">
                     <v-card title="Поделиться">
-                      <!--                      <v-card-text class = "text-center">-->
-                      <!--                        Выберите способ-->
-                      <!--                      </v-card-text>-->
                       <div class="w-full my-3 text-center">
                         <v-btn-toggle v-model="shareSortToggle" color="#20b2aa" class="ml-2" mandatory>
                           <v-btn
@@ -395,12 +386,12 @@ export default {
                       </div>
                       <v-row>
                         <v-col cols="12" sm="12">
-                          <v-text-field
-                            v-if = "shareBy !== 'email'"
-                            class = "pt-3 mx-3"
-                            variant="outlined"
-                            readonly
-                          >{{ shareLink }}</v-text-field>
+                            <v-text-field
+                              v-if = "shareBy !== 'email'"
+                              class = "pt-3 mx-3"
+                              variant="outlined"
+                              readonly
+                            >{{ shareLink }}</v-text-field>
                           <v-text-field
                             v-else
                             :error-messages="!isValidShareEmail ? 'Введена неверная почта' : ''"
@@ -416,17 +407,7 @@ export default {
                       </v-row>
 
                       <v-btn
-                        v-if = "shareBy !== 'email'"
-                        style="margin-left: 10em; margin-right: 10em;"
-                        @click="() =>
-                         {
-                           copyText(shareLink);
-                           showSnackbarMessage('Ссылка успешно скопирована');
-                         }"> Копировать
-                      </v-btn>
-
-                      <v-btn
-                        v-else
+                        v-if = "shareBy === 'email'"
                         style="margin-left: 10em; margin-right: 10em;"
                         @click="async () =>
                              {

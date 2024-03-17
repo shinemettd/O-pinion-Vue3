@@ -35,12 +35,8 @@
           :article-total-views="article.total_views"
         />
       </div>
-      <div v-else class="text-center mt-7">Нет доступных статей.</div>
-      <div class="pagination">
-        <button @click="setPage(currentPage - 1)" :disabled="currentPage === 0">Предыдущая</button>
-        <span>Страница {{ currentPage + 1 }}</span>
-        <button @click="setPage(currentPage + 1)" :disabled="currentPage === totalPages - 1">Следующая</button>
-      </div>
+      <div v-else class="text-center mt-7 pb-5"> Нет доступных статей </div>
+      <div v-if = "articles.length" v-observe-visibility="handleScrolledToBottom"> </div>
     </div>
   </main>
 </template>
@@ -63,9 +59,7 @@ const totalPages = ref(0);
 const getArticles = async () => {
   const config = {
     params: {
-      page: currentPage.value,
-      size: pageSize.value,
-      sort: sortBy.value,
+      sort: sortBy.value
     }
   };
 
@@ -76,12 +70,20 @@ const getArticles = async () => {
   }
 
   try {
-    const response = await axios.get(`${store.state.API_URL}/api/articles`, config);
-    articles.value = response.data.content;
+    const response = await axios.get(`${store.state.API_URL}/api/articles?page=${currentPage.value}`, config);
+    console.log(currentPage.value);
+    articles.value.push(...response.data.content);
     totalPages.value = response.data.totalPages;
   } catch (error) {
     console.error('Не удалось загрузить статьи:', error);
   }
+}
+
+const handleScrolledToBottom = (isVisible) => {
+  if (!isVisible) { return };
+  if (currentPage.value >= totalPages.value) { return };
+  currentPage.value += 1;
+  getArticles();
 }
 
 const sortByDateTime = () => {
