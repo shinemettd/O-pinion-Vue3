@@ -63,7 +63,6 @@
         :showModal="showModal"
         :isImageValid="isImageValid"
         :editedArticleContent="editedArticleContent"
-        :setHasUnsavedChanges="setHasUnsavedChanges"
         />
       <TagZone v-if="!article" ref="ArticleCreateTagZoneRef" />
       <TagZone v-if="article" ref="EditArticleTagZoneRef" :editedArticleTags="article.tags"/>
@@ -115,7 +114,6 @@ export default {
     const EditorComponentRef = ref(null);
     const ArticleCreateTagZoneRef = ref(null);
     const EditArticleTagZoneRef = ref(null);
-    const hasUnsavedChanges = ref(false);
 
     onMounted(() => {
 
@@ -136,31 +134,8 @@ export default {
     });
 
 
-    function setHasUnsavedChanges (value)  {
-      hasUnsavedChanges.value = value;
-    }
-
-    const warnBeforeUnload = (event) => {
-      event.preventDefault();
-      event.returnValue = ''; 
-    };
-
-    if(props.editedArticleId) {
-      window.addEventListener('beforeunload', warnBeforeUnload); // для перезагрузки страницы
-     
-    }
-    
-
     onBeforeUnmount(() => {
-      if(props.editedArticleId) {
-        
-        window.removeEventListener('beforeunload', warnBeforeUnload);
-      
-        // удаление картинок 
-        if(ArticleEditorComponentRef.value && hasUnsavedChanges.value) {
-          ArticleEditorComponentRef.value.deleteNewContentImages();
-        }
-      }
+    
       
     });
 
@@ -403,7 +378,6 @@ export default {
 
     const saveArticleChanges = async() => {
       saveCoverImageChanges();
-      saveContentImagesChanges();
       try {
         const data = {
           title: title.value,
@@ -418,7 +392,6 @@ export default {
         const imagePath = await loadCoverImageOnServer(response.data.id);
         console.log('cover image path :' + imagePath);
         alert('Ваши изменения сохранены успешно !');
-        hasUnsavedChanges.value = false;
         router.push('/');
 
       } catch (error) {
@@ -429,12 +402,6 @@ export default {
         } else {
           console.error('Error submitting article:', error);
         }
-      }
-    }
-
-    const saveContentImagesChanges = () => {
-      if (ArticleEditorComponentRef.value) {
-        ArticleEditorComponentRef.value.saveContentImagesChanges();
       }
     }
     
@@ -545,7 +512,6 @@ export default {
       EditorComponentRef,
       ArticleCreateTagZoneRef,
       EditArticleTagZoneRef,
-      setHasUnsavedChanges
     };
 
   }
