@@ -298,6 +298,8 @@ function redirectIfNotAuthorized() {
 }
 
 onMounted(async () => {
+  document.title = props.articleTitle;
+
   reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${props.articleId}`, store.state.config)).data;
 
   if (reaction.value === 'LIKE') {

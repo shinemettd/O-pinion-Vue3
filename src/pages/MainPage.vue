@@ -71,7 +71,6 @@ const getArticles = async () => {
 
   try {
     const response = await axios.get(`${store.state.API_URL}/api/articles?page=${currentPage.value}`, config);
-    console.log(currentPage.value);
     articles.value.push(...response.data.content);
     totalPages.value = response.data.totalPages;
   } catch (error) {

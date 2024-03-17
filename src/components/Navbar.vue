@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav :class="['navbar', { 'sticky': isSticky }]">
+    <nav :class="['navbar']">
       <div class="container">
         <div class="navbar-menu">
           <router-link to="/" class="navbar-brand" style="font-size: 25px ">O!pinion</router-link>
