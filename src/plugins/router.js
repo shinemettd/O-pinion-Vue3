@@ -1,9 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import HelloWorldPage from "@/pages/HelloWorldPage.vue";
 import MainPage from "@/pages/MainPage.vue";
-import About from '@/components/About.vue';
-
-
 import Notification from "@/components/Notification.vue";
 import Register from "@/components/Register.vue";
 import Auth from "@/components/Auth.vue";
@@ -44,11 +40,6 @@ const router = createRouter({
         document.title = `Профиль ${to.params.userNickname}` || 'Профиль пользователя';
         next();
       }
-    },
-    {
-      path: '/about',
-      name: 'About',
-      component: About
     },
     {
       path: '/create-article',

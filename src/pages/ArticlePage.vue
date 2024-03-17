@@ -1,6 +1,6 @@
 <script setup>
 import axios, {HttpStatusCode} from "axios";
-import {onBeforeMount, onBeforeUnmount, onMounted, onUnmounted, ref} from "vue";
+import {onBeforeMount, ref} from "vue";
 import { useRoute } from 'vue-router';
 import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
 import store from "@/store/store";
@@ -11,7 +11,6 @@ const dataFetched = ref(false);
 
 const route = useRoute();
 const articleId = route.params.articleId;
-
 
 const getArticle = async () => {
   if (store.state.isAuthorized) {
@@ -24,14 +23,6 @@ const getArticle = async () => {
 
 const getComments = async () => {
   currentArticleComments.value = await axios.get(`${store.state.API_URL}/api/article-comments/${articleId}`);
-}
-
-function cutImagePath(absolutePath) {
-  if (absolutePath === null) {
-    return null;
-  }
-  const shortPath = absolutePath.substring(absolutePath.indexOf("/images/"));
-  return shortPath;
 }
 
 const isAuthorized = async () => {
@@ -61,7 +52,7 @@ onBeforeMount(async () => {
 
 <template>
   <ArticlePageComponent
-    :authors-avatar-url = "cutImagePath(currentArticle.data.author.avatar) || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
+    :authors-avatar-url = "currentArticle.data.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
     :authors-nickname = "currentArticle.data.author.nickname"
     :posted-time-ago = "currentArticle.data.date_time"
     :article-id = "currentArticle.data.id"

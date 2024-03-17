@@ -8,6 +8,6 @@
 </template>
 
 <script setup>
-  import Navbar from "@/components/Navbar.vue";
-  import store from "@/store/store";
+import Navbar from "@/components/Navbar.vue";
+import store from "@/store/store";
 </script>
