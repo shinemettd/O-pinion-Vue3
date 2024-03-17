@@ -116,13 +116,13 @@ export default {
     const EditorComponentRef = ref(null);
     const ArticleCreateTagZoneRef = ref(null);
     const EditArticleTagZoneRef = ref(null);
-    const intervalId = setInterval(() => {
-      console.log("Запускаем интервал ")
-      updateArticleOnServer();
-    }, 30000);
+    const intervalId = ref(null);
+
 
     onMounted(() => {
-      
+      if(props.editedArticleId) {
+        startIntervalIfNeeded();
+      }
       loadTitleFromLocalStorage();
       if(props.editedArticleCoverImage) {
         coverImageSrc.value = props.editedArticleCoverImage;
@@ -139,10 +139,19 @@ export default {
 
     });
 
+    function startIntervalIfNeeded() {
+        intervalId.value = setInterval(() => {
+          console.log("Запускаем интервал");
+          updateArticleOnServer();
+        }, 30000);
+    }
 
     onUnmounted(() => {
-      clearInterval(intervalId);
+      if (intervalId.value) {
+        clearInterval(intervalId.value);
+      }
     });
+  
 
 
     const loadTitleFromLocalStorage = () => {
@@ -347,6 +356,7 @@ export default {
 
     const submitArticle = async () => {
       if(props.editedArticleId) {
+        clearInterval(intervalId);
         console.log("Публикуем уже созданную отредактированную статью >>>");
         await saveArticleChanges();
         await undraftArticle();
@@ -357,6 +367,7 @@ export default {
 
     const saveAsDraft = () => {
       if(props.editedArticleId) {
+        clearInterval(intervalId);
         console.log("Редактируем уже созданную статью >>>");
         saveArticleChanges();
         return;
@@ -366,9 +377,12 @@ export default {
 
     const undraftArticle = async() => {
       try {
-        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}/undraft`, store.state.config);
-        alert('Ваша статья опубликована успешно !')
-        router.push('/');
+        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}/undraft`, null, store.state.config);
+        if(response.status === HttpStatusCode.ok) {
+          alert('Ваша статья опубликована успешно !')
+          router.push('/');
+        }
+        
 
       } catch (error) {
         if (error.response && error.response.data && error.response.data.errors) {
