@@ -38,6 +38,11 @@ const isUserAuthorized = store.state.isAuthorized;
 
 const articles = ref([]);
 const isArticlesFound = ref();
+const currentPage = ref(0);
+const totalPages = ref(0);
+
+const snackMessageText = ref('');
+const showSnackMessage = ref(false);
 
 function isUserItself() {
   return isUserAuthorized && userLink === store.state.nickname;
@@ -45,13 +50,30 @@ function isUserItself() {
 
 const getUserArticles = async () => {
   if (props.userId !== null) {
+    let response;
     if (isUserItself()) {
-      articles.value = (await axios.get(`${store.state.API_URL}/api/articles/my-articles`, store.state.config)).data.content;
+      response = (await axios.get(`${store.state.API_URL}/api/articles/my-articles?page=${currentPage.value}`, store.state.config)).data;
     } else {
-      articles.value = (await axios.get(`${store.state.API_URL}/api/articles/` + props.userId + '/articles')).data.content;
+      response = (await axios.get(`${store.state.API_URL}/api/articles/` + props.userId + `/articles?page=${currentPage.value}`)).data;
     }
+    totalPages.value = response.totalPages;
+    articles.value.push(...response.content)
     isArticlesFound.value = articles.value.length > 0;
+  } else {
+    showSnackbarMessage('Произошла ошибка при загрузке профиля');
   }
+}
+
+const handleScrolledToBottom = (isVisible) => {
+  if (!isVisible) { return };
+  if (currentPage.value >= totalPages.value) { return };
+  currentPage.value += 1;
+  getUserArticles();
+}
+
+const showSnackbarMessage = (text) => {
+  showSnackMessage.value = true;
+  snackMessageText.value = text;
 }
 
 onMounted(() => {
@@ -113,9 +135,25 @@ watch(() => props.userId, () => {
       <div v-else-if = "isArticlesFound === false" class = "text-center my-5">
         <h2> У пользователя пока нет статей :( </h2>
       </div>
+      <div v-if="articles.length" v-observe-visibility="handleScrolledToBottom"></div>
       <hr class = "my-5">
     </div>
+    <v-snackbar
+      v-model="showSnackMessage"
+      :timeout="3000"
+    >
+      {{ snackMessageText }}
 
+      <template v-slot:actions>
+        <v-btn
+          color="purple"
+          variant="text"
+          @click="showSnackMessage = false"
+        >
+          Закрыть
+        </v-btn>
+      </template>
+    </v-snackbar>
   </main>
 </template>
 

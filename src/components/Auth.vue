@@ -11,14 +11,17 @@ export default {
     const email = ref('');
     const password = ref('');
     const router = useRouter();
+    const isDataRight = ref(true);
 
     const login = async () => {
+      console.log(isDataRight);
       if (validateInputs()) {
         try {
           const response = await axios.post(`${store.state.API_URL}/api/auth/sign-in`, {
             email: email.value,
             password: password.value,
           });
+          isDataRight.value = true;
           const accessToken = response.data.access_token;
           localStorage.setItem('accessToken', accessToken);
           console.log(accessToken);
@@ -38,6 +41,10 @@ export default {
           await router.push('/');
         } catch (error) {
           console.error('Ошибка при входе:', error);
+          isDataRight.value = false;
+          setTimeout(() => {
+            isDataRight.value = true;
+          }, 10000);
         }
       }
     };
@@ -45,12 +52,6 @@ export default {
     const validateInputs = () => {
       if (!email.value.trim() || !password.value.trim()) {
         alert('Пожалуйста, заполните все поля.');
-        return false;
-      }
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email.value)) {
-        alert('Пожалуйста, введите корректный email.');
         return false;
       }
       return true;
@@ -61,6 +62,7 @@ export default {
       password,
       login,
       validateInputs,
+      isDataRight
     };
   },
 };
@@ -79,8 +81,10 @@ export default {
         <input type="text" v-model="email" id="email" class="fadeIn second" name="email" placeholder="Email">
         <input type="password" v-model="password" id="password" class="fadeIn third" name="password"
                placeholder="Пароль">
+        <p v-show = "!isDataRight" class="error-message" style = "font-size: 0.9em; color: red"> Неправильный логин или пароль</p>
         <input type="submit" class="fadeIn fourth" value="Войти">
       </form>
+
       <router-link to="/forgot-password">
         <button type="button" class="bbbd-btn" style="margin-bottom: 20px">
           Забыли пароль?

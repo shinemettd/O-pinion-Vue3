@@ -70,7 +70,7 @@ const props = defineProps({
   },
   loadReactionType: {
     type: Function,
-      default() {
+    default() {
     }
   }
 })
@@ -371,12 +371,12 @@ onMounted(async () => {
             </div>
           </div>
           <div v-else class = "article-rating pl-1 pr-3">
-              <div class = "article-rating-icon">
-                <img src="/icons/zap_icon.svg" alt="Rating Icon">
-              </div>
-              <b v-if = "articleRating>0" style="color: green">{{ articleRating }}</b>
-              <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
-              <b v-else style="color: black">{{ articleRating }}</b>
+            <div class = "article-rating-icon">
+              <img src="/icons/zap_icon.svg" alt="Rating Icon">
+            </div>
+            <b v-if = "articleRating>0" style="color: green">{{ articleRating }}</b>
+            <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
+            <b v-else style="color: black">{{ articleRating }}</b>
           </div>
           <div class = "article-favourites" style="margin-left: -1em">
             <div v-if="articleInFavourites" class = article-in-favourites-icon @click="async () => {
@@ -544,25 +544,25 @@ onMounted(async () => {
           </div>
         </div>
         <div class = "comments-list my-5 ml-1" v-for = "comment in articleComments.content" :key="comment.id">
-            <div class = "info-header">
-              <div class = "user-avatar">
-                <router-link :to="`/user/${comment.user.nickname}`">
-                  <img :src="comment.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
-                </router-link>
-              </div>
-              <div class = "comment-user-data">
-                <router-link :to="`/user/${comment.user.nickname}`">
-                  <p style = "font-weight: 700;"> {{ comment.user.nickname }}</p>
-                </router-link>
-                  <p v-if = "comment.altered" style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} (Изменено) </p>
-                  <p v-else style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} </p>
-              </div>
+          <div class = "info-header">
+            <div class = "user-avatar">
+              <router-link :to="`/user/${comment.user.nickname}`">
+                <img :src="comment.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
+              </router-link>
             </div>
-            <div class="my-2 ml-13">
-              <div style = "font-size: 1.15em">
-                <p v-html="comment.text"></p>
-              </div>
-              <div class = "my-2" style = "font-size: 0.85em">
+            <div class = "comment-user-data">
+              <router-link :to="`/user/${comment.user.nickname}`">
+                <p style = "font-weight: 700;"> {{ comment.user.nickname }}</p>
+              </router-link>
+              <p v-if = "comment.altered" style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} (Изменено) </p>
+              <p v-else style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(comment.date) }} </p>
+            </div>
+          </div>
+          <div class="my-2 ml-13">
+            <div style = "font-size: 1.15em">
+              <p v-html="comment.text"></p>
+            </div>
+            <div class = "my-2" style = "font-size: 0.85em">
                   <span
                     class = "comment-reply-text mr-2"
                     @click="async () =>
@@ -574,22 +574,22 @@ onMounted(async () => {
                        }
                     }"
                   > <strong> Ответить </strong> </span>
-                <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
-                      class = "comment-edit-text mr-2"
-                      @click="async () =>
+              <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                    class = "comment-edit-text mr-2"
+                    @click="async () =>
                       {
                         await editComment(comment.id, comment.text);
                       }"
-                > <strong> Редактировать </strong> </span>
-                <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
-                      class = "comment-delete-text"
-                      @click="async () =>
+              > <strong> Редактировать </strong> </span>
+              <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                    class = "comment-delete-text"
+                    @click="async () =>
                       {
                         await deleteComment(comment.id);
                       }"
-                > <strong> Удалить </strong> </span>
-              </div>
+              > <strong> Удалить </strong> </span>
             </div>
+          </div>
 
           <div v-if = "comment.replies.length > 0">
             <div class = "replies-list my-5 ml-13" v-for = "reply in comment.replies" :key="reply.id">
@@ -639,30 +639,30 @@ onMounted(async () => {
                   > <strong> Удалить </strong> </span>
                 </div>
               </div>
-              </div>
+            </div>
           </div>
         </div>
         <div class = "сomment-field">
           <hr class = "mt-5 pb-2">
           <div v-if="store.state.isAuthorized" class="mt-2">
-                <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
-                  <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
-                </div>
-                <div class = "mb-2" v-if="isCommentEditing" style = "margin-top: -0.314em">
-                  <span> Изменение комментария </span> <v-icon @click="cancelEdit" style="margin-top: -0.17em;">mdi-close</v-icon>
-                </div>
-                <v-text-field
-                  v-model="userComment"
-                  :append-icon="'mdi-send'"
-                  type="text"
-                  placeholder="Напишите комментарий"
-                  :error-messages="sendEmptyComment ? 'Ну не пустой комментарий же отправлять...' : '' ||
+            <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
+              <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
+            </div>
+            <div class = "mb-2" v-if="isCommentEditing" style = "margin-top: -0.314em">
+              <span> Изменение комментария </span> <v-icon @click="cancelEdit" style="margin-top: -0.17em;">mdi-close</v-icon>
+            </div>
+            <v-text-field
+              v-model="userComment"
+              :append-icon="'mdi-send'"
+              type="text"
+              placeholder="Напишите комментарий"
+              :error-messages="sendEmptyComment ? 'Ну не пустой комментарий же отправлять...' : '' ||
                                     sendTooShortComment ? 'Комментарий должен быть информативнее...' : '' ||
                                     sendTooLongComment ? 'Комментарий должен быть не настолько информативным!' : ''"
-                  :counter="255"
-                  variant="outlined"
-                  clearable
-                  @click:append="
+              :counter="255"
+              variant="outlined"
+              clearable
+              @click:append="
                   async () => {
                     if (!isCommentEditing) {
                       await sendComment(userComment, articleId);
@@ -675,9 +675,9 @@ onMounted(async () => {
                       showSnackbarMessage('Произошла ошибка при подсчете комментариев');
                     }
                   }"
-                  @click:clear="clearComment"
-                  @update:model-value="newComment => userComment = newComment"
-                ></v-text-field>
+              @click:clear="clearComment"
+              @update:model-value="newComment => userComment = newComment"
+            ></v-text-field>
             <hr>
           </div>
           <div v-else>
