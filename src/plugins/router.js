@@ -26,9 +26,6 @@ const router = createRouter({
     {
       path: '/article/:articleId',
       component: ArticlePage,
-      meta: {
-        title: '{articleTitle}' //доделать
-      },
     },
     {
       path: '/user/:userNickname',
