@@ -82,7 +82,7 @@ import Editor from "@/components/Editor.vue";
 
 import TagZone from "@/components/TagZone.vue";
 import axios, {HttpStatusCode} from "axios";
-import {ref, onMounted, onBeforeUnmount, onBeforeMount} from 'vue';
+import {ref, onMounted, onBeforeUnmount, onBeforeMount, onUnmounted} from 'vue';
 import router from '@/plugins/router';
 import store from "@/store/store";
 
@@ -92,7 +92,8 @@ export default {
     article: Object,
     editedArticleId : Number,
     editedArticleShortDescription : String,
-    editedArticleContent : String
+    editedArticleContent : String,
+    editedArticleCoverImage : String
   },
   components: {
     ArticleEditor,
@@ -115,9 +116,13 @@ export default {
     const EditorComponentRef = ref(null);
     const ArticleCreateTagZoneRef = ref(null);
     const EditArticleTagZoneRef = ref(null);
+    const intervalId = setInterval(() => {
+      console.log("Запускаем интервал ")
+      updateArticleOnServer();
+    }, 30000);
 
     onMounted(() => {
-
+      
       loadTitleFromLocalStorage();
       if(props.editedArticleCoverImage) {
         coverImageSrc.value = props.editedArticleCoverImage;
@@ -135,9 +140,8 @@ export default {
     });
 
 
-    onBeforeUnmount(() => {
-    
-      
+    onUnmounted(() => {
+      clearInterval(intervalId);
     });
 
 
