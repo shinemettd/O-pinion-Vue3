@@ -1,12 +1,14 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import axios from "axios";
 import store from "@/store/store";
 import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
 import ArticleMenuComponent from "@/components/ArticleMenuComponent.vue";
 
-const reaction = ref('');
+const reaction = ref('NOTHING');
+const reactionLikeIconPath = ref('/icons/chevron_up_icon.svg');
+const reactionDislikeIconPath = ref('/icons/chevron_down_icon.svg');
 const shareBy = ref('link');
 const shareSortToggle = ref(0);
 const shareLink = ref('');
@@ -26,22 +28,9 @@ const replyCommentAuthorsNickname = ref('');
 const isCommentEditing = ref(false);
 const editingCommentId = ref(-1);
 const successGetNewComments = ref(false);
-const deleteCommentDialog = ref(false);
 
 const snackMessageText = ref('');
 const showSnackMessage = ref(false);
-
-
-const icons = [
-  'mdi-emoticon',
-  'mdi-emoticon-cool',
-  'mdi-emoticon-dead',
-  'mdi-emoticon-excited',
-  'mdi-emoticon-happy',
-  'mdi-emoticon-neutral',
-  'mdi-emoticon-sad',
-  'mdi-emoticon-tongue',
-]
 
 const props = defineProps({
   authorsNickname: String,
@@ -137,8 +126,7 @@ async function sendEditComment(commentId, commentText) {
 }
 
 async function replyTo(commentAuthorNickname, commentId) {
-  isCommentEditing.value = false;
-  editingCommentId.value = undefined;
+  cancelEdit();
   cancelReply();
   isCommentReply.value = true;
   replyCommentAuthorsNickname.value = commentAuthorNickname;
@@ -149,11 +137,11 @@ async function replyTo(commentAuthorNickname, commentId) {
 function cancelReply() {
   isCommentReply.value = false;
   replyCommentId.value = undefined;
+  props.loadTotalCommentsValue();
 }
 
 async function editComment(commentId, newCommentText) {
-  isCommentReply.value = false;
-  replyCommentId.value = undefined;
+  cancelReply();
   cancelEdit();
   isCommentEditing.value = true;
   userComment.value = newCommentText;
@@ -247,6 +235,21 @@ async function setLike() {
   } catch (e) {
     showSnackbarMessage('Произошла ошибка при попытке подключиться к серверу');
   }
+
+  try {
+    reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${articleId}`, store.state.config)).data;
+    console.log(reaction.value);
+  } catch (e) {
+    reaction.value = 'NOTHING';
+  }
+
+  if (reaction.value === 'LIKE') {
+    reactionLikeIconPath.value = '/icons/chevron_up_icon_green.png';
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+  } else if (reaction.value === 'DISLIKE' || reaction.value === 'NOTHING') {
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+  }
 }
 
 async function setDislike() {
@@ -259,6 +262,20 @@ async function setDislike() {
     await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
   } catch (e) {
     showSnackbarMessage('Произошла ошибка при попытке подключиться к серверу');
+  }
+
+  try {
+    reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${articleId}`, store.state.config)).data;
+  } catch (e) {
+    reaction.value = 'NOTHING';
+  }
+
+  if (reaction.value === 'DISLIKE') {
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon_red.png';
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
+  } else if (reaction.value === 'LIKE' || reaction.value === 'NOTHING') {
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
   }
 }
 
@@ -279,6 +296,21 @@ function redirectIfNotAuthorized() {
     router.push('/auth');
   }
 }
+
+onMounted(async () => {
+  reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${props.articleId}`, store.state.config)).data;
+
+  if (reaction.value === 'LIKE') {
+    reactionLikeIconPath.value = '/icons/chevron_up_icon_green.png';
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+  } else if (reaction.value === 'DISLIKE') {
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon_red.png';
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
+  } else {
+    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
+    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
+  }
+})
 </script>
 
 <template>
@@ -323,7 +355,7 @@ function redirectIfNotAuthorized() {
         <div class = "article-footer">
           <div v-if = "store.state.isAuthorized" class = "article-rating">
             <div class = "article-rating-icon">
-              <img class = "article-reaction" src="/icons/chevron_up_icon.svg" alt="Rating Icon" @click="async () => {
+              <img class = "article-reaction" :src="reactionLikeIconPath" alt="Rating Icon" @click="async () => {
                 await setLike();
                 articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
               }">
@@ -332,7 +364,7 @@ function redirectIfNotAuthorized() {
             <b v-else-if="articleRating < 0" if = "articleRating>0" style="color: red">{{ articleRating }}</b>
             <b v-else style="color: black">{{ articleRating }}</b>
             <div class = "article-rating-icon ml-3">
-              <img class = "article-reaction" src="/icons/chevron_down_icon.svg" alt="Rating Icon" @click="async () => {
+              <img class = "article-reaction" :src="reactionDislikeIconPath" alt="Rating Icon" @click="async () => {
                 await setDislike();
                 articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
               }">
@@ -347,19 +379,27 @@ function redirectIfNotAuthorized() {
               <b v-else style="color: black">{{ articleRating }}</b>
           </div>
           <div class = "article-favourites" style="margin-left: -1em">
-            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="() => {
+            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="async () => {
               redirectIfNotAuthorized();
-              deleteFromFavourites(articleId);
+              await deleteFromFavourites(articleId);
               articleInFavourites = false;
-              articleTotalFavourites--;}">
+              try {
+                articleTotalFavourites = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/total-favourites`)).data;
+              } catch (e) {
+                articleTotalFavourites--;
+              }}">
               <img src="/icons/star_icon.svg" alt = "Favourites Icon">
             </div>
             <div v-else class = article-not-in-favourites-icon>
-              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="() => {
+              <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="async () => {
                 redirectIfNotAuthorized();
-                addToFavourites(articleId);
+                await addToFavourites(articleId);
                 articleInFavourites = true;
-                articleTotalFavourites++;}">
+                try {
+                  articleTotalFavourites = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/total-favourites`)).data;
+                } catch (e) {
+                  articleTotalFavourites++;
+                }}">
             </div>
             <b> {{ articleTotalFavourites }}</b>
           </div>
@@ -373,9 +413,6 @@ function redirectIfNotAuthorized() {
 
                 <template v-slot:default="{ isActive }">
                   <v-card title="Поделиться">
-                    <!--                      <v-card-text class = "text-center">-->
-                    <!--                        Выберите способ-->
-                    <!--                      </v-card-text>-->
                     <div class="w-full my-3 text-center">
                       <v-btn-toggle v-model="shareSortToggle" color="#20b2aa" class="ml-2" mandatory>
                         <v-btn
@@ -632,6 +669,11 @@ function redirectIfNotAuthorized() {
                     } else {
                       await sendEditComment(editingCommentId, userComment);
                     }
+                    try {
+                      articleTotalComments = await axios.get(`${store.state.API_URL}/api/article-comments/${articleId}/total-comments`);
+                    } catch (e) {
+                      showSnackbarMessage('Произошла ошибка при подсчете комментариев');
+                    }
                   }"
                   @click:clear="clearComment"
                   @update:model-value="newComment => userComment = newComment"
@@ -706,8 +748,16 @@ function redirectIfNotAuthorized() {
   opacity: 100%;
 }
 
+
 .article-reaction {
   cursor: pointer;
+  max-width: 1.51em;
+}
+
+.article-reaction:hover {
+  background-color: gray;
+  opacity: 40%;
+  border-radius: 50%;
 }
 
 .article-in-favourites-icon {
