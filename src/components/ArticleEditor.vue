@@ -279,6 +279,7 @@ export default {
                 console.log("Путь к изображению:", src);
                 contentEditor.commands.deleteSelection();
                 deleteImageFromServer(src);
+                props.updateArticleOnServer();
             }
         };
 
