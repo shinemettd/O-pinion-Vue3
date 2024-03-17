@@ -124,6 +124,7 @@ export default {
         showModal: Function,
         isImageValid : Function,
         editedArticleContent: String,
+        updateArticleOnServer : Function
     },
     components: {
         EditorContent,
@@ -462,13 +463,8 @@ export default {
             const imageFile = ref(event.target.files[0]);
             if(await props.isImageValid(imageFile)) {
                 console.log('valid image');
-                let imageURL = await loadImageOnServer(imageFile);
-                if(props.editedArticleContent && imageURL !== null) {
-                    newImages.value.push(imageURL);
-                    console.log("Новые картинки : " + newImages.value)
-                    props.setHasUnsavedChanges(true);
-                }
-
+                await loadImageOnServer(imageFile);
+                props.updateArticleOnServer();
             }
         };
 

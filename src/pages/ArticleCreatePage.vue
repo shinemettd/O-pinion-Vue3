@@ -63,6 +63,7 @@
         :showModal="showModal"
         :isImageValid="isImageValid"
         :editedArticleContent="editedArticleContent"
+        :updateArticleOnServer="updateArticleOnServer"
         />
       <TagZone v-if="!article" ref="ArticleCreateTagZoneRef" />
       <TagZone v-if="article" ref="EditArticleTagZoneRef" :editedArticleTags="article.tags"/>
@@ -376,35 +377,43 @@ export default {
       }
     }
 
-    const saveArticleChanges = async() => {
+    async function saveArticleChanges () {
       saveCoverImageChanges();
-      try {
-        const data = {
-          title: title.value,
-          short_description: getShortDescription(),
-          content: getHTMLContent(),
-          tags: getSelectedTags()
-        };
-        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}`, data, store.state.config);
-
-        console.log('id = ' + response.data.id);
-        // теперь присваиваем картинку статье
-        const imagePath = await loadCoverImageOnServer(response.data.id);
-        console.log('cover image path :' + imagePath);
-        alert('Ваши изменения сохранены успешно !');
-        router.push('/');
-
-      } catch (error) {
-        if (error.response && error.response.data && error.response.data.errors) {
-          const serverErrors = error.response.data.errors;
-          showModal(null, serverErrors);
-
-        } else {
-          console.error('Error submitting article:', error);
-        }
-      }
+      await updateArticleOnServer();
+      alert('Ваши изменения сохранены успешно !');
+      router.push('/');
+      
     }
     
+
+    async function updateArticleOnServer() {
+        try {
+          const data = {
+            title: title.value,
+            short_description: getShortDescription(),
+            content: getHTMLContent(),
+            tags: getSelectedTags()
+          };
+          const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}`, data, store.state.config);
+
+          console.log('id = ' + response.data.id);
+          // теперь присваиваем картинку статье
+          const imagePath = await loadCoverImageOnServer(response.data.id);
+          console.log('cover image path :' + imagePath);
+        
+
+        } catch (error) {
+          if (error.response && error.response.data && error.response.data.errors) {
+            const serverErrors = error.response.data.errors;
+            showModal(null, serverErrors);
+
+          } else {
+            console.error('Error submitting article:', error);
+          }
+        }
+    }
+
+
     const sendArticleOnServer = async(endpoint) => {
       try {
         const data = {
@@ -512,6 +521,7 @@ export default {
       EditorComponentRef,
       ArticleCreateTagZoneRef,
       EditArticleTagZoneRef,
+      updateArticleOnServer
     };
 
   }
