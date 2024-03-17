@@ -87,11 +87,13 @@ const handleScrolledToBottom = (isVisible) => {
 
 const sortByDateTime = () => {
   sortBy.value = 'dateTime,desc';
+  articles.value.splice(0, articles.value.length);
   setPage(0);
 }
 
 const sortByPopularity = () => {
   sortBy.value = 'viewsCount,desc';
+  articles.value.splice(0, articles.value.length);
   setPage(0);
 }
 
