@@ -191,9 +191,14 @@ export default {
     };
 
     const removeImage = async() => {
+      // если мы удаляем картинку которую изначально передавали 
+      if(props.editedArticleCoverImage && props.editedArticleCoverImage === coverImageSrc.value) {
+        await deleteArticleCoverImage(props.editedArticleId);
+      }
       coverImageFile.value = null;
       coverImageSrc.value = null;
       isCoverImageValid.value = false;
+
     };
 
     const deleteArticleCoverImage = async(articleId) => {
@@ -213,24 +218,7 @@ export default {
       }
     }
 
-    const saveCoverImageChanges = async() => {
-      // если пользователь меняет главное изображение 
-      if(props.editedArticleCoverImage === null && coverImageSrc.value !== null ) {
-        console.log("ПОЛЬЗОВАТЕЛЬ ДОБАВИЛ КАРТИНКУ");
-        await loadCoverImageOnServer(props.editedArticleId);
-        return;
-      }
-      if(props.editedArticleCoverImage !== null && coverImageSrc.value === null) {
-        console.log("ПОЛЬЗОВАТЕЛЬ УДАЛИЛ КАРТИНКУ");
-        await deleteArticleCoverImage(props.editedArticleId);
-        return;
-      }
-      if(props.editedArticleCoverImage !== coverImageSrc.value) {
-        console.log("ПОЛЬЗОВАТЕЛЬ ИЗМЕНИЛ КАРТИНКУ");
-        await deleteArticleCoverImage(props.editedArticleId);
-        await loadCoverImageOnServer(props.editedArticleId);
-      }
-    }
+   
     const handleFile = async (event) => {
       const files = event.target.files;
       handleCoverImage(files);
@@ -383,6 +371,7 @@ export default {
       if(props.editedArticleId) {
         clearInterval(intervalId);
         console.log("Редактируем уже созданную статью >>>");
+        await loadCoverImageOnServer(props.editedArticleId);
         var result = await updateArticleOnServer();
         console.log("result updateArticle " + result);
         if(result) {
@@ -433,7 +422,6 @@ export default {
     
 
     async function updateArticleOnServer() {
-      saveCoverImageChanges();
         try {
           const data = {
             title: title.value,
@@ -442,11 +430,6 @@ export default {
             tags: getSelectedTags()
           };
           const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}`, data, store.state.config);
-
-          console.log('id = ' + response.data.id);
-          // теперь присваиваем картинку статье
-          const imagePath = await loadCoverImageOnServer(response.data.id);
-          console.log('cover image path :' + imagePath);
           return true;
         
 
