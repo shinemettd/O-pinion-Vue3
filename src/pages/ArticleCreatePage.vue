@@ -354,12 +354,18 @@ export default {
     const submitArticle = async () => {
       if(props.editedArticleId) {
         clearInterval(intervalId);
-        console.log("Публикуем уже созданную отредактированную статью >>>");
-        await updateArticleOnServer();
-        const isSuccess = await undraftArticle();
+        await loadCoverImageOnServer(props.editedArticleId);
+        var isSuccess = await updateArticleOnServer();
+        console.log("result updateArticle " + isSuccess);
         if(isSuccess) {
-          alert('Ваша статья опубликована успешно !')
-          router.push('/');
+          isSuccess = await updateFromCacheToDB(props.editedArticleId);
+        }
+        console.log("result update from cache " + isSuccess);
+        if(isSuccess) {
+          isSuccess =  await undraftArticle();
+        }
+        if(isSuccess) {
+          router.push('/create-article/success');
         }
         return;
       }
@@ -367,20 +373,18 @@ export default {
     };
 
     const saveAsDraft = async() => {
-      console.log("In save as Draft");
       if(props.editedArticleId) {
         clearInterval(intervalId);
-        console.log("Редактируем уже созданную статью >>>");
         await loadCoverImageOnServer(props.editedArticleId);
         var result = await updateArticleOnServer();
         console.log("result updateArticle " + result);
         if(result) {
-          result = await updateFromCacheToDB();
+          result = await updateFromCacheToDB(props.editedArticleId);
         }
         console.log("result update from cache " + result);
         if(result) {
           alert('Ваши изменения сохранены успешно !');
-          router.push('/');
+          router.push(`/user/${store.state.nickname}`);
         }
         return;
       }
@@ -405,9 +409,9 @@ export default {
       }
     }
 
-    async function updateFromCacheToDB() {
+    async function updateFromCacheToDB(articleId) {
         try {
-          const response = await axios.put(`${store.state.API_URL}/api/articles/drafts/${props.editedArticleId}`, null, store.state.config);
+          const response = await axios.put(`${store.state.API_URL}/api/articles/drafts/${articleId}`, null, store.state.config);
           return true;
 
         } catch (error) {
@@ -453,10 +457,10 @@ export default {
         };
 
         const response = await axios.post(endpoint, data, store.state.config);
-
         console.log('id = ' + response.data.id);
         // теперь присваиваем картинку статье
         const imagePath = await loadCoverImageOnServer(response.data.id);
+        updateFromCacheToDB(response.data.id);
         console.log('cover image path :' + imagePath);
         // удаляем данные из localStorage
         localStorage.removeItem('articleContent');
