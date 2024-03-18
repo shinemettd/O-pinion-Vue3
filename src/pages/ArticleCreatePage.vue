@@ -192,7 +192,7 @@ export default {
 
     const removeImage = async() => {
       coverImageFile.value = null;
-      coverImageSrc.value = '';
+      coverImageSrc.value = null;
       isCoverImageValid.value = false;
     };
 
@@ -215,10 +215,19 @@ export default {
 
     const saveCoverImageChanges = async() => {
       // если пользователь меняет главное изображение 
-      if(props.editedArticleCoverImage !== coverImageSrc.value) {
-        // удаляем главнуб картинку 
+      if(props.editedArticleCoverImage === null && coverImageSrc.value !== null ) {
+        console.log("ПОЛЬЗОВАТЕЛЬ ДОБАВИЛ КАРТИНКУ");
+        await loadCoverImageOnServer(props.editedArticleId);
+        return;
+      }
+      if(props.editedArticleCoverImage !== null && coverImageSrc.value === null) {
+        console.log("ПОЛЬЗОВАТЕЛЬ УДАЛИЛ КАРТИНКУ");
         await deleteArticleCoverImage(props.editedArticleId);
-        // сохраняем новую 
+        return;
+      }
+      if(props.editedArticleCoverImage !== coverImageSrc.value) {
+        console.log("ПОЛЬЗОВАТЕЛЬ ИЗМЕНИЛ КАРТИНКУ");
+        await deleteArticleCoverImage(props.editedArticleId);
         await loadCoverImageOnServer(props.editedArticleId);
       }
     }
@@ -369,11 +378,21 @@ export default {
       sendArticleOnServer(`${store.state.API_URL}/api/articles`);
     };
 
-    const saveAsDraft = () => {
+    const saveAsDraft = async() => {
+      console.log("In save as Draft");
       if(props.editedArticleId) {
         clearInterval(intervalId);
         console.log("Редактируем уже созданную статью >>>");
-        saveArticleChanges();
+        var result = await updateArticleOnServer();
+        console.log("result updateArticle " + result);
+        if(result) {
+          result = await updateFromCacheToDB();
+        }
+        console.log("result update from cache " + result);
+        if(result) {
+          alert('Ваши изменения сохранены успешно !');
+          router.push('/');
+        }
         return;
       }
       sendArticleOnServer(`${store.state.API_URL}/api/articles/drafts`);
@@ -397,11 +416,19 @@ export default {
       }
     }
 
-    async function saveArticleChanges () {
-      await updateArticleOnServer();
-      alert('Ваши изменения сохранены успешно !');
-      router.push('/');
-      
+    async function updateFromCacheToDB() {
+        try {
+          const response = await axios.put(`${store.state.API_URL}/api/articles/drafts/${props.editedArticleId}`, null, store.state.config);
+          return true;
+
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.errors) {
+              const serverErrors = error.response.data.errors;
+              showModal(null, serverErrors);
+            }
+            return false;
+        }
+        
     }
     
 
@@ -420,16 +447,15 @@ export default {
           // теперь присваиваем картинку статье
           const imagePath = await loadCoverImageOnServer(response.data.id);
           console.log('cover image path :' + imagePath);
+          return true;
         
 
         } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {
             const serverErrors = error.response.data.errors;
             showModal(null, serverErrors);
-
-          } else {
-            console.error('Error submitting article:', error);
           }
+          return false;
         }
     }
 
