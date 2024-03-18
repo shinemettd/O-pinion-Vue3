@@ -116,13 +116,13 @@ export default {
     const EditorComponentRef = ref(null);
     const ArticleCreateTagZoneRef = ref(null);
     const EditArticleTagZoneRef = ref(null);
-    const intervalId = setInterval(() => {
-      console.log("Запускаем интервал ")
-      updateArticleOnServer();
-    }, 30000);
+    const intervalId = ref(null);
+
 
     onMounted(() => {
-      
+      if(props.editedArticleId) {
+        startIntervalIfNeeded();
+      }
       loadTitleFromLocalStorage();
       if(props.editedArticleCoverImage) {
         coverImageSrc.value = props.editedArticleCoverImage;
@@ -139,10 +139,19 @@ export default {
 
     });
 
+    function startIntervalIfNeeded() {
+        intervalId.value = setInterval(() => {
+          console.log("Запускаем интервал");
+          updateArticleOnServer();
+        }, 30000);
+    }
 
     onUnmounted(() => {
-      clearInterval(intervalId);
+      if (intervalId.value) {
+        clearInterval(intervalId.value);
+      }
     });
+  
 
 
     const loadTitleFromLocalStorage = () => {
@@ -182,9 +191,14 @@ export default {
     };
 
     const removeImage = async() => {
+      // если мы удаляем картинку которую изначально передавали 
+      if(props.editedArticleCoverImage && props.editedArticleCoverImage === coverImageSrc.value) {
+        await deleteArticleCoverImage(props.editedArticleId);
+      }
       coverImageFile.value = null;
-      coverImageSrc.value = '';
+      coverImageSrc.value = null;
       isCoverImageValid.value = false;
+
     };
 
     const deleteArticleCoverImage = async(articleId) => {
@@ -204,15 +218,7 @@ export default {
       }
     }
 
-    const saveCoverImageChanges = async() => {
-      // если пользователь меняет главное изображение 
-      if(props.editedArticleCoverImage !== coverImageSrc.value) {
-        // удаляем главнуб картинку 
-        await deleteArticleCoverImage(props.editedArticleId);
-        // сохраняем новую 
-        await loadCoverImageOnServer(props.editedArticleId);
-      }
-    }
+   
     const handleFile = async (event) => {
       const files = event.target.files;
       handleCoverImage(files);
@@ -347,18 +353,39 @@ export default {
 
     const submitArticle = async () => {
       if(props.editedArticleId) {
-        console.log("Публикуем уже созданную отредактированную статью >>>");
-        await saveArticleChanges();
-        await undraftArticle();
+        clearInterval(intervalId);
+        await loadCoverImageOnServer(props.editedArticleId);
+        var isSuccess = await updateArticleOnServer();
+        console.log("result updateArticle " + isSuccess);
+        if(isSuccess) {
+          isSuccess = await updateFromCacheToDB(props.editedArticleId);
+        }
+        console.log("result update from cache " + isSuccess);
+        if(isSuccess) {
+          isSuccess =  await undraftArticle();
+        }
+        if(isSuccess) {
+          router.push('/create-article/success');
+        }
         return;
       }
       sendArticleOnServer(`${store.state.API_URL}/api/articles`);
     };
 
-    const saveAsDraft = () => {
+    const saveAsDraft = async() => {
       if(props.editedArticleId) {
-        console.log("Редактируем уже созданную статью >>>");
-        saveArticleChanges();
+        clearInterval(intervalId);
+        await loadCoverImageOnServer(props.editedArticleId);
+        var result = await updateArticleOnServer();
+        console.log("result updateArticle " + result);
+        if(result) {
+          result = await updateFromCacheToDB(props.editedArticleId);
+        }
+        console.log("result update from cache " + result);
+        if(result) {
+          alert('Ваши изменения сохранены успешно !');
+          router.push(`/user/${store.state.nickname}`);
+        }
         return;
       }
       sendArticleOnServer(`${store.state.API_URL}/api/articles/drafts`);
@@ -366,27 +393,35 @@ export default {
 
     const undraftArticle = async() => {
       try {
-        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}/undraft`, store.state.config);
-        alert('Ваша статья опубликована успешно !')
-        router.push('/');
+        const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}/undraft`, null, store.state.config);
+        return true;
 
       } catch (error) {
         if (error.response && error.response.data && error.response.data.errors) {
           const serverErrors = error.response.data.errors;
           showModal(null, serverErrors);
+          return false;
 
         } else {
           console.error('Error submitting article:', error);
+          return false;
         }
       }
     }
 
-    async function saveArticleChanges () {
-      saveCoverImageChanges();
-      await updateArticleOnServer();
-      alert('Ваши изменения сохранены успешно !');
-      router.push('/');
-      
+    async function updateFromCacheToDB(articleId) {
+        try {
+          const response = await axios.put(`${store.state.API_URL}/api/articles/drafts/${articleId}`, null, store.state.config);
+          return true;
+
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.errors) {
+              const serverErrors = error.response.data.errors;
+              showModal(null, serverErrors);
+            }
+            return false;
+        }
+        
     }
     
 
@@ -399,21 +434,15 @@ export default {
             tags: getSelectedTags()
           };
           const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}`, data, store.state.config);
-
-          console.log('id = ' + response.data.id);
-          // теперь присваиваем картинку статье
-          const imagePath = await loadCoverImageOnServer(response.data.id);
-          console.log('cover image path :' + imagePath);
+          return true;
         
 
         } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {
             const serverErrors = error.response.data.errors;
             showModal(null, serverErrors);
-
-          } else {
-            console.error('Error submitting article:', error);
           }
+          return false;
         }
     }
 
@@ -428,10 +457,10 @@ export default {
         };
 
         const response = await axios.post(endpoint, data, store.state.config);
-
         console.log('id = ' + response.data.id);
         // теперь присваиваем картинку статье
         const imagePath = await loadCoverImageOnServer(response.data.id);
+        updateFromCacheToDB(response.data.id);
         console.log('cover image path :' + imagePath);
         // удаляем данные из localStorage
         localStorage.removeItem('articleContent');
