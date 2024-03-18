@@ -672,7 +672,7 @@ onMounted(async () => {
                       await sendEditComment(editingCommentId, userComment);
                     }
                     try {
-                      articleTotalComments = await axios.get(`${store.state.API_URL}/api/article-comments/${articleId}/total-comments`);
+                      articleTotalComments = (await axios.get(`${store.state.API_URL}/api/article-comments/${articleId}/total-comments`)).data;
                     } catch (e) {
                       showSnackbarMessage('Произошла ошибка при подсчете комментариев');
                     }
