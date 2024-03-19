@@ -1,5 +1,4 @@
 <template>
-    <!-- Hello from Editor ! -->
     <div class="editor-wrapper">
         <div class="editor">
             <div v-if="contentEditor" class="editor-tool">
@@ -125,7 +124,7 @@ export default {
         showModal: Function,
         isImageValid : Function,
         editedArticleContent: String,
-        setHasUnsavedChanges : Function
+        updateArticleOnServer : Function
     },
     components: {
         EditorContent,
@@ -136,8 +135,6 @@ export default {
         const contentLimit = ref(40000);
         const contentCharacterCountNumber = ref(0);
         const maxAcceptableImgNum = ref(3);
-        const contentImagesToDelete = ref([]);
-        const newImages = ref([]);
 
         const imageInput = ref(null);
 
@@ -217,7 +214,6 @@ export default {
 
         // Функция, которая будет вызвана после монтирования элемента в DOM
         onMounted(() => {
-            console.log("Картинки на удаление : " + contentImagesToDelete.value);
             if(props.editedArticleContent) {
                 contentEditor.commands.setContent(props.editedArticleContent);
             } else {
@@ -272,9 +268,7 @@ export default {
             if (!editor) {
                 return -1;
             }
-
-            var images = editor.querySelectorAll('img');
-
+             var images = editor.querySelectorAll('img');
             return images.length;
         }
 
@@ -284,19 +278,11 @@ export default {
                 const src = selection.node.attrs.src;
                 console.log("Путь к изображению:", src);
                 contentEditor.commands.deleteSelection();
-                if(props.editedArticleContent) {
-                    contentImagesToDelete.value.push(src);
-                    console.log("Картинки для удаления : " + contentImagesToDelete.value);
-                    return;
-                }
                 deleteImageFromServer(src);
+                props.updateArticleOnServer();
             }
         };
 
-        const addToContentImagesToDelete =(src) => {
-            contentImagesToDelete.value.push(src);
-            console.log("Картинки для удаления " + contentImagesToDelete.value);
-        }
 
         const deleteImageFromServer = async(imagePath) => {
             try {
@@ -315,24 +301,6 @@ export default {
 
         }
 
-        const deleteContentImages = async() => {
-            const promises = contentImagesToDelete.value.map(imagePath => deleteImageFromServer(imagePath));
-            // Выполнение всех запросов параллельно
-            await Promise.all(promises);
-        }
-        const deleteNewContentImages = async() => {
-            const promises = newImages.value.map(imagePath => deleteImageFromServer(imagePath));
-            // Выполнение всех запросов параллельно
-            await Promise.all(promises);
-        }
-
-        const saveContentImagesChanges = () => {
-            if(contentImagesToDelete.value) {
-                console.log("Пользователь удалял картинки в ходе редактирования");
-                deleteContentImages();
-            }
-            newImages.value = [];
-        }
         const getHTMLContent = () => {
             return contentEditor.getHTML();
         };
@@ -496,13 +464,8 @@ export default {
             const imageFile = ref(event.target.files[0]);
             if(await props.isImageValid(imageFile)) {
                 console.log('valid image');
-                let imageURL = await loadImageOnServer(imageFile);
-                if(props.editedArticleContent && imageURL !== null) {
-                    newImages.value.push(imageURL);
-                    console.log("Новые картинки : " + newImages.value)
-                    props.setHasUnsavedChanges(true);
-                }
-
+                await loadImageOnServer(imageFile);
+                props.updateArticleOnServer();
             }
         };
 
@@ -578,8 +541,6 @@ export default {
             toggleOrderedList,
             toggleBlockquote,
             setTextAlign,
-            saveContentImagesChanges,
-            deleteNewContentImages
         };
     },
 

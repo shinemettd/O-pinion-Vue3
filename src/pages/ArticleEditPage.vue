@@ -6,7 +6,6 @@
             :editedArticleTitle="article.title"
             :editedArticleShortDescription="article.short_description"
             :editedArticleContent="article.content"
-            :editedArtcileTags="article.tags"
             :editedArticleCoverImage="article.cover_image"
         />
     <div v-if="!articleValid">
