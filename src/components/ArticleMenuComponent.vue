@@ -1,5 +1,5 @@
 <template>
-    <div class="dropdown" v-if="store.state.isAuthorized && (store.state.nickname === authorsNickname)">
+   <div class="dropdown" v-if="store.state.isAuthorized && (store.state.nickname === authorsNickname)">
             <img src="/icons/three-points-menu.svg" alt="Menu" @click="toggleArticleMenu" class="menu-icon">
             <ul class="article-menu" v-if="articleMenuOpen" @mouseleave="articleMenuOpen = false">
               <li v-if="articleStatus !== 'DELETED'">
@@ -11,7 +11,7 @@
                 </router-link>
               </li>
               <li v-if="articleStatus !== 'DELETED'">
-                <button  @click="deleteArticle" style="color: red;">
+                <button  @click="showModal = true" style="color: red;">
                   Удалить статью
                 </button>
                 <img src="/icons/delete-article.svg" class="menu-icons" alt="icon"  @click="deleteArticle">
@@ -23,11 +23,23 @@
                 <img  src="/icons/undelete-article.svg"  class="menu-icons undelete-icon" alt="icon"  @click="restoreArticle">
               </li>
             </ul>
+            <div v-if="showModal" class="modal-wrapper">
+              <div class="modal">
+                <div class="modal-content">
+                  <p>Вы точно хотите удалить статью?</p>
+                  <div class="modal-btn">
+                    <button class="delete-btn"  @click="deleteArticle">Да, удалить</button>
+                    <button class="delete-btn cancel-btn" @click="showModal = false">Отмена</button>
+                  </div>
+                </div>
+            </div>
+          </div>
     </div>
 </template>
 <script>
 import { ref } from "vue";
 import {useStore} from "vuex";
+import axios, {HttpStatusCode} from "axios";
 
 
 export default {
@@ -39,6 +51,7 @@ export default {
     setup(props) {
     const articleMenuOpen = ref(false);
     const store = useStore();
+    const showModal = ref(false);
     
 
 
@@ -46,13 +59,48 @@ export default {
       articleMenuOpen.value = !articleMenuOpen.value;
     };
 
-    const deleteArticle = () => {
+    const deleteArticle = async() => {
+      showModal.value = false;
       console.log("delete article");
+      await deleteArticleRequest();
     };
 
-    const restoreArticle = () => {
+    const deleteArticleRequest = async() => {  
+      try {
+        const response = await axios.delete(`${store.state.API_URL}/api/articles/${props.articleId}`, store.state.config);
+        alert('Ваша статья успешно удалена ');
+
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.errors) {
+          const serverErrors = error.response.data.errors;
+          alert(serverErrors);
+
+        } else {
+          console.error('Ошибка удаления статьи ', error);
+        }
+      }
+    }
+
+    const restoreArticle = async() => {
       console.log("restore article");
+      await restoreArticleRequest();
     };
+
+    async function restoreArticleRequest() {
+        try {
+          const response = await axios.put(`${store.state.API_URL}/api/articles/restore/${props.articleId}`, null, store.state.config);
+          alert('Ваша статья успешно восстановлена ');
+
+
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.errors) {
+              const serverErrors = error.response.data.errors;
+              alert(serverErrors);
+            }
+            
+        }
+        
+    }
 
     return {
       articleMenuOpen,
@@ -60,6 +108,7 @@ export default {
       deleteArticle,
       restoreArticle,
       store,
+      showModal
     };
   }
 };
@@ -127,5 +176,49 @@ export default {
 .undelete-icon {
   width: 60px;
   height: 50px;
+}
+
+.modal {
+  display: block;
+  position: fixed; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgb(0, 0, 0); 
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  width: 30%;
+  height: 22%;
+}
+
+.modal-content p {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  margin-top: 15px;
+}
+.modal-btn {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.delete-btn {
+  display: block;
+  background-color: brown; 
+  color: aliceblue; 
+  border-radius: 10px;
+  padding: 10px;
+  margin: 20px;
+}
+.cancel-btn {
+  background-color: gray; 
 }
 </style>
