@@ -1,4 +1,5 @@
 <template>
+  <div>
     <div class="dropdown" v-if="store.state.isAuthorized && (store.state.nickname === authorsNickname)">
             <img src="/icons/three-points-menu.svg" alt="Menu" @click="toggleArticleMenu" class="menu-icon">
             <ul class="article-menu" v-if="articleMenuOpen" @mouseleave="articleMenuOpen = false">
@@ -11,7 +12,7 @@
                 </router-link>
               </li>
               <li v-if="articleStatus !== 'DELETED'">
-                <button  @click="deleteArticle" style="color: red;">
+                <button  @click="showModal = true" style="color: red;">
                   Удалить статью
                 </button>
                 <img src="/icons/delete-article.svg" class="menu-icons" alt="icon"  @click="deleteArticle">
@@ -24,6 +25,18 @@
               </li>
             </ul>
     </div>
+    <div v-if="showModal" class="modal-wrapper">
+      <div class="modal">
+      <div class="modal-content">
+        <p>Вы точно хотите удалить статью?</p>
+        <div class="modal-btn">
+          <button class="delete-btn"  @click="deleteArticle">Да, удалить</button>
+          <button class="delete-btn cancel-btn" @click="showModal = false">Отмена</button>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
 </template>
 <script>
 import { ref } from "vue";
@@ -39,6 +52,7 @@ export default {
     setup(props) {
     const articleMenuOpen = ref(false);
     const store = useStore();
+    const showModal = ref(false);
     
 
 
@@ -47,7 +61,9 @@ export default {
     };
 
     const deleteArticle = () => {
+      showModal.value = false;
       console.log("delete article");
+
     };
 
     const restoreArticle = () => {
@@ -60,6 +76,7 @@ export default {
       deleteArticle,
       restoreArticle,
       store,
+      showModal
     };
   }
 };
@@ -127,5 +144,54 @@ export default {
 .undelete-icon {
   width: 60px;
   height: 50px;
+}
+
+/* .modal-wrapper {
+  width: 100%;
+  height: 100%;
+  
+} */
+.modal {
+  display: block;
+  position: fixed; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgb(0, 0, 0); 
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  width: 30%;
+  height: 30%;
+}
+
+.modal-content p {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  margin-top: 15px;
+}
+.modal-btn {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.delete-btn {
+  display: block;
+  background-color: brown; 
+  color: aliceblue; 
+  border-radius: 10px;
+  padding: 10px;
+  margin: 20px;
+}
+.cancel-btn {
+  background-color: gray; 
 }
 </style>
