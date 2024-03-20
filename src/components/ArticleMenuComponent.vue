@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <div class="dropdown" v-if="store.state.isAuthorized && (store.state.nickname === authorsNickname)">
+   <div class="dropdown" v-if="store.state.isAuthorized && (store.state.nickname === authorsNickname)">
             <img src="/icons/three-points-menu.svg" alt="Menu" @click="toggleArticleMenu" class="menu-icon">
             <ul class="article-menu" v-if="articleMenuOpen" @mouseleave="articleMenuOpen = false">
               <li v-if="articleStatus !== 'DELETED'">
@@ -24,23 +23,23 @@
                 <img  src="/icons/undelete-article.svg"  class="menu-icons undelete-icon" alt="icon"  @click="restoreArticle">
               </li>
             </ul>
+            <div v-if="showModal" class="modal-wrapper">
+              <div class="modal">
+                <div class="modal-content">
+                  <p>Вы точно хотите удалить статью?</p>
+                  <div class="modal-btn">
+                    <button class="delete-btn"  @click="deleteArticle">Да, удалить</button>
+                    <button class="delete-btn cancel-btn" @click="showModal = false">Отмена</button>
+                  </div>
+                </div>
+            </div>
+          </div>
     </div>
-    <div v-if="showModal" class="modal-wrapper">
-      <div class="modal">
-      <div class="modal-content">
-        <p>Вы точно хотите удалить статью?</p>
-        <div class="modal-btn">
-          <button class="delete-btn"  @click="deleteArticle">Да, удалить</button>
-          <button class="delete-btn cancel-btn" @click="showModal = false">Отмена</button>
-        </div>
-      </div>
-    </div>
-    </div>
-  </div>
 </template>
 <script>
 import { ref } from "vue";
 import {useStore} from "vuex";
+import axios, {HttpStatusCode} from "axios";
 
 
 export default {
@@ -60,11 +59,28 @@ export default {
       articleMenuOpen.value = !articleMenuOpen.value;
     };
 
-    const deleteArticle = () => {
+    const deleteArticle = async() => {
       showModal.value = false;
       console.log("delete article");
-
+      await deleteArticleRequest();
     };
+
+    const deleteArticleRequest = async() => {
+      
+      try {
+        const response = await axios.delete(`${store.state.API_URL}/api/articles/${props.articleId}`, store.state.config);
+        alert('Ваша статья успешно удалена ');
+
+      } catch (error) {
+        if (error.response && error.response.data && error.response.data.errors) {
+          const serverErrors = error.response.data.errors;
+          alert(serverErrors);
+
+        } else {
+          console.error('Ошибка удаления статьи ', error);
+        }
+      }
+    }
 
     const restoreArticle = () => {
       console.log("restore article");
@@ -146,11 +162,6 @@ export default {
   height: 50px;
 }
 
-/* .modal-wrapper {
-  width: 100%;
-  height: 100%;
-  
-} */
 .modal {
   display: block;
   position: fixed; 
@@ -169,7 +180,7 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   width: 30%;
-  height: 30%;
+  height: 22%;
 }
 
 .modal-content p {
