@@ -65,8 +65,7 @@ export default {
       await deleteArticleRequest();
     };
 
-    const deleteArticleRequest = async() => {
-      
+    const deleteArticleRequest = async() => {  
       try {
         const response = await axios.delete(`${store.state.API_URL}/api/articles/${props.articleId}`, store.state.config);
         alert('Ваша статья успешно удалена ');
@@ -82,9 +81,26 @@ export default {
       }
     }
 
-    const restoreArticle = () => {
+    const restoreArticle = async() => {
       console.log("restore article");
+      await restoreArticleRequest();
     };
+
+    async function restoreArticleRequest() {
+        try {
+          const response = await axios.put(`${store.state.API_URL}/api/articles/restore/${props.articleId}`, null, store.state.config);
+          alert('Ваша статья успешно восстановлена ');
+
+
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.errors) {
+              const serverErrors = error.response.data.errors;
+              alert(serverErrors);
+            }
+            
+        }
+        
+    }
 
     return {
       articleMenuOpen,
