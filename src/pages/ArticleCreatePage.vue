@@ -55,10 +55,7 @@
           <img v-if="imageSrc !== null" :src="imageSrc" alt="image" id="warningImage">
         </div>
       </div>
-
       <h2>Содержание статьи :</h2>
-
-
       <ArticleEditor ref="ArticleEditorComponentRef"
         :showModal="showModal"
         :isImageValid="isImageValid"
@@ -72,6 +69,11 @@
         <button class="btn btn-create-article" @click="submitArticle">Опубликовать</button>
         <button class="btn btn-create-draft" @click="saveAsDraft">Сохранить как черновик</button>
        </div>
+       <div v-if="loading" class="loading-spinner">
+        <div class="loading-content">
+          <img src="/icons/loading.gif" alt="Loading..." style="margin: auto;">
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -117,6 +119,7 @@ export default {
     const ArticleCreateTagZoneRef = ref(null);
     const EditArticleTagZoneRef = ref(null);
     const intervalId = ref(null);
+    const loading = ref(false);
 
 
     onMounted(() => {
@@ -352,6 +355,7 @@ export default {
     };
 
     const submitArticle = async () => {
+      loading.value = true;
       if(props.editedArticleId) {
         clearInterval(intervalId);
         await loadCoverImageOnServer(props.editedArticleId);
@@ -365,14 +369,20 @@ export default {
           isSuccess =  await undraftArticle();
         }
         if(isSuccess) {
+          loading.value = false;
           router.push('/create-article/success');
+          return;
         }
+        loading.value = false;
+        alert("Произошла ошибка = (")
         return;
       }
       sendArticleOnServer(`${store.state.API_URL}/api/articles`);
     };
 
     const saveAsDraft = async() => {
+      loading.value = true;
+      console.log("loading : " + loading.value);
       if(props.editedArticleId) {
         clearInterval(intervalId);
         await loadCoverImageOnServer(props.editedArticleId);
@@ -383,9 +393,13 @@ export default {
         }
         console.log("result update from cache " + result);
         if(result) {
+          loading.value = false;
           alert('Ваши изменения сохранены успешно !');
           router.push(`/user/${store.state.nickname}`);
+          return;    
         }
+        loading.value = false;
+        alert("Произошла ошибка = (");
         return;
       }
       sendArticleOnServer(`${store.state.API_URL}/api/articles/drafts`);
@@ -462,14 +476,13 @@ export default {
         const imagePath = await loadCoverImageOnServer(response.data.id);
         updateFromCacheToDB(response.data.id);
         console.log('cover image path :' + imagePath);
-        // удаляем данные из localStorage
+
         localStorage.removeItem('articleContent');
         localStorage.removeItem('savedTitle');
         localStorage.removeItem('savedShortDescription');
         localStorage.removeItem('selectedTags');
 
-        // выдаем страницу успешного создания статьи
-
+        loading.value = false;
         router.push('/create-article/success');
 
       } catch (error) {
@@ -554,7 +567,8 @@ export default {
       EditorComponentRef,
       ArticleCreateTagZoneRef,
       EditArticleTagZoneRef,
-      updateArticleOnServer
+      updateArticleOnServer,
+      loading
     };
 
   }
@@ -675,13 +689,31 @@ label {
   background-color: rgb(0, 0, 0); 
   background-color: rgba(0, 0, 0, 0.4);
 }
+.loading-spinner {
+  position: fixed; 
+  z-index: 1; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  background-color: rgb(0, 0, 0);  
+  background-color: rgba(0, 0, 0, 0.4); 
+}
 
-.modal-content {
+.modal-content { 
   background-color: #fefefe;
   margin: 15% auto;
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
+}
+
+.loading-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%
 }
 
 .modal-content img {

@@ -4,6 +4,7 @@ import Notification from "@/components/Notification.vue";
 import Register from "@/components/Register.vue";
 import Auth from "@/components/Auth.vue";
 import ArticlePage from "@/pages/ArticlePage.vue";
+import AnnouncementPage from '@/pages/AnnouncementPage.vue';
 import UserProfilePage from "@/pages/UserProfilePage.vue";
 import ArticleCreatePage from "@/pages/ArticleCreatePage.vue";
 import ArticleEditPage from "@/pages/ArticleEditPage.vue";
@@ -27,6 +28,10 @@ const router = createRouter({
     {
       path: '/article/:articleId',
       component: ArticlePage,
+    },
+    {
+      path: '/announcement/:announcementId',
+      component: AnnouncementPage,
     },
     {
       path: '/user/:userNickname',

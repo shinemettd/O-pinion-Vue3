@@ -4,11 +4,7 @@ import axios from "axios";
 import store from "@/store/store";
 import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
-import ArticleMenuComponent from "@/components/ArticleMenuComponent.vue";
 
-const reaction = ref('NOTHING');
-const reactionLikeIconPath = ref('/icons/chevron_up_icon.svg');
-const reactionDislikeIconPath = ref('/icons/chevron_down_icon.svg');
 const shareBy = ref('link');
 const shareSortToggle = ref(0);
 const shareLink = ref('');
@@ -33,49 +29,28 @@ const snackMessageText = ref('');
 const showSnackMessage = ref(false);
 
 const props = defineProps({
-  authorsNickname: String,
-  authorsAvatarUrl: {
-    type: String,
-    default: 'https://cdn-icons-png.flaticon.com/512/10/10938.png'
-  },
   postedTimeAgo: String,
-  articleId: Number,
-  articleTitle: String,
-  articleRating: Number,
-  articleTotalFavourites: Number,
-  articleInFavourites: {
+  announcementId: Number,
+  announcementTitle: String,
+  announcementContent: String,
+  announcementTotalFavourites: Number,
+  announcementInFavourites: {
     type: Boolean,
     default: false,
   },
-  articleContent: String,
-  articleTotalComments: Number,
-  articleTotalViews: Number,
-  articleComments: String,
-  articleCommentsReplies: String,
-  articleStatus: String,
+  announcementTotalComments: Number,
+  announcementTotalViews: Number,
+  announcementComments: String,
+  announcmentCommentsReplies: String,
   loadComments: {
     type: Function,
     default() {
     }
   },
-  loadTotalCommentsValue: {
-    type: Function,
-    default() {
-    }
-  },
-  loadTotalFavouritesValue: {
-    type: Function,
-    default() {
-    }
-  },
-  loadReactionType: {
-    type: Function,
-    default() {
-    }
-  }
+
 })
 
-async function sendComment(comment, articleId) {
+async function sendComment(comment, announcementId) {
   if (comment.length === 0) {
     await setSendEmptyComment();
     return;
@@ -89,9 +64,9 @@ async function sendComment(comment, articleId) {
 
   try {
     if (!isCommentReply.value) {
-      await axios.post(`${store.state.API_URL}/api/article-comments/${articleId}`, { text: comment }, store.state.config);
+      await axios.post(`${store.state.API_URL}/api/announcement-comments/${announcementId}`, { text: comment }, store.state.config);
     } else {
-      await axios.post(`${store.state.API_URL}/api/article-comments/${replyCommentId.value}/replies`, { text: comment }, store.state.config);
+      await axios.post(`${store.state.API_URL}/api/announcement-comments/${replyCommentId.value}/replies`, { text: comment }, store.state.config);
     }
     await props.loadComments();
     successGetNewComments.value = true;
@@ -115,7 +90,7 @@ async function sendEditComment(commentId, commentText) {
   }
 
   try {
-    await axios.put(`${store.state.API_URL}/api/article-comments/${commentId}`, { text: commentText }, store.state.config);
+    await axios.put(`${store.state.API_URL}/api/announcement-comments/${commentId}`, { text: commentText }, store.state.config);
     await props.loadComments();
     successGetNewComments.value = true;
   } catch (e) {
@@ -178,7 +153,7 @@ function clearComment () {
 
 const deleteComment = async (commentId) => {
   try {
-    await axios.delete(`${store.state.API_URL}/api/article-comments/${commentId}`, store.state.config);
+    await axios.delete(`${store.state.API_URL}/api/announcement-comments/${commentId}`, store.state.config);
     await props.loadComments();
     showSnackbarMessage('Комментарий удален');
   } catch (e) {
@@ -191,93 +166,40 @@ const showSnackbarMessage = (text) => {
   snackMessageText.value = text;
 }
 
-async function addToFavourites(articleId) {
+async function addToFavourites(announcementId) {
   try {
-    await axios.post(`${store.state.API_URL}/api/saved-articles/${articleId}`, '', store.state.config);
+    await axios.post(`${store.state.API_URL}/api/saved-announcements/${announcementId}`, '', store.state.config);
   } catch (e) {
     showSnackbarMessage('Произошла ошибка при добавлении в избранное');
   }
 }
 
-async function deleteFromFavourites(articleId) {
+async function deleteFromFavourites(announcementId) {
   try {
-    await axios.delete(`${store.state.API_URL}/api/saved-articles/${articleId}`, store.state.config);
+    await axios.delete(`${store.state.API_URL}/api/saved-announcements/${announcementId}`, store.state.config);
   } catch (e) {
     showSnackbarMessage('Произошла ошибка при удалении комментария');
   }
 }
 
-const shareArticle = async (articleId, shareType) => {
+const shareAnnouncement = async (articleId, shareType) => {
   shareBy.value = shareType;
   if (shareBy.value === 'link') {
     try {
-      shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
+    //   shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
     } catch (e) {
       shareLink.value = undefined;
     }
   } else {
     try {
-      shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
+    //   shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
     } catch (e) {
       shareLink.value = undefined;
     }
   }
 }
 
-async function setLike() {
-  const articleId = props.articleId;
-  const data = {
-    article_id: articleId,
-    reaction_type: "LIKE"
-  }
-  try {
-    await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
-  } catch (e) {
-    showSnackbarMessage('Произошла ошибка при попытке подключиться к серверу');
-  }
 
-  try {
-    reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${articleId}`, store.state.config)).data;
-    console.log(reaction.value);
-  } catch (e) {
-    reaction.value = 'NOTHING';
-  }
-
-  if (reaction.value === 'LIKE') {
-    reactionLikeIconPath.value = '/icons/chevron_up_icon_green.png';
-    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
-  } else if (reaction.value === 'DISLIKE' || reaction.value === 'NOTHING') {
-    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
-    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
-  }
-}
-
-async function setDislike() {
-  const articleId = props.articleId;
-  const data = {
-    article_id: articleId,
-    reaction_type: "DISLIKE"
-  }
-  try {
-    await axios.post(`${store.state.API_URL}/api/article-reactions`, data, store.state.config);
-  } catch (e) {
-    showSnackbarMessage('Произошла ошибка при попытке подключиться к серверу');
-  }
-
-  try {
-    reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${articleId}`, store.state.config)).data;
-  } catch (e) {
-    reaction.value = 'NOTHING';
-  }
-
-  if (reaction.value === 'DISLIKE') {
-    reactionDislikeIconPath.value = '/icons/chevron_down_icon_red.png';
-    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
-  } else if (reaction.value === 'LIKE' || reaction.value === 'NOTHING') {
-    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
-    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
-  }
-}
 
 function formatDateTime(timeString) {
   const dateTime = new Date(timeString);
@@ -298,20 +220,8 @@ function redirectIfNotAuthorized() {
 }
 
 onMounted(async () => {
-  document.title = props.articleTitle;
-
-  reaction.value = (await axios.get(`${store.state.API_URL}/api/article-reactions/reaction-type/${props.articleId}`, store.state.config)).data;
-
-  if (reaction.value === 'LIKE') {
-    reactionLikeIconPath.value = '/icons/chevron_up_icon_green.png';
-    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
-  } else if (reaction.value === 'DISLIKE') {
-    reactionDislikeIconPath.value = '/icons/chevron_down_icon_red.png';
-    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
-  } else {
-    reactionDislikeIconPath.value = '/icons/chevron_down_icon.svg';
-    reactionLikeIconPath.value = '/icons/chevron_up_icon.svg';
-  }
+    document.title = props.announcementTitle;
+    console.log("comments : " + announcementComments.content);
 })
 </script>
 
@@ -320,97 +230,50 @@ onMounted(async () => {
     <div class = "scroll mx-auto border scroll-container w-66 h-100 px-4 py-3">
       <hr>
       <div class = "article-header mt-3">
-        <p style = "font-size: 2em; word-wrap: break-word;"> {{ articleTitle }} </p>
+        <p style = "font-size: 2em; word-wrap: break-word;"> {{ announcementTitle }} </p>
         <div class = "article-header-data my-2" style = "display: flex">
           <div class="article-header-data">
             <div class = "user-avatar mr-3">
-              <router-link :to="'/user/' + authorsNickname">
-                <img :src = "authorsAvatarUrl" class = "my-1 mt-2" alt = "user avatar">
-              </router-link>
+                <img  src="/icons/announcement.jpg" class = "my-1 mt-2" alt = "user avatar">
             </div>
             <div class = "">
-              <router-link :to="'/user/' + authorsNickname">
-                <p style = "font-size: 1.25em"> <strong> {{ authorsNickname }} </strong> </p>
-              </router-link>
-
               <p> {{ formatDateTime(postedTimeAgo) }}</p>
             </div>
           </div>
-          <ArticleMenuComponent
-            style="float: right;"
-            :articleStatus="articleStatus"
-            :authorsNickname="authorsNickname"
-            :articleId="articleId"
-          />
         </div>
       </div>
       <div class="my-3">
-        <!--   article content     -->
-        <ContentRender :content="articleContent"/>
+        <ContentRender :content="announcementContent"/>
       </div>
-      <div class="my-3">
-        Секция тегов
-        <!--  tags  reactions etc    -->
-      </div>
+
       <hr class = "my-3">
       <div class = "article-footer-bar">
         <div class = "article-footer">
-          <div v-if = "store.state.isAuthorized" class = "article-rating">
-            <div class = "article-rating-icon">
-              <img class = "article-reaction" :src="reactionLikeIconPath" alt="Rating Icon" @click="async () => {
-                await setLike();
-                articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
-              }">
-            </div>
-            <b v-if = "articleRating > 0" style="color: green">{{ articleRating }}</b>
-            <b v-else-if="articleRating < 0" if = "articleRating>0" style="color: red">{{ articleRating }}</b>
-            <b v-else style="color: black">{{ articleRating }}</b>
-            <div class = "article-rating-icon ml-3">
-              <img class = "article-reaction" :src="reactionDislikeIconPath" alt="Rating Icon" @click="async () => {
-                await setDislike();
-                articleRating = ((await axios.get(`${store.state.API_URL}/api/articles/${articleId}/rating`)).data);
-              }">
-            </div>
-          </div>
-          <div v-else class = "article-rating pl-1 pr-3">
-            <div class = "article-rating-icon">
-              <img src="/icons/zap_icon.svg" alt="Rating Icon">
-            </div>
-            <b v-if = "articleRating>0" style="color: green">{{ articleRating }}</b>
-            <b v-else-if="articleRating<0" style="color: red">{{ articleRating }}</b>
-            <b v-else style="color: black">{{ articleRating }}</b>
-          </div>
           <div class = "article-favourites" style="margin-left: -1em">
-            <div v-if="articleInFavourites" class = article-in-favourites-icon @click="async () => {
+            <div v-if="announcementInFavourites" class = article-in-favourites-icon @click="async () => {
               redirectIfNotAuthorized();
-              await deleteFromFavourites(articleId);
-              articleInFavourites = false;
-              try {
-                articleTotalFavourites = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/total-favourites`)).data;
-              } catch (e) {
-                articleTotalFavourites--;
-              }}">
+              await deleteFromFavourites(announcementId);
+              announcementInFavourites = false;
+              announcementTotalFavourites--;
+              }">
               <img src="/icons/star_icon.svg" alt = "Favourites Icon">
             </div>
             <div v-else class = article-not-in-favourites-icon>
               <img src="/icons/star_icon.svg" alt = "Not Favourites Icon" @click="async () => {
                 redirectIfNotAuthorized();
-                await addToFavourites(articleId);
-                articleInFavourites = true;
-                try {
-                  articleTotalFavourites = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/total-favourites`)).data;
-                } catch (e) {
-                  articleTotalFavourites++;
-                }}">
+                await addToFavourites(announcementId);
+                announcementInFavourites = true;
+                announcementTotalFavourites++;
+                }">
             </div>
-            <b> {{ articleTotalFavourites }}</b>
+            <b> {{ announcementTotalFavourites }}</b>
           </div>
           <div class = "article-share pb-1">
             <div class = "article-share-icon">
               <v-dialog max-width="500">
                 <template v-slot:activator="{ props: activatorProps }">
                   <img src="/icons/corner_up_right_icon.svg" alt = "Share Icon" v-bind="activatorProps"
-                       @click="async () => {shareLink = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;}">
+                       @click="async () => {shareLink = (await axios.get(`${store.state.API_URL}/api/articles/${announcementId}/share`)).data;}">
                 </template>
 
                 <template v-slot:default="{ isActive }">
@@ -418,26 +281,26 @@ onMounted(async () => {
                     <div class="w-full my-3 text-center">
                       <v-btn-toggle v-model="shareSortToggle" color="#20b2aa" class="ml-2" mandatory>
                         <v-btn
-                          @click="async () => { await shareArticle(articleId, 'link'); }"
+                          @click="async () => { await shareAnnouncement(announcementId, 'link'); }"
                           icon
                           size="large">
                           <img src="/icons/share_link_icon.webp" style="height: 2.5em; width: 2.5em;">
                         </v-btn>
 
-                        <v-btn @click="async () => { await shareArticle(articleId, 'vk'); }"
+                        <v-btn @click="async () => { await shareArticle(announcementId, 'vk'); }"
                                icon
                                size="large">
                           <img src="/icons/share_vk_icon.png" style="height: 2.5em; width: 2.5em;">
                         </v-btn>
 
                         <v-btn
-                          @click="async () => { await shareArticle(articleId, 'telegram'); }"
+                          @click="async () => { await shareAnnouncement(announcementId, 'telegram'); }"
                           icon
                           size="large">
                           <img src="/icons/share_tg_icon.png" style="height: 2.5em; width: 2.5em;">
                         </v-btn>
 
-                        <v-btn @click="async () => { await shareArticle(articleId, 'whatsapp'); }"
+                        <v-btn @click="async () => { await shareAnnouncement(announcementId, 'whatsapp'); }"
                                icon
                                size="large">
                           <img src="/icons/share_wa_icon.png" style="height: 3em; width: 3em;">
@@ -493,7 +356,7 @@ onMounted(async () => {
                                 if (regex.test(shareEmailAddress)) {
                                   isValidShareEmail = true;
                                   try {
-                                    await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
+                                    // await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
                                     showEmailShareSnackMessage = true;
                                   } catch (e) {
                                     console.error(e);
@@ -532,7 +395,7 @@ onMounted(async () => {
             <div class = "article-views-icon">
               <img src ="/icons/eye_icon.svg" alt="Image Icon">
             </div>
-            <b>{{ articleTotalViews }}</b>
+            <b>{{ announcementTotalViews }}</b>
           </div>
         </div>
       </div>
@@ -540,12 +403,12 @@ onMounted(async () => {
 
       <div class="my-5" style = "z-index: 1000">
         <div style = "z-index: 100">
-          <p style="font-size: 1.5em"> Комментарии <strong> {{ articleTotalComments }}</strong> </p>
-          <div v-show = "articleTotalComments === 0" class = "px-5 pt-5" style = "font-style: italic">
+          <p style="font-size: 1.5em"> Комментарии <strong> {{ announcementTotalComments }}</strong> </p>
+          <div v-show = "announcementTotalComments === 0" class = "px-5 pt-5" style = "font-style: italic">
             Комментариев пока нет :(
           </div>
         </div>
-        <div class = "comments-list my-5 ml-1" v-for = "comment in articleComments.content" :key="comment.id">
+        <div class = "comments-list my-5 ml-1" v-for = "comment in announcementComments.content" :key="comment.id">
           <div class = "info-header">
             <div class = "user-avatar">
               <router-link :to="`/user/${comment.user.nickname}`">
@@ -592,59 +455,8 @@ onMounted(async () => {
               > <strong> Удалить </strong> </span>
             </div>
           </div>
-
-          <!-- <div v-if = "comment.replies.length > 0">
-            <div class = "replies-list my-5 ml-13" v-for = "reply in comment.replies" :key="reply.id">
-              <div class = "info-header">
-                <div class = "user-avatar">
-                  <router-link :to="`/user/${reply.user.nickname}`">
-                    <img :src="reply.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
-                  </router-link>
-                </div>
-                <div class = "comment-user-data">
-                  <router-link :to="`/user/${reply.user.nickname}`">
-                    <p style = "font-weight: 700;"> {{ reply.user.nickname }}</p>
-                  </router-link>
-                  <p v-if = "reply.altered" style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(reply.date) }} (Изменено) </p>
-                  <p v-else style = "font-size: 0.75em" class = "inline-block"> {{ formatDateTime(reply.date) }} </p>
-                </div>
-              </div>
-              <div class="my-2 ml-13">
-                <div style = "font-size: 1.15em">
-                  <p v-html="reply.text"></p>
-                </div>
-                <div class = "my-2" style = "font-size: 0.85em">
-                  <span
-                    class = "comment-reply-text mr-2"
-                    @click="async () =>
-                    {
-                      if (store.state.isAuthorized) {
-                          await replyTo(reply.user.nickname, comment.id);
-                      } else {
-                         await router.push('/auth')
-                       }
-                    }"
-                  > <strong> Ответить </strong> </span>
-                  <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
-                        class = "comment-edit-text mr-2"
-                        @click="async () =>
-                      {
-                        await editComment(reply.id, reply.text);
-                      }"
-                  > <strong> Редактировать </strong> </span>
-                  <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
-                        class = "comment-delete-text"
-                        @click="async () =>
-                      {
-                        await deleteComment(reply.id);
-                      }"
-                  > <strong> Удалить </strong> </span>
-                </div>
-              </div>
-            </div>
-          </div> -->
         </div>
-        <!-- <div class = "сomment-field">
+        <div class = "сomment-field">
           <hr class = "mt-5 pb-2">
           <div v-if="store.state.isAuthorized" class="mt-2">
             <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
@@ -667,15 +479,15 @@ onMounted(async () => {
               @click:append="
                   async () => {
                     if (!isCommentEditing) {
-                      await sendComment(userComment, articleId);
+                      await sendComment(userComment, announcementId);
                     } else {
                       await sendEditComment(editingCommentId, userComment);
                     }
-                    try {
-                      articleTotalComments = (await axios.get(`${store.state.API_URL}/api/article-comments/${articleId}/total-comments`)).data;
-                    } catch (e) {
-                      showSnackbarMessage('Произошла ошибка при подсчете комментариев');
-                    }
+                    // try {
+                    //   announcementTotalComments = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}/total-comments`);
+                    // } catch (e) {
+                    //   showSnackbarMessage('Произошла ошибка при подсчете комментариев');
+                    // }
                   }"
               @click:clear="clearComment"
               @update:model-value="newComment => userComment = newComment"
@@ -691,8 +503,8 @@ onMounted(async () => {
               @click:append="() => { router.push('/auth'); }"
             ></v-text-field>
           </div>
-        </div> -->
-      </div>
+        </div>
+        </div>
     </div>
     <v-snackbar
       v-model="showSnackMessage"
@@ -751,16 +563,6 @@ onMounted(async () => {
 }
 
 
-.article-reaction {
-  cursor: pointer;
-  max-width: 1.51em;
-}
-
-.article-reaction:hover {
-  background-color: gray;
-  opacity: 40%;
-  border-radius: 50%;
-}
 
 .article-in-favourites-icon {
   opacity: 100%;
@@ -771,7 +573,6 @@ onMounted(async () => {
   opacity: 50%;
 }
 
-.article-rating,
 .article-favourites {
   display: flex;
   flex-direction: row;
