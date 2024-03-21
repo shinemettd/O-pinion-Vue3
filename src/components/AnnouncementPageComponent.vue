@@ -182,22 +182,22 @@ async function deleteFromFavourites(announcementId) {
   }
 }
 
-// const shareAnnouncement = async (articleId, shareType) => {
-//   shareBy.value = shareType;
-//   if (shareBy.value === 'link') {
-//     try {
-//     //   shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
-//     } catch (e) {
-//       shareLink.value = undefined;
-//     }
-//   } else {
-//     try {
-//     //   shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
-//     } catch (e) {
-//       shareLink.value = undefined;
-//     }
-//   }
-// }
+const shareAnnouncement = async (articleId, shareType) => {
+  shareBy.value = shareType;
+  if (shareBy.value === 'link') {
+    try {
+    //   shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
+    } catch (e) {
+      shareLink.value = undefined;
+    }
+  } else {
+    try {
+    //   shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
+    } catch (e) {
+      shareLink.value = undefined;
+    }
+  }
+}
 
 
 
@@ -268,7 +268,7 @@ onMounted(async () => {
             </div>
             <b> {{ announcementTotalFavourites }}</b>
           </div>
-          <!-- <div class = "article-share pb-1">
+          <div class = "article-share pb-1">
             <div class = "article-share-icon">
               <v-dialog max-width="500">
                 <template v-slot:activator="{ props: activatorProps }">
@@ -389,7 +389,7 @@ onMounted(async () => {
                   </v-card>
                 </template>
               </v-dialog>
-            </div> -->
+            </div>
           </div>
           <div class = "article-views-count">
             <div class = "article-views-icon">
@@ -504,6 +504,7 @@ onMounted(async () => {
             ></v-text-field>
           </div>
         </div>
+        </div>
     </div>
     <v-snackbar
       v-model="showSnackMessage"
@@ -562,16 +563,6 @@ onMounted(async () => {
 }
 
 
-.article-reaction {
-  cursor: pointer;
-  max-width: 1.51em;
-}
-
-.article-reaction:hover {
-  background-color: gray;
-  opacity: 40%;
-  border-radius: 50%;
-}
 
 .article-in-favourites-icon {
   opacity: 100%;
@@ -582,7 +573,6 @@ onMounted(async () => {
   opacity: 50%;
 }
 
-.article-rating,
 .article-favourites {
   display: flex;
   flex-direction: row;

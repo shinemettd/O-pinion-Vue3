@@ -593,7 +593,7 @@ onMounted(async () => {
             </div>
           </div>
 
-          <div v-if = "comment.replies.length > 0">
+          <!-- <div v-if = "comment.replies.length > 0">
             <div class = "replies-list my-5 ml-13" v-for = "reply in comment.replies" :key="reply.id">
               <div class = "info-header">
                 <div class = "user-avatar">
@@ -642,9 +642,9 @@ onMounted(async () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
-        <div class = "сomment-field">
+        <!-- <div class = "сomment-field">
           <hr class = "mt-5 pb-2">
           <div v-if="store.state.isAuthorized" class="mt-2">
             <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
@@ -691,7 +691,7 @@ onMounted(async () => {
               @click:append="() => { router.push('/auth'); }"
             ></v-text-field>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
     <v-snackbar
