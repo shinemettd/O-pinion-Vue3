@@ -64,7 +64,7 @@ async function sendComment(comment, announcementId) {
 
   try {
     if (!isCommentReply.value) {
-      await axios.post(`${store.state.API_URL}/api/announcement-comments/${articleId}`, { text: comment }, store.state.config);
+      await axios.post(`${store.state.API_URL}/api/announcement-comments/${announcementId}`, { text: comment }, store.state.config);
     } else {
       await axios.post(`${store.state.API_URL}/api/announcement-comments/${replyCommentId.value}/replies`, { text: comment }, store.state.config);
     }
@@ -479,15 +479,15 @@ onMounted(async () => {
               @click:append="
                   async () => {
                     if (!isCommentEditing) {
-                      await sendComment(userComment, articleId);
+                      await sendComment(userComment, announcementId);
                     } else {
                       await sendEditComment(editingCommentId, userComment);
                     }
-                    try {
-                      articleTotalComments = await axios.get(`${store.state.API_URL}/api/article-comments/${articleId}/total-comments`);
-                    } catch (e) {
-                      showSnackbarMessage('Произошла ошибка при подсчете комментариев');
-                    }
+                    // try {
+                    //   announcementTotalComments = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}/total-comments`);
+                    // } catch (e) {
+                    //   showSnackbarMessage('Произошла ошибка при подсчете комментариев');
+                    // }
                   }"
               @click:clear="clearComment"
               @update:model-value="newComment => userComment = newComment"
