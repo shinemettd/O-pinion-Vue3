@@ -12,6 +12,7 @@ import PageNotFound from "@/pages/PageNotFound.vue";
 import store from "@/store/store";
 import SettingsPage from "@/pages/SettingsPage.vue";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
+import SuccessRegisterPage from "@/pages/SuccessRegisterPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -84,6 +85,14 @@ const router = createRouter({
       component: Register,
       meta: {
         title: 'Регистрация'
+      }
+    },
+    {
+      name: 'SuccessRegister',
+      path: '/success-registration',
+      component: SuccessRegisterPage,
+      meta: {
+        title: 'Успешная регистрация'
       }
     },
     {
