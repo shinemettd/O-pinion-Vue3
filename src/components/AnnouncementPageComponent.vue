@@ -158,17 +158,17 @@ async function deleteFromFavourites(announcementId) {
   }
 }
 
-const shareAnnouncement = async (articleId, shareType) => {
+const shareAnnouncement = async (announcementId, shareType) => {
   shareBy.value = shareType;
   if (shareBy.value === 'link') {
     try {
-    //   shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
+      shareLink.value = (await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}/share`)).data;
     } catch (e) {
       shareLink.value = undefined;
     }
   } else {
     try {
-    //   shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
+      shareLink.value =  (await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}/share?share-type=${shareType}`)).data;
     } catch (e) {
       shareLink.value = undefined;
     }
@@ -263,7 +263,7 @@ onMounted(async () => {
                           <img src="/icons/share_link_icon.webp" style="height: 2.5em; width: 2.5em;">
                         </v-btn>
 
-                        <v-btn @click="async () => { await shareArticle(announcementId, 'vk'); }"
+                        <v-btn @click="async () => { await shareAnnouncement(announcementId, 'vk'); }"
                                icon
                                size="large">
                           <img src="/icons/share_vk_icon.png" style="height: 2.5em; width: 2.5em;">
@@ -332,7 +332,7 @@ onMounted(async () => {
                                 if (regex.test(shareEmailAddress)) {
                                   isValidShareEmail = true;
                                   try {
-                                    // await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
+                                    await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}/share/email?to=${shareEmailAddress}`, store.state.config);
                                     showEmailShareSnackMessage = true;
                                   } catch (e) {
                                     console.error(e);
