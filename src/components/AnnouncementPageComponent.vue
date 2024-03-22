@@ -416,6 +416,12 @@ onMounted(async () => {
                     @click="async () =>
                       {
                         await deleteComment(comment.id);
+                        try {
+                          const response = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}/total-comments`);
+                          announcementTotalComments = response.data;
+                        } catch (e) {
+                          showSnackbarMessage('Произошла ошибка при подсчете комментариев');
+                        }
                       }"
               > <strong> Удалить </strong> </span>
             </div>
@@ -424,9 +430,6 @@ onMounted(async () => {
         <div class = "сomment-field">
           <hr class = "mt-5 pb-2">
           <div v-if="store.state.isAuthorized" class="mt-2">
-            <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
-              <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
-            </div>
             <div class = "mb-2" v-if="isCommentEditing" style = "margin-top: -0.314em">
               <span> Изменение комментария </span> <v-icon @click="cancelEdit" style="margin-top: -0.17em;">mdi-close</v-icon>
             </div>
@@ -448,11 +451,12 @@ onMounted(async () => {
                     } else {
                       await sendEditComment(editingCommentId, userComment);
                     }
-                    // try {
-                    //   announcementTotalComments = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}/total-comments`);
-                    // } catch (e) {
-                    //   showSnackbarMessage('Произошла ошибка при подсчете комментариев');
-                    // }
+                    try {
+                      const response = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}/total-comments`);
+                      announcementTotalComments = response.data;
+                    } catch (e) {
+                      showSnackbarMessage('Произошла ошибка при подсчете комментариев');
+                    }
                   }"
               @click:clear="clearComment"
               @update:model-value="newComment => userComment = newComment"
