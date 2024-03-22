@@ -18,9 +18,6 @@ const userComment = ref('');
 const sendEmptyComment = ref(false);
 const sendTooShortComment = ref(false);
 const sendTooLongComment = ref(false);
-const isCommentReply = ref(false);
-const replyCommentId = ref(undefined);
-const replyCommentAuthorsNickname = ref('');
 const isCommentEditing = ref(false);
 const editingCommentId = ref(-1);
 const successGetNewComments = ref(false);
@@ -41,7 +38,6 @@ const props = defineProps({
   announcementTotalComments: Number,
   announcementTotalViews: Number,
   announcementComments: String,
-  announcmentCommentsReplies: String,
   loadComments: {
     type: Function,
     default() {
@@ -63,11 +59,7 @@ async function sendComment(comment, announcementId) {
   }
 
   try {
-    if (!isCommentReply.value) {
-      await axios.post(`${store.state.API_URL}/api/announcement-comments/${announcementId}`, { text: comment }, store.state.config);
-    } else {
-      await axios.post(`${store.state.API_URL}/api/announcement-comments/${replyCommentId.value}/replies`, { text: comment }, store.state.config);
-    }
+    await axios.post(`${store.state.API_URL}/api/announcement-comments/${announcementId}`, { text: comment }, store.state.config);
     await props.loadComments();
     successGetNewComments.value = true;
   } catch (e) {
@@ -100,23 +92,8 @@ async function sendEditComment(commentId, commentText) {
   clearComment();
 }
 
-async function replyTo(commentAuthorNickname, commentId) {
-  cancelEdit();
-  cancelReply();
-  isCommentReply.value = true;
-  replyCommentAuthorsNickname.value = commentAuthorNickname;
-  // userComment.value = `@${commentAuthorNickname}, ${userComment}`;
-  replyCommentId.value = commentId;
-}
-
-function cancelReply() {
-  isCommentReply.value = false;
-  replyCommentId.value = undefined;
-  props.loadTotalCommentsValue();
-}
 
 async function editComment(commentId, newCommentText) {
-  cancelReply();
   cancelEdit();
   isCommentEditing.value = true;
   userComment.value = newCommentText;
@@ -147,7 +124,6 @@ const setSendTooLongComment = async () => {
 }
 function clearComment () {
   userComment.value = ''
-  cancelReply();
   cancelEdit();
 }
 
@@ -428,17 +404,6 @@ onMounted(async () => {
               <p v-html="comment.text"></p>
             </div>
             <div class = "my-2" style = "font-size: 0.85em">
-                  <span
-                    class = "comment-reply-text mr-2"
-                    @click="async () =>
-                    {
-                      if (store.state.isAuthorized) {
-                          await replyTo(comment.user.nickname, comment.id);
-                      } else {
-                         await router.push('/auth')
-                       }
-                    }"
-                  > <strong> Ответить </strong> </span>
               <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
                     class = "comment-edit-text mr-2"
                     @click="async () =>
