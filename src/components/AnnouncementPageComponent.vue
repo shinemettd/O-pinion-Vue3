@@ -225,7 +225,7 @@ onMounted(async () => {
       <hr class = "my-3">
       <div class = "article-footer-bar">
         <div class = "article-footer">
-          <div class = "article-favourites" style="margin-left: -1em">
+          <div class = "article-favourites" >
             <div v-if="announcementInFavourites" class = article-in-favourites-icon @click="async () => {
               redirectIfNotAuthorized();
               await deleteFromFavourites(announcementId);
