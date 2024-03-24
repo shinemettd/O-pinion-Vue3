@@ -6,6 +6,9 @@ import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
 import ArticleMenuComponent from "@/components/ArticleMenuComponent.vue";
 
+const reportReason = ref('');
+const reportReasonText = ref('');
+
 const reaction = ref('NOTHING');
 const reactionLikeIconPath = ref('/icons/chevron_up_icon.svg');
 const reactionDislikeIconPath = ref('/icons/chevron_down_icon.svg');
@@ -336,12 +339,124 @@ onMounted(async () => {
               <p> {{ formatDateTime(postedTimeAgo) }}</p>
             </div>
           </div>
-          <ArticleMenuComponent
-            style="float: right;"
-            :articleStatus="articleStatus"
-            :authorsNickname="authorsNickname"
-            :articleId="articleId"
-          />
+          <div v-if = "authorsNickname === store.state.nickname" style="float: right">
+            <ArticleMenuComponent
+              :articleStatus="articleStatus"
+              :authorsNickname="authorsNickname"
+              :articleId="articleId"
+            />
+          </div>
+          <div v-else>
+            <div class = "article-header-report-icon">
+              <v-dialog max-width="500">
+                <template v-slot:activator="{ props: activatorProps }">
+                  <img src="/icons/alert_circle_icon.svg" alt = "icon" v-bind="activatorProps" @click="() => {
+                  if (!(store.state.isAuthorized)) {
+                    router.push('/auth')
+                  }
+                }">
+                </template>
+
+                <template v-slot:default="{ isActive }" >
+                  <v-card title="Жалоба">
+                    <v-card-text>
+                      Что именно вам кажется недопустимым в этом материале?
+                    </v-card-text>
+                    <v-radio-group
+                      v-model="reportReason"
+                      column
+                      class = "pl-5"
+                    >
+                      <v-radio label="Спам"
+                               value="SPAM"
+                      ></v-radio>
+
+                      <v-radio label="Обман"
+                               value="FRAUD"
+                      ></v-radio>
+
+                      <v-radio label="Оскорбления"
+                               value="SWEAR_WORD"
+                      ></v-radio>
+
+                      <v-radio label="Запрещенные товары"
+                               value="BANNED_GOODS"
+                      ></v-radio>
+
+                      <v-radio label="Откровенное изображение"
+                               value="EXPLICIT_IMAGE"
+                      ></v-radio>
+
+                      <v-radio label="Враждебные высказывания"
+                               value="HATE_SPEECH"
+                      ></v-radio>
+
+                      <v-radio label="Прочее"
+                               value="OTHER"
+                      ></v-radio>
+
+                    </v-radio-group>
+                    <div class = "px-5">
+                      <div class="">Сообщение (обязательно) </div>
+
+                      <v-textarea
+                        :error-messages="reportReasonText.length < 5 ? 'Сообщение должно содержать как минимум 5 символов' : '' ||
+                                       reportReasonText.length > 500 ? 'Превышен лимит, сообщение будет урезано до 500 символов.' : ''"
+                        :counter="500"
+                        class="mb-2"
+                        rows="2"
+                        variant="outlined"
+                        v-model="reportReasonText"
+                        persistent-counter
+                      ></v-textarea>
+                    </div>
+
+
+                    <v-card-actions class = "mx-3 my-1">
+                      <v-btn
+                        color="surface-variant"
+                        text="Отправить"
+                        variant="flat"
+                        @click="async () => {
+                        if (reportReasonText.length < 5) {
+                          showSnackbarMessage('Ну написано же...');
+                          return;
+                        } else if (reportReasonText.length > 500) {
+                          reportReasonText = reportReasonText.slice(0, 500);
+                        }
+                        if (store.state.isAuthorized) {
+                          const data = {
+                            reason: reportReason,
+                            text: reportReasonText
+                          }
+                          try {
+                            await axios.post(`${store.state.API_URL}/api/complaints/${articleId}`, data, store.state.config);                            showSnackbarMessage('Произошла ошибка при отправке жалобы');
+                            showSnackbarMessage('Жалоба успешно отправлена');
+                          } catch (e) {
+                            showSnackbarMessage('Произошла ошибка при отправке жалобы');
+                          }
+                          isActive.value = false;
+                        } else {
+                          await router.push('/auth');
+                        }
+                      }"
+                      ></v-btn>
+
+                      <v-spacer>
+
+                      </v-spacer>
+
+                      <v-btn
+                        text="Закрыть"
+                        @click="isActive.value = false"
+                      ></v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </template>
+              </v-dialog>
+            </div>
+          </div>
+
         </div>
       </div>
       <div class="my-3">
@@ -593,7 +708,7 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- <div v-if = "comment.replies.length > 0">
+          <div v-if = "comment.replies.length > 0">
             <div class = "replies-list my-5 ml-13" v-for = "reply in comment.replies" :key="reply.id">
               <div class = "info-header">
                 <div class = "user-avatar">
@@ -642,9 +757,9 @@ onMounted(async () => {
                 </div>
               </div>
             </div>
-          </div> -->
+          </div>
         </div>
-        <!-- <div class = "сomment-field">
+        <div class = "сomment-field">
           <hr class = "mt-5 pb-2">
           <div v-if="store.state.isAuthorized" class="mt-2">
             <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
@@ -691,7 +806,7 @@ onMounted(async () => {
               @click:append="() => { router.push('/auth'); }"
             ></v-text-field>
           </div>
-        </div> -->
+        </div>
       </div>
     </div>
     <v-snackbar
@@ -725,6 +840,22 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.article-header-report {
+  float: right;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.article-header-report-icon {
+  opacity: 25%;
+  transition: all 0.35s ease;
+}
+
+.article-header-report-icon:hover {
+  opacity: 100%;
+  cursor: pointer;
 }
 
 .article-footer div {
