@@ -18,9 +18,6 @@ const userComment = ref('');
 const sendEmptyComment = ref(false);
 const sendTooShortComment = ref(false);
 const sendTooLongComment = ref(false);
-const isCommentReply = ref(false);
-const replyCommentId = ref(undefined);
-const replyCommentAuthorsNickname = ref('');
 const isCommentEditing = ref(false);
 const editingCommentId = ref(-1);
 const successGetNewComments = ref(false);
@@ -41,7 +38,6 @@ const props = defineProps({
   announcementTotalComments: Number,
   announcementTotalViews: Number,
   announcementComments: String,
-  announcmentCommentsReplies: String,
   loadComments: {
     type: Function,
     default() {
@@ -63,11 +59,7 @@ async function sendComment(comment, announcementId) {
   }
 
   try {
-    if (!isCommentReply.value) {
-      await axios.post(`${store.state.API_URL}/api/announcement-comments/${announcementId}`, { text: comment }, store.state.config);
-    } else {
-      await axios.post(`${store.state.API_URL}/api/announcement-comments/${replyCommentId.value}/replies`, { text: comment }, store.state.config);
-    }
+    await axios.post(`${store.state.API_URL}/api/announcement-comments/${announcementId}`, { text: comment }, store.state.config);
     await props.loadComments();
     successGetNewComments.value = true;
   } catch (e) {
@@ -100,23 +92,8 @@ async function sendEditComment(commentId, commentText) {
   clearComment();
 }
 
-async function replyTo(commentAuthorNickname, commentId) {
-  cancelEdit();
-  cancelReply();
-  isCommentReply.value = true;
-  replyCommentAuthorsNickname.value = commentAuthorNickname;
-  // userComment.value = `@${commentAuthorNickname}, ${userComment}`;
-  replyCommentId.value = commentId;
-}
-
-function cancelReply() {
-  isCommentReply.value = false;
-  replyCommentId.value = undefined;
-  props.loadTotalCommentsValue();
-}
 
 async function editComment(commentId, newCommentText) {
-  cancelReply();
   cancelEdit();
   isCommentEditing.value = true;
   userComment.value = newCommentText;
@@ -147,7 +124,6 @@ const setSendTooLongComment = async () => {
 }
 function clearComment () {
   userComment.value = ''
-  cancelReply();
   cancelEdit();
 }
 
@@ -182,17 +158,17 @@ async function deleteFromFavourites(announcementId) {
   }
 }
 
-const shareAnnouncement = async (articleId, shareType) => {
+const shareAnnouncement = async (announcementId, shareType) => {
   shareBy.value = shareType;
   if (shareBy.value === 'link') {
     try {
-    //   shareLink.value = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share`)).data;
+      shareLink.value = (await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}/share`)).data;
     } catch (e) {
       shareLink.value = undefined;
     }
   } else {
     try {
-    //   shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
+      shareLink.value =  (await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}/share?share-type=${shareType}`)).data;
     } catch (e) {
       shareLink.value = undefined;
     }
@@ -249,7 +225,7 @@ onMounted(async () => {
       <hr class = "my-3">
       <div class = "article-footer-bar">
         <div class = "article-footer">
-          <div class = "article-favourites" style="margin-left: -1em">
+          <div class = "article-favourites" >
             <div v-if="announcementInFavourites" class = article-in-favourites-icon @click="async () => {
               redirectIfNotAuthorized();
               await deleteFromFavourites(announcementId);
@@ -287,7 +263,7 @@ onMounted(async () => {
                           <img src="/icons/share_link_icon.webp" style="height: 2.5em; width: 2.5em;">
                         </v-btn>
 
-                        <v-btn @click="async () => { await shareArticle(announcementId, 'vk'); }"
+                        <v-btn @click="async () => { await shareAnnouncement(announcementId, 'vk'); }"
                                icon
                                size="large">
                           <img src="/icons/share_vk_icon.png" style="height: 2.5em; width: 2.5em;">
@@ -356,7 +332,7 @@ onMounted(async () => {
                                 if (regex.test(shareEmailAddress)) {
                                   isValidShareEmail = true;
                                   try {
-                                    // await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share/email?to=${shareEmailAddress}`, store.state.config);
+                                    await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}/share/email?to=${shareEmailAddress}`, store.state.config);
                                     showEmailShareSnackMessage = true;
                                   } catch (e) {
                                     console.error(e);
@@ -428,17 +404,6 @@ onMounted(async () => {
               <p v-html="comment.text"></p>
             </div>
             <div class = "my-2" style = "font-size: 0.85em">
-                  <span
-                    class = "comment-reply-text mr-2"
-                    @click="async () =>
-                    {
-                      if (store.state.isAuthorized) {
-                          await replyTo(comment.user.nickname, comment.id);
-                      } else {
-                         await router.push('/auth')
-                       }
-                    }"
-                  > <strong> Ответить </strong> </span>
               <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
                     class = "comment-edit-text mr-2"
                     @click="async () =>
@@ -451,6 +416,12 @@ onMounted(async () => {
                     @click="async () =>
                       {
                         await deleteComment(comment.id);
+                        try {
+                          const response = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}/total-comments`);
+                          announcementTotalComments = response.data;
+                        } catch (e) {
+                          showSnackbarMessage('Произошла ошибка при подсчете комментариев');
+                        }
                       }"
               > <strong> Удалить </strong> </span>
             </div>
@@ -459,9 +430,6 @@ onMounted(async () => {
         <div class = "сomment-field">
           <hr class = "mt-5 pb-2">
           <div v-if="store.state.isAuthorized" class="mt-2">
-            <div class = "mb-2" v-if="isCommentReply" style = "margin-top: -0.314em">
-              <span> Ответ пользователю {{ replyCommentAuthorsNickname }} </span> <v-icon @click="cancelReply" style="margin-top: -0.17em;">mdi-close</v-icon>
-            </div>
             <div class = "mb-2" v-if="isCommentEditing" style = "margin-top: -0.314em">
               <span> Изменение комментария </span> <v-icon @click="cancelEdit" style="margin-top: -0.17em;">mdi-close</v-icon>
             </div>
@@ -483,11 +451,12 @@ onMounted(async () => {
                     } else {
                       await sendEditComment(editingCommentId, userComment);
                     }
-                    // try {
-                    //   announcementTotalComments = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}/total-comments`);
-                    // } catch (e) {
-                    //   showSnackbarMessage('Произошла ошибка при подсчете комментариев');
-                    // }
+                    try {
+                      const response = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}/total-comments`);
+                      announcementTotalComments = response.data;
+                    } catch (e) {
+                      showSnackbarMessage('Произошла ошибка при подсчете комментариев');
+                    }
                   }"
               @click:clear="clearComment"
               @update:model-value="newComment => userComment = newComment"

@@ -488,11 +488,12 @@ export default {
       } catch (error) {
         if (error.response && error.response.data && error.response.data.errors) {
           const serverErrors = error.response.data.errors;
+          loading.value = false;
           showModal(null, serverErrors);
-
-        } else {
-          console.error('Error submitting article:', error);
-        }
+          return;
+        } 
+        loading.value = false;
+        console.log("Error submiting article " + error);
       }
     }
 
