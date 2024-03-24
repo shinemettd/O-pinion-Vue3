@@ -392,14 +392,15 @@
                               password: oldPasswordConfirmationValue
                             });
                             if (checkPasswordResponse.status === HttpStatusCode.Ok) {
+                              const freshToken = checkPasswordResponse.data.access_token;
                               try {
-                                await axios.put(`${store.state.API_URL}/api/password/reset/${store.state.userToken}`,
+                                await axios.put(`${store.state.API_URL}/api/password/reset/${freshToken}`,
                                 {
                                   password: passwordValue,
                                   confirm_password: passwordConfirmationValue
                                 })
                                 isActive.value = false;
-                                showSnackbarMessage('Пароль успешно сменен');
+                                showSnackbarMessage('Пароль успешно изменен');
                               } catch (e) {
                                 isActive.value = false;
                                 console.error(e);
