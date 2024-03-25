@@ -13,6 +13,7 @@
         </div>
         <div>
           <div v-if="store.state.isAuthorized">
+            <router-link v-if="store.state.isAuthorized" to="/saved-content" class="burger-button"><i class="fas fa-heart"></i></router-link>
             <router-link v-if="store.state.isAuthorized" to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
             <router-link v-if="store.state.isAuthorized" to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
             <button v-if="store.state.isAuthorized" @click="toggleMenu" class="burger-button1">☰</button>

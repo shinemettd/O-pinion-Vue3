@@ -13,6 +13,7 @@ import PageNotFound from "@/pages/PageNotFound.vue";
 import store from "@/store/store";
 import SettingsPage from "@/pages/SettingsPage.vue";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
+import SavedContentPage from '@/pages/SavedContentPage.vue';
 
 
 const router = createRouter({
@@ -23,6 +24,13 @@ const router = createRouter({
       component: MainPage,
       meta: {
         title: 'Главная'
+      }
+    },
+    {
+      path: '/saved-content',
+      component: SavedContentPage,
+      meta: {
+        title: 'Понравившиеся'
       }
     },
     {
