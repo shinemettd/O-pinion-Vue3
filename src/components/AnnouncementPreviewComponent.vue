@@ -23,6 +23,7 @@ defineProps({
   postedTimeAgo: String,
   announcementId: Number,
   announcementTitle: String,
+  announcementContent: String,
   announcementMainPictureUrl: {
     type: String,
   },
@@ -99,7 +100,7 @@ const shareAnnouncement = async (announcementId, shareType) => {
             <img src="/icons/announcement.jpg" alt = "Users avatar picture">
           </div>
           <div class = "article-authors-nickname">
-            <p style = "font-weight: 700;">O!pinion</p>
+            <p style = "font-weight: 700;"> O!pinion</p>
           </div>
           <div class = "article-recently-date">
             <router-link :to="'/announcement/' + announcementId">
@@ -108,7 +109,6 @@ const shareAnnouncement = async (announcementId, shareType) => {
           </div>
         </div>
       </div>
-
       <router-link :to="'/announcement/' + announcementId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
         <div class = "article-title">
@@ -122,10 +122,8 @@ const shareAnnouncement = async (announcementId, shareType) => {
             <img :src = "announcementMainPictureUrl" alt = "Main picture of article preview">
           </router-link>
         </div>
-        <div class = "article-read-more">
-          <router-link :to="'/announcement/' + announcementId" class="navbar-item">
-            <v-btn style="margin-top: 10px; margin-bottom: 10px;">Читать далее</v-btn>
-          </router-link>
+        <div class="my-3">
+          <ContentRender :content="announcementContent"/>
         </div>
         <div class = "article-footer-bar mt-4">
           <div class = "article-footer">
@@ -300,8 +298,8 @@ article {
   border-radius: 20px;
   box-sizing: border-box;
   margin: 0 auto;
+  background-color: #b4a7cc;
 }
-
 .article-header div {
   display: inline-block;
   vertical-align: middle;
@@ -328,6 +326,13 @@ article {
 .article-title a:hover {
   color: rgb(120, 194, 255);
 }
+
+
+.article-authors-nickname p
+{
+  margin-left: 10px;
+}
+
 
 .article-authors-avatar img {
   width: 32px;

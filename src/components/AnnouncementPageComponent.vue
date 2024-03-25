@@ -30,6 +30,9 @@ const props = defineProps({
   announcementId: Number,
   announcementTitle: String,
   announcementContent: String,
+  announcementMainPictureUrl: {
+    type: String,
+  },
   announcementTotalFavourites: Number,
   announcementInFavourites: {
     type: Boolean,
@@ -217,6 +220,11 @@ onMounted(async () => {
             </div>
           </div>
         </div>
+      </div>
+      <div v-if = "(announcementMainPictureUrl !== '' && announcementMainPictureUrl !== null)" class = "article-picture">
+          <router-link :to="'/announcement/' + announcementId">
+            <img :src = "announcementMainPictureUrl" alt = "Main picture of article preview">
+          </router-link>
       </div>
       <div class="my-3">
         <ContentRender :content="announcementContent"/>
@@ -531,6 +539,14 @@ onMounted(async () => {
   opacity: 100%;
 }
 
+.article-picture img {
+  max-width: 100%;
+  max-height: 80%;
+  display: block;
+  margin: 0 auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
 
 
 .article-in-favourites-icon {

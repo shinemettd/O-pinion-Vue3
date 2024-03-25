@@ -14,6 +14,7 @@ import store from "@/store/store";
 import SettingsPage from "@/pages/SettingsPage.vue";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
 
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [

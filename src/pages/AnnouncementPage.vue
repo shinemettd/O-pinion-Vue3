@@ -55,6 +55,7 @@ onBeforeMount(async () => {
     :announcement-id = "currentAnnouncement.data.id"
     :announcement-title = "currentAnnouncement.data.title"
     :announcement-content = "currentAnnouncement.data.content"
+    :announcement-main-picture-url="currentAnnouncement.data.cover_image"
     :posted-time-ago = "currentAnnouncement.data.date_time"
     :announcement-total-views = "currentAnnouncement.data.total_views"
     :announcement-total-favourites = "currentAnnouncement.data.total_favourites"
