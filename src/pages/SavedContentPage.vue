@@ -180,6 +180,6 @@ const isAuthorized = async () => {
 }
 
 .loading-content img {
-    height: 100px;
+    height: 150px;
 }
 </style>

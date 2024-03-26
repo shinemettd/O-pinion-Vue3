@@ -298,7 +298,8 @@ article {
   border-radius: 20px;
   box-sizing: border-box;
   margin: 0 auto;
-  background-color: #b4a7cc;
+  background-color: #e3e4e5;
+  /* background-color: #fdf6ee; */
 }
 .article-header div {
   display: inline-block;
