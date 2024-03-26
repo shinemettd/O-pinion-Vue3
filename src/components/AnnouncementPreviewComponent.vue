@@ -301,12 +301,11 @@ const shareAnnouncement = async (announcementId, shareType) => {
 <style scoped>
 article {
   width: 95%;
-  border: solid 1px #350454FF;
+  /* border: solid 1px #350454FF; */
+  border: solid 2px rgb(251, 201, 0);
   border-radius: 20px;
   box-sizing: border-box;
   margin: 0 auto;
-  background-color: #e3e4e5;
-  /* background-color: #fdf6ee; */
 }
 .article-header div {
   display: inline-block;

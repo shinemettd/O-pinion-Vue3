@@ -19,6 +19,9 @@
             
           <hr>
           <div v-if="content === 'article'">
+              <div v-if="articles.length === 0">
+                  <p style="display: inline;margin: auto;"> Ничего то тебе не нравится</p>
+              </div>
               <div v-if="articles.length > 0" v-for="article in articles" :key="article.id" class="scroll-content my-7">
                   <ArticlePreviewComponent
                   :authors-nickname="article.author.nickname"
@@ -38,6 +41,11 @@
               </div>
           </div>
           <div v-else-if="content === 'announcement'">
+              <div v-if="announcements.length === 0">
+                <div>
+                  Ничего то тебе не нравится
+                </div> 
+              </div>
               <div v-if="announcements.length > 0" v-for="announcement in announcements" :key="announcement.id" class="scroll-content my-7">
                   <AnnouncementPreviewComponent
                   :postedTimeAgo="announcement.date_time"
