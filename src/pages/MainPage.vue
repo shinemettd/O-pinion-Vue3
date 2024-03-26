@@ -50,11 +50,13 @@
       </div> -->
       <div v-if="loading" class="loading-spinner">
         <div class="loading-content">
-          <img src="/icons/loading.gif" alt="Loading..." style="margin: auto;">
+          <img src="/icons/loading.gif" alt="Loading...">
         </div>
       </div>
-      <div v-else class="text-center mt-7 pb-5"> Нет доступных статей </div>
+
+      <div v-else-if="!isDataFetched" class="text-center mt-7 pb-5"> Нет доступных статей </div>
       <div v-if = "articles.length" v-observe-visibility="handleScrolledToBottom"> </div>
+
     </div>
   </main>
 </template>
@@ -76,6 +78,7 @@ const sortBy = ref('dateTime,desc');
 const showContent = ref('articles');
 const totalPages = ref(0);
 const loading = ref(false);
+const isDataFetched = ref(true);
 
 const getArticles = async () => {
   loading.value = true;
@@ -94,16 +97,17 @@ const getArticles = async () => {
   try {
     const response = await axios.get(`${store.state.API_URL}/api/articles?page=${currentPage.value}`, config);
     loading.value = false;
+    isDataFetched.value = true;
     articles.value.push(...response.data.content);
     totalPages.value = response.data.totalPages;
   } catch (error) {
     loading.value = false;
+    isDataFetched.value = false;
     console.error('Не удалось загрузить статьи:', error);
   }
 }
 
 const getAnnouncements = async () => {
-  loading.value = true;
   const config = {
     params: {
       sort: sortBy.value
@@ -169,8 +173,8 @@ onBeforeMount(async () => {
   if (!(await isAuthorized())) {
     store.commit('logout');
   }
-  await getArticles();
   await getAnnouncements();
+  await getArticles();
 });
 
 </script>
@@ -203,14 +207,16 @@ onBeforeMount(async () => {
   z-index: 1;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
+  width: 0%;
+  height: 0%;
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-.loading-content {
+.loading-content img {
   position: fixed;
+  max-width: 20%;
+  min-height: 20%;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
