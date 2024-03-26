@@ -49,7 +49,7 @@
                   :announcement-in-favourites="announcement.in_favourites"
                   :announcement-total-comments="announcement.total_comments"
                   :announcement-total-views="announcement.total_views"
-                  :articles="articles"
+                  :announcements="announcements"
                   />
               </div>
           </div>

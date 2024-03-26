@@ -15,7 +15,7 @@ const shareEmailAddress = ref('');
 const showSnackMessage = ref(false);
 const snackMessageText = ref('');
 
-defineProps({
+const props = defineProps({
   showWithoutHeader: {
     type: Boolean,
     default: false
@@ -34,6 +34,7 @@ defineProps({
   },
   announcementTotalComments: Number,
   announcementTotalViews: Number,
+  announcements: Function
 })
 
 function formatDateTime(timeString) {
@@ -63,6 +64,12 @@ async function addToFavourites(announcementId) {
 async function deleteFromFavourites(announcementId) {
   try {
     await axios.delete(`${store.state.API_URL}/api/saved-announcements/${announcementId}`, store.state.config);
+    if(props.announcements) {
+      const indexToRemove = props.announcements.findIndex(announcement => announcement.id === announcementId)
+      if (indexToRemove !== -1) {
+        props.announcements.splice(indexToRemove, 1)
+      }
+    }
     showSnackbarMessage('Объявление успешно удалена из избранного');
   } catch (e) {
     console.log(e)
