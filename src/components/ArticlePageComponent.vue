@@ -319,8 +319,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class = "container mx-auto">
-    <div class = "scroll mx-auto border scroll-container w-66 h-100 px-4 py-3">
+  <main class = "container">
+    <div class = "article-content scroll mx-auto border scroll-container h-100 px-4 py-3">
       <hr>
       <div class = "article-header mt-3">
         <p style = "font-size: 2em; word-wrap: break-word;"> {{ articleTitle }} </p>
@@ -664,7 +664,7 @@ onMounted(async () => {
           <div class = "info-header">
             <div class = "user-avatar">
               <router-link :to="`/user/${comment.user.nickname}`">
-                <img :src="comment.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
+                <img :src="comment.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" alt = "Users avatar picture">
               </router-link>
             </div>
             <div class = "comment-user-data">
@@ -713,7 +713,7 @@ onMounted(async () => {
               <div class = "info-header">
                 <div class = "user-avatar">
                   <router-link :to="`/user/${reply.user.nickname}`">
-                    <img :src="reply.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" style = "margin-top: 0.35em; margin-right: 0.75em" alt = "Users avatar picture">
+                    <img :src="reply.user.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'" alt = "Users avatar picture">
                   </router-link>
                 </div>
                 <div class = "comment-user-data">
@@ -830,6 +830,8 @@ onMounted(async () => {
 
 <style scoped>
 .user-avatar img {
+  margin-top: 0.35em;
+  margin-right: 0.75em;
   width: 2.5em;
   height: 2.5em;
   border-radius: 50%;
@@ -880,7 +882,6 @@ onMounted(async () => {
   cursor: pointer;
   opacity: 100%;
 }
-
 
 .article-reaction {
   cursor: pointer;
@@ -973,6 +974,10 @@ onMounted(async () => {
 }
 
 @media screen and (max-width: 720px) {
+  .article-content {
+    width: 100%;
+  }
+
   .scroll-container {
     width: 100%;
   }
@@ -989,8 +994,12 @@ onMounted(async () => {
   .article-footer-bar {
     flex-direction: column;
   }
-  .comment-user-data p {
-    text-align: center;
+
+}
+
+@media screen and (min-width: 1280px){
+  .article-content {
+    width: 66%;
   }
 }
 
