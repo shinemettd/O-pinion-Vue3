@@ -243,7 +243,7 @@
     padding: 5px;
     display: flex;
     flex-wrap: wrap;
-    min-height: 200px;
+    min-height: 100px;
   }
 
   .tag-functionality {
@@ -282,7 +282,7 @@
 
 .matching-tags {
   overflow-y: auto;
-  max-height: 200px;
+  max-height: 100px;
 }
   .existing-tags {
     display: flex;
