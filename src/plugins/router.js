@@ -15,6 +15,7 @@ import SettingsPage from "@/pages/SettingsPage.vue";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
 import SuccessRegisterPage from "@/pages/SuccessRegisterPage.vue";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
+import SavedContentPage from '@/pages/SavedContentPage.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -24,6 +25,13 @@ const router = createRouter({
       component: MainPage,
       meta: {
         title: 'Главная'
+      }
+    },
+    {
+      path: '/saved-content',
+      component: SavedContentPage,
+      meta: {
+        title: 'Понравившиеся'
       }
     },
     {

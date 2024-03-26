@@ -35,6 +35,19 @@
           :article-total-views="article.total_views"
         />
       </div>
+      <!-- <div v-if="announcements.length > 0" v-for="announcement in announcements" :key="announcement.id" class="scroll-content my-7">
+        <AnnouncementPreviewComponent
+          :postedTimeAgo="announcement.date_time"
+          :announcement-id="announcement.id"
+          :announcement-title="announcement.title"
+          :announcement-content = "announcement.content"
+          :announcement-main-picture-url="announcement.cover_image"
+          :announcement-total-favourites="announcement.total_favourites"
+          :announcement-in-favourites="announcement.in_favourites"
+          :announcement-total-comments="announcement.total_comments"
+          :announcement-total-views="announcement.total_views"
+        />
+      </div> -->
       <div v-if="loading" class="loading-spinner">
         <div class="loading-content">
           <img src="/icons/loading.gif" alt="Loading..." style="margin: auto;">
@@ -49,18 +62,20 @@
 <script setup>
 import axios, {HttpStatusCode} from 'axios';
 import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
+import AnnouncementPreviewComponent from '@/components/AnnouncementPreviewComponent.vue';
 import {onBeforeMount, ref} from "vue";
 import store from "@/store/store";
 
 const currentPage = ref(0);
 const pageSize = ref(10);
 const articles = ref([]);
+const announcements = ref([]);
 const sortToggle = ref(0);
 const showToggle = ref(0);
 const sortBy = ref('dateTime,desc');
 const showContent = ref('articles');
 const totalPages = ref(0);
-const loading = ref(true);
+const loading = ref(false);
 
 const getArticles = async () => {
   loading.value = true;
@@ -82,7 +97,33 @@ const getArticles = async () => {
     articles.value.push(...response.data.content);
     totalPages.value = response.data.totalPages;
   } catch (error) {
+    loading.value = false;
     console.error('Не удалось загрузить статьи:', error);
+  }
+}
+
+const getAnnouncements = async () => {
+  loading.value = true;
+  const config = {
+    params: {
+      sort: sortBy.value
+    }
+  };
+
+  if (store.state.isAuthorized) {
+    config.headers = {
+      'Authorization': `Bearer ${store.state.userToken}`
+    };
+  }
+
+  try {
+    const response = await axios.get(`${store.state.API_URL}/api/announcements?page=${currentPage.value}`, config);
+    loading.value = false;
+    announcements.value.push(...response.data.content);
+    totalPages.value = response.data.totalPages;
+  } catch (error) {
+    loading.value = false;
+    console.error('Не удалось загрузить объявления:', error);
   }
 }
 
@@ -91,6 +132,7 @@ const handleScrolledToBottom = (isVisible) => {
   if (currentPage.value >= totalPages.value) { return };
   currentPage.value += 1;
   getArticles();
+  // getAnnouncements();
 }
 
 const sortByDateTime = () => {
@@ -108,6 +150,7 @@ const sortByPopularity = () => {
 const setPage = async (page) => {
   currentPage.value = page;
   await getArticles();
+  // await getAnnouncements();
 }
 
 const isAuthorized = async () => {
@@ -127,6 +170,7 @@ onBeforeMount(async () => {
     store.commit('logout');
   }
   await getArticles();
+  await getAnnouncements();
 });
 
 </script>

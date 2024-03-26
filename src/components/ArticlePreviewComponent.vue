@@ -132,7 +132,6 @@ export default {
   }
 }
 </script>
-
 <template>
   <article class = "article-block">
     <div class = "article-content">
