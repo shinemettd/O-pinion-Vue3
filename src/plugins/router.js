@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import MainPage from "@/pages/MainPage.vue";
-import Notification from "@/components/Notification.vue";
 import Register from "@/components/Register.vue";
 import Auth from "@/components/Auth.vue";
 import ArticlePage from "@/pages/ArticlePage.vue";
@@ -16,6 +15,8 @@ import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
 import SuccessRegisterPage from "@/pages/SuccessRegisterPage.vue";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
 import SavedContentPage from '@/pages/SavedContentPage.vue';
+import NotificationComponent from "@/components/NotificationComponent.vue";
+import NotificationPage from "@/pages/NotificationPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -79,8 +80,8 @@ const router = createRouter({
     },
     {
       path: '/notification',
-      name: 'Notification',
-      component: Notification,
+      name: 'Notifications',
+      component: NotificationPage,
       meta: {
         title: 'Уведомления'
       }
