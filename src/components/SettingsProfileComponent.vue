@@ -8,8 +8,12 @@
           Личные данные
         </v-btn>
         <v-btn
-          @click = "tab = 'privacy'">
-          Приватность
+        @click = "tab = 'privacy'">
+        Приватность
+      </v-btn>
+        <v-btn
+          @click = "tab = 'changePassword'">
+          Смена пароля
         </v-btn>
       </v-btn-toggle>
       </div>
@@ -118,53 +122,6 @@
 
           </v-row>
 
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                :error-messages = "(passwordValue.length < 8 && passwordValue.length !== 0) ? 'Пароль не может содержать меньше 8 символов' : ''"
-                label="Смена пароля"
-                placeholder="Введите пароль"
-                :model-value="passwordValue"
-                :append-inner-icon="showPasswordValue ? 'mdi-eye' : 'mdi-eye-off'"
-                :type="showPasswordValue ? 'text' : 'password'"
-                :rules="[
-                        rule => /^(?=.*\d)/.test(rule) || 'Пароль должен содержать хотя бы одну цифру',
-                        rule => /(?=.*[!@#$%^&*])/.test(rule)  || 'Пароль должен содержать хотя бы один специальный символ',
-                        rule => /(?=.*[a-z])/.test(rule) || 'Пароль должен содержать хотя бы одну маленькую латинскую букву',
-                        rule => /(?=.*[A-Z])/.test(rule) || 'Пароль должен содержать хотя бы одну заглавную латинскую букву'
-                        ]"
-                variant="outlined"
-                @click:append-inner="showPasswordValue = !showPasswordValue"
-                @update:modelValue="newPassword => { passwordValue = newPassword }"
-              ></v-text-field>
-            </v-col>
-
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-if="passwordValue.length < 8"
-                label="Подтверждение смены пароля"
-                placeholder="Сначала введите основное поле"
-                :append-inner-icon="showPasswordConfirmationValue ? 'mdi-eye' : 'mdi-eye-off'"
-                :type="showPasswordConfirmationValue ? 'text' : 'password'"
-                @click:append-inner="showPasswordConfirmationValue = !showPasswordConfirmationValue"
-                variant="outlined"
-                readonly
-              ></v-text-field>
-
-              <v-text-field v-else
-                :error-messages="(passwordValue !== passwordConfirmationValue) ? 'Пароли не совпадают' : ''"
-                label="Подтверждение смены пароля"
-                placeholder="Введите пароль еще раз"
-                :model-value="passwordConfirmationValue"
-                :append-inner-icon="showPasswordConfirmationValue ? 'mdi-eye' : 'mdi-eye-off'"
-                :type="showPasswordConfirmationValue ? 'text' : 'password'"
-                variant="outlined"
-                @click:append-inner="showPasswordConfirmationValue = !showPasswordConfirmationValue"
-                @update:modelValue="newConfirmationPassword => { passwordConfirmationValue = newConfirmationPassword}"
-              ></v-text-field>
-            </v-col>
-
-          </v-row>
           <div style="margin-left: 85%">
             <v-btn
               class="mb-2 mt-5"
@@ -200,22 +157,6 @@
             >
               Сохранить
             </v-btn>
-            <v-snackbar
-              v-model="showSnackMessage"
-              :timeout="3000"
-            >
-              {{ snackMessageText }}
-
-              <template v-slot:actions>
-                <v-btn
-                  color="purple"
-                  variant="text"
-                  @click="showSnackMessage = false"
-                >
-                  Закрыть
-                </v-btn>
-              </template>
-            </v-snackbar>
           </div>
         </v-container>
       </div>
@@ -343,26 +284,151 @@
             >
               Сохранить
             </v-btn>
-            <v-snackbar
-              v-model="showSnackMessage"
-              :timeout="3000"
-            >
-              {{ snackMessageText }}
 
-              <template v-slot:actions>
-                <v-btn
-                  color="purple"
-                  variant="text"
-                  @click="showSnackMessage = false"
-                >
-                  Закрыть
-                </v-btn>
-              </template>
-            </v-snackbar>
           </div>
 
         </v-container>
       </div>
+      <div v-else-if="tab === 'changePassword'">
+        <strong> <p class = "mt-3 ml-3 pb-10"> Введите новый пароль: </p></strong>
+        <v-row>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              :error-messages = "(passwordValue.length < 8 && passwordValue.length !== 0) ? 'Пароль не может содержать меньше 8 символов' : ''"
+              label="Пароль"
+              placeholder="Введите пароль"
+              :model-value="passwordValue"
+              :append-inner-icon="showPasswordValue ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showPasswordValue ? 'text' : 'password'"
+              :rules="[
+                        rule => /^(?=.*\d)/.test(rule) || 'Пароль должен содержать хотя бы одну цифру',
+                        rule => /(?=.*[!@#$%^&*])/.test(rule)  || 'Пароль должен содержать хотя бы один специальный символ',
+                        rule => /(?=.*[a-z])/.test(rule) || 'Пароль должен содержать хотя бы одну маленькую латинскую букву',
+                        rule => /(?=.*[A-Z])/.test(rule) || 'Пароль должен содержать хотя бы одну заглавную латинскую букву'
+                        ]"
+              variant="outlined"
+              @click:append-inner="showPasswordValue = !showPasswordValue"
+              @update:modelValue="newPassword => {
+                passwordValue = newPassword;
+                checkPasswords();
+                }"
+            ></v-text-field>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-if="passwordValue.length < 8"
+              label="Подтверждение пароля"
+              placeholder="Сначала введите основное поле"
+              :append-inner-icon="showPasswordConfirmationValue ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showPasswordConfirmationValue ? 'text' : 'password'"
+              @click:append-inner="showPasswordConfirmationValue = !showPasswordConfirmationValue"
+              variant="outlined"
+              readonly
+            ></v-text-field>
+
+            <v-text-field v-else
+                          :error-messages="(passwordValue !== passwordConfirmationValue) ? 'Пароли не совпадают' : ''"
+                          label="Подтверждение смены пароля"
+                          placeholder="Введите пароль еще раз"
+                          :model-value="passwordConfirmationValue"
+                          :append-inner-icon="showPasswordConfirmationValue ? 'mdi-eye' : 'mdi-eye-off'"
+                          :type="showPasswordConfirmationValue ? 'text' : 'password'"
+                          variant="outlined"
+                          @click:append-inner="showPasswordConfirmationValue = !showPasswordConfirmationValue"
+                          @update:modelValue="newConfirmationPassword => {
+                            passwordConfirmationValue = newConfirmationPassword;
+                            checkPasswords();
+                          }"
+            ></v-text-field>
+          </v-col>
+
+        </v-row>
+
+        <v-dialog max-width="500">
+          <template v-slot:activator="{ props: activatorProps }">
+            <div style="margin-left: 85%">
+              <v-btn
+                v-bind="openOldPasswordWindow? activatorProps : ''"
+                class="my-5"
+                variant="tonal"
+                color = "purple"
+                @click = "async () => {
+                if (!(passwordValue === passwordConfirmationValue)) {
+                  isPasswordsConfirmed = true;
+                  showSnackbarMessage('Пароли не совпадают!');
+                  return;
+                }
+            }"
+              >
+                Сохранить
+              </v-btn>
+            </div>
+          </template>
+
+          <template v-if = "openOldPasswordWindow" v-slot:default="{ isActive }" >
+            <v-card v-if = "openOldPasswordWindow" title="А теперь, введите свой старый пароль:">
+              <div class = "my-5 mx-5">
+                <v-text-field
+                      :error-messages="isOldPasswordCorrect ? '' : 'Неверный пароль'"
+                      label="Ваш старый пароль"
+                      placeholder="Введите старый пароль"
+                      type="password"
+                      :model-value="oldPasswordConfirmationValue"
+                      variant="outlined"
+                      @update:modelValue="oldPassword => { oldPasswordConfirmationValue = oldPassword }"
+                ></v-text-field>
+              </div>
+              <v-card-actions class = "mx-3 mb-5" style="margin-top: -1.1em">
+                <v-btn
+                  color="surface-variant"
+                  text="Подтвердить"
+                  variant="flat"
+                  @click="async () => {
+                              try {
+                                await axios.put(`${store.state.API_URL}/api/password`,
+                                {
+                                  old_password: oldPasswordConfirmationValue,
+                                  new_password: passwordValue,
+                                  confirm_new_password: passwordConfirmationValue
+                                }, store.state.config)
+                                showSnackbarMessage('Пароль успешно изменен');
+                                oldPasswordConfirmationValue = '';
+                              } catch (e) {
+                                console.error(e);
+                                showSnackbarMessage('Произошла ошибка при изменении пароля');
+                              }
+                              isActive.value = false;
+                        }"
+                ></v-btn>
+                <v-spacer>
+                </v-spacer>
+
+                <v-btn
+                  text="Закрыть"
+                  @click="isActive.value = false"
+                ></v-btn>
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-dialog>
+      </div>
+      <v-snackbar
+        v-model="showSnackMessage"
+        :timeout="3000"
+      >
+        {{ snackMessageText }}
+
+        <template v-slot:actions>
+          <v-btn
+            color="purple"
+            variant="text"
+            @click="showSnackMessage = false"
+          >
+            Закрыть
+          </v-btn>
+        </template>
+      </v-snackbar>
     </div>
   </main>
 </template>
@@ -377,6 +443,7 @@ const tab = ref('personal');
 const showToggle = ref(0);
 const showSnackMessage = ref(false);
 const snackMessageText = ref('');
+const reportReason = ref('');
 
 defineProps({
   firstName: {
@@ -405,6 +472,12 @@ const passwordValue = ref('');
 const passwordConfirmationValue = ref('');
 const showPasswordValue = ref(false)
 const showPasswordConfirmationValue = ref(false)
+const isPasswordsConfirmed = ref(false);
+
+const oldPasswordConfirmationValue = ref('');
+const isOldPasswordCorrect = ref(true);
+
+const openOldPasswordWindow = ref(false);
 
 const days = ref(Array.from({ length: 31 }, (_, index) => index + 1));
 const months = ref(['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']);
@@ -528,6 +601,18 @@ const checkNickname = async (nickname) => {
     }
   } catch (e) {
     isNicknameTaken.value = false;
+  }
+}
+
+const checkPasswords = () => {
+  let regExp = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+  if (!(regExp.test(passwordValue.value))) {
+    return;
+  }
+  if (passwordConfirmationValue.value === passwordValue.value) {
+    openOldPasswordWindow.value = true;
+  } else {
+    openOldPasswordWindow.value = false;
   }
 }
 

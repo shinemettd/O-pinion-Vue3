@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper fadeInDown">
-    <div id="formContent">
+    <div v-if="!registerSuccess" id="formContent">
       <router-link to="/auth"><h2 class="inactive underlineHover">Войти</h2></router-link>
       <h2 class="inactive text-black">Зарегистрироваться</h2>
       <div class="fadeIn first"></div>
@@ -74,13 +74,20 @@
 
 
     </div>
+    <div v-else class="border rounded-xl py-10 px-10">
+      <h1 class = "text-center" style="font-size: 5em;">🎉</h1>
+      <h2 class = "text-center" style="font-size: 1.75em;"> Вы были успешно зарегистрированы </h2>
+      <h1 class = "text-center" style="font-size: 1em; margin-top: 1.5em;"> Проверьте почту {{ email }}, вам пришло письмо (с подтверждением аккаунта)</h1>
+      <h3 class = "text-center" style="font-size: 1em; margin-top: 1.5em;"> <router-link to="/auth"> На страницу входа </router-link></h3>
+    </div>
   </div>
 </template>
 
 <script>
 import {ref} from 'vue';
-import axios from 'axios';
+import axios, {HttpStatusCode} from 'axios';
 import store from "@/store/store";
+import router from "@/plugins/router";
 
 export default {
   setup() {
@@ -95,6 +102,8 @@ export default {
 
     const showPassword = ref(false);
     const errors = ref({});
+
+    const registerSuccess = ref(false);
 
     const register = async () => {
       errors.value = {};
@@ -114,9 +123,7 @@ export default {
               'Content-Type': 'application/json',
             },
           });
-
-          console.log(response.data);
-          this.$router.push('/auth');
+          await router.push('/success-registration');
 
         } catch (error) {
         }
@@ -218,6 +225,7 @@ export default {
       togglePasswordVisibility,
       birth_date,
       errors,
+      registerSuccess,
     };
   },
 };

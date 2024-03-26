@@ -13,8 +13,9 @@ import PageNotFound from "@/pages/PageNotFound.vue";
 import store from "@/store/store";
 import SettingsPage from "@/pages/SettingsPage.vue";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
+import SuccessRegisterPage from "@/pages/SuccessRegisterPage.vue";
+import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
 import SavedContentPage from '@/pages/SavedContentPage.vue';
-
 
 const router = createRouter({
   history: createWebHistory(),
@@ -101,11 +102,27 @@ const router = createRouter({
       }
     },
     {
+      name: 'SuccessRegister',
+      path: '/success-registration',
+      component: SuccessRegisterPage,
+      meta: {
+        title: 'Успешная регистрация'
+      }
+    },
+    {
       name: 'ForgotPassword',
       path: '/forgot-password',
       component: ForgotPasswordPage,
       meta: {
         title: 'Сброс пароля'
+      }
+    },
+    {
+      name: 'ResetPassword',
+      path: '/reset-password/:token',
+      component: ResetPasswordPage,
+      meta: {
+        title: 'Новый пароль'
       }
     },
     {

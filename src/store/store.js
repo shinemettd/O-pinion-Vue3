@@ -16,32 +16,25 @@ export default createStore({
   },
   mutations: {
     setToken(state, token) {
-      console.log(`установлен токен:${token}`);
       state.userToken = token;
     },
     setAuthorized (state) {
       state.isAuthorized = true;
-      console.log(`установлено значение авторизации: ${state.isAuthorized}`);
       state.isAuthorized = true;
     },
     setUnauthorized (state) {
       state.isAuthorized = false;
-      console.log(`установлено значение авторизации: ${state.isAuthorized}`);
     },
     setNickname (state, nickname) {
-      console.log(`установлен ник:${nickname}`);
       state.nickname = nickname;
     },
     setEmail (state, email) {
-      console.log(`установлен email:${email}`);
       state.email = email;
     },
     setId (state, id) {
-      console.log(`установлен id:${id}`);
       state.id = id;
     },
     setConfig(state, config) {
-      console.log(`установлен config:${config}`);
       state.config = config;
     },
     logout(state) {
