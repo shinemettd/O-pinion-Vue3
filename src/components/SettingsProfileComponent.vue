@@ -385,31 +385,20 @@
                   text="Подтвердить"
                   variant="flat"
                   @click="async () => {
-                          try {
-                            const checkPasswordResponse = await axios.post(`${store.state.API_URL}/api/auth/sign-in`,
-                            {
-                              email: store.state.email,
-                              password: oldPasswordConfirmationValue
-                            });
-                            if (checkPasswordResponse.status === HttpStatusCode.Ok) {
-                              const freshToken = checkPasswordResponse.data.access_token;
                               try {
-                                await axios.put(`${store.state.API_URL}/api/password/reset/${freshToken}`,
+                                await axios.put(`${store.state.API_URL}/api/password`,
                                 {
-                                  password: passwordValue,
-                                  confirm_password: passwordConfirmationValue
-                                })
-                                isActive.value = false;
+                                  old_password: oldPasswordConfirmationValue,
+                                  new_password: passwordValue,
+                                  confirm_new_password: passwordConfirmationValue
+                                }, store.state.config)
                                 showSnackbarMessage('Пароль успешно изменен');
+                                oldPasswordConfirmationValue = '';
                               } catch (e) {
-                                isActive.value = false;
                                 console.error(e);
                                 showSnackbarMessage('Произошла ошибка при изменении пароля');
                               }
-                            }
-                          } catch (e) {
-                            isOldPasswordCorrect = false;
-                          }
+                              isActive.value = false;
                         }"
                 ></v-btn>
                 <v-spacer>
