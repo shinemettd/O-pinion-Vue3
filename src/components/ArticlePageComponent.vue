@@ -35,6 +35,7 @@ const successGetNewComments = ref(false);
 const snackMessageText = ref('');
 const showSnackMessage = ref(false);
 
+
 const props = defineProps({
   authorsNickname: String,
   authorsAvatarUrl: {
@@ -56,6 +57,7 @@ const props = defineProps({
   articleComments: String,
   articleCommentsReplies: String,
   articleStatus: String,
+  articleTags: Array,
   loadComments: {
     type: Function,
     default() {
@@ -77,6 +79,10 @@ const props = defineProps({
     }
   }
 })
+
+function formatTags() {
+  return props.articleTags.map(tag => tag.name).join(', ');
+}
 
 async function sendComment(comment, articleId) {
   if (comment.length === 0) {
@@ -460,12 +466,10 @@ onMounted(async () => {
         </div>
       </div>
       <div class="my-3">
-        <!--   article content     -->
         <ContentRender :content="articleContent"/>
       </div>
-      <div class="my-3">
-        Секция тегов
-        <!--  tags  reactions etc    -->
+      <div class="my-3" v-if="articleTags">
+        <p ><span style="font-weight: bold; margin-right: 5px;">Теги:</span> {{ formatTags() }}</p>
       </div>
       <hr class = "my-3">
       <div class = "article-footer-bar">
