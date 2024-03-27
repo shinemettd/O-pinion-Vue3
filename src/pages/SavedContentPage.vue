@@ -2,8 +2,10 @@
     <main class="container mx-auto">
         <div class="scroll mx-auto border w-66 lg:w-2/3 xl:w-1/2 h-auto lg:h-100 px-10">
           <div class="sorter w-full lg:w-1/2 h-auto my-5 flex flex-col lg:flex-row items-center justify-between">
+            <div class="w-full lg:w-auto mb-5 lg:mb-0 text-center " style="font-size: 2rem;">
+              Ваши избранные
+            </div>
             <div class = "w-full lg:w-auto mb-5 lg:mb-0 text-center lg:text-left">
-                Избранные :
                 <v-btn-toggle v-model="showToggle" color="purple" class="ml-5" mandatory>
                     <v-btn
                     @click = "content = 'article'">
@@ -14,13 +16,13 @@
                      Объявления
                     </v-btn>
                 </v-btn-toggle>
-              </div>
+            </div>
           </div>
             
           <hr>
           <div v-if="content === 'article'">
-              <div v-if="articles.length === 0">
-                  <p style="display: inline;margin: auto;"> Ничего то тебе не нравится</p>
+              <div v-if="articles.length === 0" class="text-center" style="margin: 30% 0; font-size: 1.5rem; ">
+                Не думаешь, что здесь слишком пусто ?🤔
               </div>
               <div v-if="articles.length > 0" v-for="article in articles" :key="article.id" class="scroll-content my-7">
                   <ArticlePreviewComponent
@@ -42,8 +44,8 @@
           </div>
           <div v-else-if="content === 'announcement'">
               <div v-if="announcements.length === 0">
-                <div>
-                  Ничего то тебе не нравится
+                <div class="text-center" style="margin: 30% 0; font-size: 1.5rem; ">
+                  Похоже, тебе сложно угодить 🤨
                 </div> 
               </div>
               <div v-if="announcements.length > 0" v-for="announcement in announcements" :key="announcement.id" class="scroll-content my-7">
