@@ -25,7 +25,7 @@ const statusColors = computed(() => ({
 const showSnackMessage = ref(false);
 const snackMessageText = ref('');
 
-defineProps({
+const props = defineProps({
   showWithoutHeader: {
     type: Boolean,
     default: false
@@ -52,7 +52,8 @@ defineProps({
   articleTotalViews: Number,
   articleStatus: {
     type: String
-  }
+  },
+  articles: Array
 })
 
 function formatDateTime(timeString) {
@@ -82,6 +83,12 @@ async function addToFavourites(articleId) {
 async function deleteFromFavourites(articleId) {
   try {
     await axios.delete(`${store.state.API_URL}/api/saved-articles/${articleId}`, store.state.config);
+    if(props.articles) {
+      const indexToRemove = props.articles.findIndex(article => article.id === articleId)
+      if (indexToRemove !== -1) {
+        props.articles.splice(indexToRemove, 1)
+      }
+    }
     showSnackbarMessage('Статья успешно удалена из избранного');
   } catch (e) {
     console.log(e)
