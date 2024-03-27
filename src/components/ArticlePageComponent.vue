@@ -133,7 +133,7 @@ async function replyTo(commentAuthorNickname, commentId) {
   cancelReply();
   isCommentReply.value = true;
   replyCommentAuthorsNickname.value = commentAuthorNickname;
-  // userComment.value = `@${commentAuthorNickname}, ${userComment}`;
+  userComment.value = `@${commentAuthorNickname}, ${userComment.value}`;
   replyCommentId.value = commentId;
 }
 
