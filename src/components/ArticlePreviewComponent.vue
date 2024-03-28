@@ -5,6 +5,7 @@ import {ref, computed} from "vue";
 import router from "@/plugins/router";
 import ContentRender from "@/components/ContentRender.vue";
 import ArticleMenuComponent from "@/components/ArticleMenuComponent.vue";
+import { onBeforeMount } from "vue";
 
 const store = useStore();
 const reportReason = ref('');
@@ -24,6 +25,7 @@ const statusColors = computed(() => ({
 }));
 const showSnackMessage = ref(false);
 const snackMessageText = ref('');
+const status = ref(null);
 
 const props = defineProps({
   showWithoutHeader: {
@@ -55,6 +57,10 @@ const props = defineProps({
   },
   articles: Array
 })
+
+onBeforeMount(() => {
+    status.value = props.articleStatus;
+});
 
 function formatDateTime(timeString) {
   const dateTime = new Date(timeString);
@@ -127,6 +133,19 @@ const getStatusText = (status) => {
   return statusMap[status] || status;
 };
 
+async function setStatus() {
+  try {
+    const response = await axios.get(`${store.state.API_URL}/api/articles/status/${props.articleId}`, store.state.config);
+    status.value = response.data;
+  } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const serverErrors = error.response.data.errors;
+        alert(serverErrors);
+      }
+      
+  } 
+}
+
 </script>
 
 <script>
@@ -161,9 +180,10 @@ export default {
           </div>
         </div>
         <ArticleMenuComponent
-          :articleStatus="articleStatus"
+          :articleStatus="status"
           :authorsNickname="authorsNickname"
           :articleId="articleId"
+          :setStatus="setStatus"
         />
         <div class = "article-header-report" v-if="store.state.isAuthorized && (store.state.nickname !== authorsNickname)">
 
@@ -279,15 +299,16 @@ export default {
       </div>
       <ArticleMenuComponent
           v-show = "showWithoutHeader"
-          :articleStatus="articleStatus"
+          :articleStatus="status"
           :authorsNickname="authorsNickname"
           :articleId="articleId"
+          :setStatus="setStatus"
         />
 
       <router-link :to="'/article/' + articleId" v-show="showWithoutHeader" style = "float: right"> {{ formatDateTime(postedTimeAgo) }} <hr> </router-link>
       <div class = "article-data">
-        <div v-show="articleStatus !== null && articleStatus !== undefined" class="article-status" >
-          <p> Статус : <span :style="{ color: statusColors[articleStatus] }">{{ getStatusText(articleStatus) }}</span> </p>
+        <div v-show="status !== null && status !== undefined" class="article-status" >
+          <p> Статус : <span :style="{ color: statusColors[status] }">{{ getStatusText(status) }}</span> </p>
         </div>
         <div class = "article-title">
           <router-link :to="'/article/' + articleId">

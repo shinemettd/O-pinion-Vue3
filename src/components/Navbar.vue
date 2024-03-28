@@ -8,8 +8,20 @@
           </div>
         </div>
         <div class="search-container">
-          <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery">
+          <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery" @input="search">
           <button @click.prevent="search" class="search-button"><i class="fas fa-search elevation-24"></i></button>
+        </div>
+        <div class="search-results" v-if="searchQuery.trim().length > 0">
+            <ul v-if="searchResults.length > 0">
+                <li v-for="result in searchResults" :key="result.id">
+                    <img :src="result.cover_image" alt="img" v-if="result.cover_image" style="max-width: 50px; max-height: 50px; margin: 0 5px 5px 0">
+                    <img v-if="!result.cover_image" src="/icons/search-icon.png" alt="img" style="margin: 0 5px 5px 23px;">
+                    <a :href="'http://143.110.182.202/article/' + result.id">{{ result.title }}</a>
+                </li>
+            </ul>
+          <div class="no-results" v-if="searchResults.length === 0">
+            По запросу '{{ searchQuery }}' ничего не найдено 🫤
+          </div>
         </div>
         <div>
           <div v-if="store.state.isAuthorized">
@@ -49,17 +61,6 @@
         </div>
       </div>
     </nav>
-    <div class="search-modal" v-if="showSearchModal">
-      <div class="modal-content">
-        <span class="close" @click="showSearchModal = false">&times;</span>
-        <h3>Результаты поиска:</h3>
-        <ul>
-          <li v-for="result in searchResults" :key="result.id">
-            <router-link :to="'/article/' + result.id">{{ result.title }}</router-link>
-          </li>
-        </ul>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -103,7 +104,7 @@ export default {
     async search() {
       try {
         if (this.searchQuery.trim() === '') {
-          return; // Если запрос поиска пуст, не выполнять поиск и отображение модального окна
+          return; 
         }
 
         const response = await axios.get(`${store.state.API_URL}/api/articles/search`, {
@@ -114,9 +115,7 @@ export default {
 
         if (response.data.content && response.data.content.length > 0) {
           this.searchResults = response.data.content;
-          this.showSearchModal = true;
         } else {
-          console.log('Нет результатов поиска');
           this.searchResults = [];
           this.showSearchModal = false;
         }
@@ -135,11 +134,12 @@ export default {
 <style scoped>
 .navbar {
   width: 100%;
-  z-index: 1000;
+  z-index: 999;
   background: linear-gradient(21deg, #6b1e6e, #5611ec);
   color: #f6f6f6;
   padding: 13px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  align-content: center;
 }
 
 .sticky {
@@ -156,6 +156,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position:relative;
 }
 
 .navbar-brand {
@@ -209,19 +210,6 @@ export default {
   margin-right: 8px;
 }
 
-.search-container {
-  display: flex;
-  align-items: center;
-  border-radius: 4px;
-  background: transparent;
-  cursor: pointer;
-}
-
-.search-input {
-  flex: 1;
-  padding: 5px;
-  margin-right: 5px;
-}
 
 .filter-button {
   padding: 3px 3px;
@@ -234,35 +222,76 @@ export default {
   font-size: 20px;
 }
 
-.search-button {
-  padding: 5px 10px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
+.search-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%); 
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 5px 10px;
+    width: 400px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-height: 20vh;
 }
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 8px;
+    font-size: 16px;
+}
+
+.no-results {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.search-results {
+    position: absolute;
+    top: 6vh; 
+    left: 50%;
+    transform: translateX(-50%); 
+    z-index: 2000;
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    width: 50vh; 
+    max-height: 200px;
+    min-height: 200px;
+    overflow-y: auto;
+    color: #070607;
+}
+
+.search-results ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.search-results li {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.search-results li:last-child {
+    border-bottom: none;
+}
+
 
 @media (max-width: 368px) {
   .menu.is-open{
-    width: 40%; /* Уменьшаем ширину окна */
-    right: 10%; /* Располагаем окно ближе к правому краю экрана */
-    padding: 20px; /* Увеличиваем внутренний отступ окна */
+    width: 40%; 
+    right: 10%; 
+    padding: 20px; 
   }
 }
 
-.search-modal {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 250px;
-  background-color: #fff;
-  border-right: 1px solid #ccc;
-  box-shadow: -2px -2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 999;
-}
-
-.modal-content {
-  padding: 20px;
-}
 
 .close {
   color: #aaa;
