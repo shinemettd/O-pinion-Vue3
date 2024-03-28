@@ -15,7 +15,6 @@ import ForgotPasswordPage from "@/pages/ForgotPasswordPage.vue";
 import SuccessRegisterPage from "@/pages/SuccessRegisterPage.vue";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
 import SavedContentPage from '@/pages/SavedContentPage.vue';
-import NotificationComponent from "@/components/NotificationComponent.vue";
 import NotificationPage from "@/pages/NotificationPage.vue";
 
 const router = createRouter({
