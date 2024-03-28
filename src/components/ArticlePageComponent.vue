@@ -744,14 +744,14 @@ onMounted(async () => {
                        }
                     }"
                   > <strong> Ответить </strong> </span>
-                  <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                  <span v-if = "store.state.isAuthorized && (reply.user.nickname === store.state.nickname)"
                         class = "comment-edit-text mr-2"
                         @click="async () =>
                       {
                         await editComment(reply.id, reply.text);
                       }"
                   > <strong> Редактировать </strong> </span>
-                  <span v-if = "store.state.isAuthorized && (comment.user.nickname === store.state.nickname)"
+                  <span v-if = "store.state.isAuthorized && (reply.user.nickname === store.state.nickname)"
                         class = "comment-delete-text"
                         @click="async () =>
                       {
@@ -833,6 +833,10 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.article-content {
+  box-shadow: 0px 100px 100px rgba(0, 0, 0, 0.1);
+}
+
 .article-author-avatar img {
   margin-top: 0.35em;
   width: 2.5em;
