@@ -6,11 +6,11 @@
         <div class="sort-buttons w-full lg:w-auto mb-5 lg:mb-0 text-center lg:text-left">
           Отображать:
           <v-btn-toggle v-model="showToggle" color="#ff6347" class="ml-5" mandatory>
-            <v-btn @click="showContent = 'articles'">Статьи</v-btn>
-            <v-btn @click="showContent = 'announcements'">Объявления</v-btn>
+            <v-btn @click="changeContent('article')">Статьи</v-btn>
+            <v-btn @click="changeContent('announcement')">Объявления</v-btn>
           </v-btn-toggle>
         </div>
-        <div class="w-full lg:w-auto text-center lg:text-right">
+        <div  v-if="content === 'article'"  class="w-full lg:w-auto text-center lg:text-right">
           Сортировка:
           <v-btn-toggle v-model="sortToggle" color="#20b2aa" class="ml-5" mandatory>
             <v-btn @click="sortByDateTime">По новизне</v-btn>
@@ -19,7 +19,7 @@
         </div>
       </div>
       <hr>
-      <div v-if="articles.length > 0" v-for="article in articles" :key="article.id" class="scroll-content my-7">
+      <div  v-if="content === 'article' && articles.length > 0" class="scroll-content my-7" v-for="article in articles" :key="article.id" >
         <ArticlePreviewComponent
           :authors-nickname="article.author.nickname"
           :authors-avatar-url="article.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
@@ -35,7 +35,7 @@
           :article-total-views="article.total_views"
         />
       </div>
-      <!-- <div v-if="announcements.length > 0" v-for="announcement in announcements" :key="announcement.id" class="scroll-content my-7">
+      <div v-else-if="content === 'announcement' && announcements.length > 0" v-for="announcement in announcements" :key="announcement.id" class="scroll-content my-7">
         <AnnouncementPreviewComponent
           :postedTimeAgo="announcement.date_time"
           :announcement-id="announcement.id"
@@ -47,7 +47,7 @@
           :announcement-total-comments="announcement.total_comments"
           :announcement-total-views="announcement.total_views"
         />
-      </div> -->
+      </div>
       <div v-if="loading" class="loading-spinner">
         <div class="loading-content">
           <img src="/icons/loading.gif" alt="Loading...">
@@ -68,17 +68,28 @@ import AnnouncementPreviewComponent from '@/components/AnnouncementPreviewCompon
 import {onBeforeMount, ref} from "vue";
 import store from "@/store/store";
 
-const currentPage = ref(0);
-const pageSize = ref(10);
+const content = ref('article');
+const currentArticlePage = ref(0);
+const currentAnnouncementPage = ref(0);
+
 const articles = ref([]);
 const announcements = ref([]);
 const sortToggle = ref(0);
 const showToggle = ref(0);
 const sortBy = ref('dateTime,desc');
-const showContent = ref('articles');
-const totalPages = ref(0);
+
+
+const articleTotalPages = ref(0);
+const announcementTotalPages = ref(0);
+
 const loading = ref(false);
 const isDataFetched = ref(true);
+
+
+const changeContent = (contentType) => {
+  content.value = contentType;
+  console.log("content type : " + content.value);
+}
 
 const getArticles = async () => {
   loading.value = true;
@@ -95,11 +106,11 @@ const getArticles = async () => {
   }
 
   try {
-    const response = await axios.get(`${store.state.API_URL}/api/articles?page=${currentPage.value}`, config);
+    const response = await axios.get(`${store.state.API_URL}/api/articles?page=${currentArticlePage.value}`, config);
     loading.value = false;
     isDataFetched.value = true;
     articles.value.push(...response.data.content);
-    totalPages.value = response.data.totalPages;
+    articleTotalPages.value = response.data.totalPages;
   } catch (error) {
     loading.value = false;
     isDataFetched.value = false;
@@ -108,6 +119,7 @@ const getArticles = async () => {
 }
 
 const getAnnouncements = async () => {
+  loading.value = true;
   const config = {
     params: {
       sort: sortBy.value
@@ -121,10 +133,10 @@ const getAnnouncements = async () => {
   }
 
   try {
-    const response = await axios.get(`${store.state.API_URL}/api/announcements?page=${currentPage.value}`, config);
+    const response = await axios.get(`${store.state.API_URL}/api/announcements?page=${currentAnnouncementPage.value}`, config);
     loading.value = false;
     announcements.value.push(...response.data.content);
-    totalPages.value = response.data.totalPages;
+    announcementTotalPages.value = response.data.totalPages;
   } catch (error) {
     loading.value = false;
     console.error('Не удалось загрузить объявления:', error);
@@ -133,10 +145,15 @@ const getAnnouncements = async () => {
 
 const handleScrolledToBottom = (isVisible) => {
   if (!isVisible) { return };
-  if (currentPage.value >= totalPages.value) { return };
-  currentPage.value += 1;
-  getArticles();
-  // getAnnouncements();
+  if(content.value === 'article') {
+    if (currentArticlePage.value >= articleTotalPages.value) { return };
+    currentArticlePage.value += 1;
+    getArticles();
+  } else if(content.value === 'announcement') {
+    if (currentAnnouncementPage.value >= announcementTotalPages.value) { return };
+    currentAnnouncementPage.value += 1;
+    getAnnouncements();
+  }
 }
 
 const sortByDateTime = () => {
@@ -152,9 +169,8 @@ const sortByPopularity = () => {
 }
 
 const setPage = async (page) => {
-  currentPage.value = page;
+  currentArticlePage.value = page;
   await getArticles();
-  // await getAnnouncements();
 }
 
 const isAuthorized = async () => {
