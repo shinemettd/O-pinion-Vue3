@@ -5,10 +5,64 @@ import store from "@/store/store";
 import router from "@/plugins/router";
 
 const notifications = ref([]);
+const currentPage = ref(0);
+const totalPages = ref(0);
+
+const snackMessageText = ref('');
+const showSnackMessage = ref(false);
+
+const isDataFetched = ref(false);
 
 const getNotifications = async () => {
-  notifications.value = (await axios.get(`${store.state.API_URL}/api/user-notifications`, store.state.config)).data.content;
-  console.log(notifications);
+  const config = {
+    params: {
+      sort: 'dateTime,desc'
+    },
+    headers: {
+      'Authorization': `Bearer ${store.state.userToken}`
+    }
+  };
+
+  const response = (await axios.get(`${store.state.API_URL}/api/user-notifications`, config)).data.content;
+  notifications.value.push(...response);
+  totalPages.value = response.data.totalPages;
+  isDataFetched.value = true;
+}
+
+const setNotificationAsRead = async (notificationId) => {
+  try {
+    await axios.put(`${store.state.API_URL}/api/user-notifications/${notificationId}/make-read`, '', store.state.config);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+const deleteNotification = async (notificationId) => {
+  if (notifications.value.length === 0) {
+    return;
+  }
+  try {
+    await axios.delete(`${store.state.API_URL}/api/user-notifications/${notificationId}`, store.state.config);
+    notifications.value = notifications.value.filter(function(element) {
+      return element.id !== notificationId;
+    });
+    showSnackbarMessage('Уведомление удалено');
+  } catch (e) {
+    console.log(e);
+    showSnackbarMessage('Произошла ошибка при удалении уведомления');
+  }
+}
+
+const handleScrolledToBottom = (isVisible) => {
+  if (!isVisible) { return };
+  if (currentPage.value >= totalPages.value) { return };
+  currentPage.value += 1;
+  getNotifications();
+}
+
+const showSnackbarMessage = (text) => {
+  showSnackMessage.value = true;
+  snackMessageText.value = text;
 }
 
 const isAuthorized = async () => {
@@ -50,31 +104,94 @@ onBeforeMount(async () => {
       <strong>Ваши уведомления</strong>
     </div>
     <hr class="mb-3">
-    <div v-if = "notifications.length > 0" v-for="notification in notifications" :key="notification.id" class = "notification mx-3">
-      <p v-if="notification.is_read === false" style = "color: red"> <strong> НЕ ПРОЧИТАНО </strong> </p>
-      <div class="notification-header">
-        <div class="notification-type">
-          <p style="font-size: 1.5em"> <strong> {{ notification.title }} </strong></p>
-        </div>
-      </div>
-      <div class="notification-content">
-        <p v-html="notification.content" style="font-size: 1.25em"> </p>
-      </div>
-      <div class="notification-footer">
-        <div class="notification-time my-1">
-          <p style="font-size: 0.85em; opacity: 75%"> {{ formatDateTime(notification.date_time) }} </p>
-        </div>
-      </div>
-      <hr class="mb-2">
-    </div>
+    <div v-if = "notifications.length > 0" v-for="notification in notifications" :key="notification.id" class = "mx-3">
+      <div class = "notification" @click="async () => {await setNotificationAsRead(notification.id)}">
+        <router-link :to="notification.url">
+          <div class="new-notification-message">
+            <p v-if="notification.is_read === false" > <strong> Новое </strong> </p>
+          </div>
+          <div class="notification-header">
+            <div class="notification-type">
+              <p style="font-size: 1.5em"> <strong> {{ notification.title }} </strong></p>
+            </div>
 
+            <div class = "notification-delete-icon">
+              <router-link to="/notification">
+                <v-icon @click="async () => { await deleteNotification(notification.id)}" title="Удалить">mdi-close</v-icon>
+              </router-link>
+            </div>
+          </div>
+          <div class="notification-content">
+            <p v-html="notification.content" style="font-size: 1.25em"> </p>
+          </div>
+          <div class="notification-footer">
+            <div class="notification-time my-1">
+              <p style="font-size: 0.85em; opacity: 75%"> {{ formatDateTime(notification.date_time) }} </p>
+            </div>
+          </div>
+        </router-link>
+      </div>
+      <hr class="my-2">
+    </div>
+    <div v-if = "notifications.length" v-observe-visibility="handleScrolledToBottom"> </div>
+    <div v-if="notifications.length === 0 && isDataFetched" class = "my-10" style="text-align: center"> У вас пока нет уведомлений :( </div>
+    <v-snackbar
+      v-model="showSnackMessage"
+      :timeout="3000"
+    >
+      {{ snackMessageText }}
+
+      <template v-slot:actions>
+        <v-btn
+          color="purple"
+          variant="text"
+          @click="showSnackMessage = false"
+        >
+          Закрыть
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
 <style scoped>
+.scroll {
+  width: 50%;
+  box-shadow: 0px 100px 100px rgba(0, 0, 0, 0.1);
+}
+
+.notification {
+  padding: 0.5em;
+}
+
 .notification:hover {
   background: #F0F0F0;
   cursor: pointer;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.notification-delete-icon {
+  vertical-align: center;
+  margin-bottom: 10px;
+}
+
+.notification-delete-icon:hover {
+  background: #D0D0D0;
+}
+
+.new-notification-message {
+  background: #FFCBD1;
+  border-radius: 7%;
+  max-width: 3.5em;
+}
+
+.new-notification-message p {
+  margin-left: 0.25em;
+  color: red;
 }
 
 @media screen and (max-width: 1920px) {
