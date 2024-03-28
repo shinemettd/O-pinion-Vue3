@@ -252,7 +252,7 @@ export default {
 }
 .search-results {
     position: absolute;
-    top: 9vh; 
+    top: 6vh; 
     left: 50%;
     transform: translateX(-50%); 
     z-index: 2000;
