@@ -21,12 +21,8 @@ const validateEmail = async (email) => {
 const sendRequest = async (email) => {
   try {
     const response = await axios.get(`${store.state.API_URL}/api/password/forgot?email=${email}`);
-    if (response.status === HttpStatusCode.NoContent) {
-      isUserEmailExists.value = true;
-      isMessageSend.value = true;
-    } else {
-      isUserEmailExists.value = false;
-    }
+    isUserEmailExists.value = true;
+    isMessageSend.value = true;
   } catch (e) {
     isUserEmailExists.value = false;
   }
