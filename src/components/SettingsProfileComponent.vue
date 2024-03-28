@@ -675,6 +675,11 @@ onBeforeMount(async () => {
 
 <style scoped>
 
+.scroll {
+  width: 50%;
+  box-shadow: 0px 5px 100px rgba(0, 0, 0, 0.1);
+}
+
 .user-avatar img {
   width: 9em;
   height: 9em;

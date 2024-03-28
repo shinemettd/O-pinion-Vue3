@@ -48,6 +48,7 @@
           :announcement-total-views="announcement.total_views"
         />
       </div>
+
       <div v-if="loading" class="loading-spinner">
         <div class="loading-content">
           <img src="/icons/loading.gif" alt="Loading...">
@@ -198,6 +199,7 @@ onBeforeMount(async () => {
 <style scoped>
 .scroll {
   width: 50%;
+  box-shadow: 0px 100px 100px rgba(0, 0, 0, 0.1);
 }
 
 .pagination {
