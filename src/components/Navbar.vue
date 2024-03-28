@@ -8,16 +8,18 @@
           </div>
         </div>
         <div class="search-container">
-          <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery">
+          <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery" @input="search">
           <button @click.prevent="search" class="search-button"><i class="fas fa-search elevation-24"></i></button>
           <div class="search-results" v-if="searchQuery.trim().length > 0">
             <ul v-if="searchResults.length > 0">
                 <li v-for="result in searchResults" :key="result.id">
+                    <img :src="result.cover_image" alt="img" v-if="result.cover_image" style="max-width: 50px; max-height: 50px; margin: 0 5px 5px 0">
+                    <img v-if="!result.cover_image" src="/icons/search-icon.png" alt="img" style="margin: 0 5px 5px 23px;">
                     <a :href="'http://143.110.182.202/article/' + result.id">{{ result.title }}</a>
                 </li>
             </ul>
             <div class="no-results" v-if="searchResults.length === 0">
-              Нет результатов поиска ...{{ searchResults.length }}
+              По запросу '{{ searchQuery }}' ничего не найдено 🫤
             </div>
           </div>
         </div>
@@ -100,10 +102,9 @@ export default {
       this.isMenuOpen = !this.isMenuOpen;
     },
     async search() {
-      console.log("IN SEARCH");
       try {
         if (this.searchQuery.trim() === '') {
-          return; // Если запрос поиска пуст, не выполнять поиск и отображение модального окна
+          return; 
         }
 
         const response = await axios.get(`${store.state.API_URL}/api/articles/search`, {
@@ -114,9 +115,7 @@ export default {
 
         if (response.data.content && response.data.content.length > 0) {
           this.searchResults = response.data.content;
-          console.log("searchResults = " + this.searchResults);
         } else {
-          console.log('Нет результатов поиска');
           this.searchResults = [];
           this.showSearchModal = false;
         }
@@ -228,7 +227,7 @@ export default {
     border: 1px solid #ccc;
     border-radius: 20px;
     padding: 5px 10px;
-    width: 300px; /* Ширина контейнера для поиска */
+    width: 400px; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     max-height: 20vh;
 }
@@ -241,15 +240,20 @@ export default {
     font-size: 16px;
 }
 
-
+.no-results {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 .search-results {
     position: absolute;
     top: 8vh; 
     left: 50%;
-    transform: translateX(-50%); 
+    transform: translateX(-54%); 
     z-index: 1001;
     background-color: #fff;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     border-top: none;
     border-radius: 0 0 5px 5px;
     width: 50vh; 
@@ -266,7 +270,9 @@ export default {
 
 .search-results li {
     padding: 10px;
-    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .search-results li:last-child {
@@ -276,9 +282,9 @@ export default {
 
 @media (max-width: 368px) {
   .menu.is-open{
-    width: 40%; /* Уменьшаем ширину окна */
-    right: 10%; /* Располагаем окно ближе к правому краю экрана */
-    padding: 20px; /* Увеличиваем внутренний отступ окна */
+    width: 40%; 
+    right: 10%; 
+    padding: 20px; 
   }
 }
 
