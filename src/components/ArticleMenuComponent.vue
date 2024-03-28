@@ -46,7 +46,8 @@ export default {
     props: {
         articleStatus: String,
         authorsNickname: String,
-        articleId : Number
+        articleId : Number,
+        setStatus: Function
     },
     setup(props) {
     const articleMenuOpen = ref(false);
@@ -69,6 +70,7 @@ export default {
       try {
         const response = await axios.delete(`${store.state.API_URL}/api/articles/${props.articleId}`, store.state.config);
         alert('Ваша статья успешно удалена ');
+        props.setStatus();
 
       } catch (error) {
         if (error.response && error.response.data && error.response.data.errors) {
@@ -90,7 +92,7 @@ export default {
         try {
           const response = await axios.put(`${store.state.API_URL}/api/articles/restore/${props.articleId}`, null, store.state.config);
           alert('Ваша статья успешно восстановлена ');
-
+          props.setStatus();
 
         } catch (error) {
             if (error.response && error.response.data && error.response.data.errors) {
