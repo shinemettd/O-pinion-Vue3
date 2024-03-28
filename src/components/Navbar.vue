@@ -10,7 +10,8 @@
         <div class="search-container">
           <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery" @input="search">
           <button @click.prevent="search" class="search-button"><i class="fas fa-search elevation-24"></i></button>
-          <div class="search-results" v-if="searchQuery.trim().length > 0">
+        </div>
+        <div class="search-results" v-if="searchQuery.trim().length > 0">
             <ul v-if="searchResults.length > 0">
                 <li v-for="result in searchResults" :key="result.id">
                     <img :src="result.cover_image" alt="img" v-if="result.cover_image" style="max-width: 50px; max-height: 50px; margin: 0 5px 5px 0">
@@ -18,9 +19,8 @@
                     <a :href="'http://143.110.182.202/article/' + result.id">{{ result.title }}</a>
                 </li>
             </ul>
-            <div class="no-results" v-if="searchResults.length === 0">
-              По запросу '{{ searchQuery }}' ничего не найдено 🫤
-            </div>
+          <div class="no-results" v-if="searchResults.length === 0">
+            По запросу '{{ searchQuery }}' ничего не найдено 🫤
           </div>
         </div>
         <div>
@@ -156,6 +156,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position:relative;
 }
 
 .navbar-brand {
@@ -222,6 +223,9 @@ export default {
 }
 
 .search-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%); 
     display: flex;
     align-items: center;
     border: 1px solid #ccc;
@@ -251,7 +255,7 @@ export default {
     top: 9vh; 
     left: 50%;
     transform: translateX(-50%); 
-    z-index: 1001;
+    z-index: 2000;
     background-color: #fff;
     border: 2px solid #ccc;
     border-top: none;
