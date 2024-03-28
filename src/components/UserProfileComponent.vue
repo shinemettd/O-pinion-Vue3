@@ -159,6 +159,7 @@ watch(() => props.userId, () => {
 
 <style scoped>
 .scroll {
+  width: 50%;
   box-shadow: 0px 100px 100px rgba(0, 0, 0, 0.1);
 }
 
