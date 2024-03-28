@@ -88,7 +88,7 @@ const shareAnnouncement = async (announcementId, shareType) => {
     }
   } else {
     try {
-      shareLink.value =  (await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}/share?share-type=${shareType}`)).data;
+      window.location.href = (await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}/share?share-type=${shareType}`)).data;
     } catch (e) {
       shareLink.value = undefined;
       console.error(e);
