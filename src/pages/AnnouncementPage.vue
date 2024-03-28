@@ -4,6 +4,7 @@ import {onBeforeMount, ref} from "vue";
 import { useRoute } from 'vue-router';
 import AnnouncementPageComponent from "@/components/AnnouncementPageComponent.vue";
 import store from "@/store/store";
+import PageNotFound from "@/pages/PageNotFound.vue";
 
 const currentAnnouncement = ref('');
 const currentAnnouncementComments = ref('');
@@ -12,17 +13,23 @@ const dataFetched = ref(false);
 const route = useRoute();
 const announcementId = (route.params.announcementId);
 
+const isNotFound = ref(false);
+
 const getAnnouncement = async () => {
-  if (store.state.isAuthorized) {
-    currentAnnouncement.value = await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}`, store.state.config);
-  } else {
-    currentAnnouncement.value = await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}`);
-  }
-  dataFetched.value = true;
+  try {
+    if (store.state.isAuthorized) {
+      currentAnnouncement.value = await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}`, store.state.config)
+    } else {
+      currentAnnouncement.value = await axios.get(`${store.state.API_URL}/api/announcements/${announcementId}`);
+    }
+    dataFetched.value = true;
+    } catch (e) {
+      isNotFound.value = true;
+    }
 }
 
 const getComments = async () => {
-    currentAnnouncementComments.value = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}`);
+    currentAnnouncementComments.value = await axios.get(`${store.state.API_URL}/api/announcement-comments/${announcementId}`, store.state.config);
 }
 
 const isAuthorized = async () => {
@@ -51,7 +58,7 @@ onBeforeMount(async () => {
 
 
 <template>
-    <AnnouncementPageComponent
+    <AnnouncementPageComponent v-if="!isNotFound"
     :announcement-id = "currentAnnouncement.data.id"
     :announcement-title = "currentAnnouncement.data.title"
     :announcement-content = "currentAnnouncement.data.content"
@@ -64,6 +71,8 @@ onBeforeMount(async () => {
     :announcement-comments = "currentAnnouncementComments.data"
     :load-comments="getComments"
     />
+  <PageNotFound v-if="isNotFound"
+                secondary-message="У вас нет доступа к этому объявлению"/>
 </template>
 
 <style scoped>
