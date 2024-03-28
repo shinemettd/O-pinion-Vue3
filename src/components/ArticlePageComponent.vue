@@ -225,8 +225,8 @@ const shareArticle = async (articleId, shareType) => {
       shareLink.value = undefined;
     }
   } else {
-    try {
-      shareLink.value =  (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
+    try { 
+      window.location.href = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
     } catch (e) {
       shareLink.value = undefined;
     }
