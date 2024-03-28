@@ -640,5 +640,19 @@ article {
   word-wrap: break-word;
 }
 
+@media screen and (max-width: 450px) {
+  .article-views-count {
+    float: none;
+  }
+
+  .article-footer div {
+    margin-right: 5px;
+  }
+
+  .article-footer > div:not(:last-child) {
+    margin-right: 1.5em;
+  }
+}
+
 
 </style>

@@ -326,12 +326,12 @@ onMounted(async () => {
         <p style = "font-size: 2em; word-wrap: break-word;"> {{ articleTitle }} </p>
         <div class = "article-header-data my-2" style = "display: flex">
           <div class="article-header-data">
-            <div class = "user-avatar mr-3">
+            <div class = "article-author-avatar mr-3">
               <router-link :to="'/user/' + authorsNickname">
                 <img :src = "authorsAvatarUrl" class = "my-1 mt-2" alt = "user avatar">
               </router-link>
             </div>
-            <div class = "">
+            <div class = "user-nickname">
               <router-link :to="'/user/' + authorsNickname">
                 <p style = "font-size: 1.25em"> <strong> {{ authorsNickname }} </strong> </p>
               </router-link>
@@ -829,25 +829,37 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.user-avatar img {
+.article-author-avatar img {
   margin-top: 0.35em;
-  margin-right: 0.75em;
   width: 2.5em;
   height: 2.5em;
   border-radius: 50%;
   vertical-align: middle;
 }
 
+.user-avatar img {
+  margin-top: 0.35em;
+  width: 2.5em;
+  height: 2.5em;
+  margin-right: 0.75em;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.user-nickname a:hover {
+  color: rgb(120, 194, 255);
+}
+
+.user-nickname a {
+  text-decoration: none;
+  color: black;
+  transition: all 0.35s ease;
+}
+
 .article-header-data {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.article-header-report {
-  float: right;
-  vertical-align: middle;
-  cursor: pointer;
 }
 
 .article-header-report-icon {
@@ -943,8 +955,7 @@ onMounted(async () => {
   margin-bottom: 0.5em;
 }
 
-.comment-user-data a
-{
+.comment-user-data a {
   text-decoration: none;
   color: black;
   transition: all 0.35s ease;
@@ -1002,5 +1013,6 @@ onMounted(async () => {
     width: 66%;
   }
 }
+
 
 </style>

@@ -695,22 +695,33 @@ onBeforeMount(async () => {
   color: red;
 }
 
-@media screen and (max-width: 767px) {
-  .sorter {
-    flex-direction: column;
-  }
-  .sorter div {
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-  .sorter div:last-child {
-    margin-bottom: 0;
+@media screen and (max-width: 1920px) {
+  .scroll {
+    width: 50%;
   }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (max-width: 1650px) {
   .scroll {
-    width: 50%;
+    width: 66%;
+  }
+}
+
+@media screen and (max-width: 1280px) {
+  .scroll {
+    width: 75%;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .scroll {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .scroll {
+    width: 100%;
   }
 }
 </style>

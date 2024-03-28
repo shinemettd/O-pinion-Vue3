@@ -45,13 +45,13 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div className="notification-container mx-auto border">
+  <div class="scroll mx-auto border">
     <div class = "my-3" @click="console.log(notifications)" style="text-align: center; font-size: 2em;">
       <strong>Ваши уведомления</strong>
     </div>
     <hr class="mb-3">
-    <div v-if = "notifications.length > 0" v-for="notification in notifications" :key="notification.id" class = "mx-3">
-      <p v-if="notification.is_read === null" style = "color: red"> <strong> НЕ ПРОЧИТАНО </strong> </p>
+    <div v-if = "notifications.length > 0" v-for="notification in notifications" :key="notification.id" class = "notification mx-3">
+      <p v-if="notification.is_read === false" style = "color: red"> <strong> НЕ ПРОЧИТАНО </strong> </p>
       <div class="notification-header">
         <div class="notification-type">
           <p style="font-size: 1.5em"> <strong> {{ notification.title }} </strong></p>
@@ -72,21 +72,26 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-@media screen and (max-width: 600px){
-  .notification-container {
-    width: 100%;
-  }
+.notification:hover {
+  background: #F0F0F0;
+  cursor: pointer;
 }
 
-@media screen and (max-width: 1280px) and (min-width: 600px){
-  .notification-container {
-    width: 75%;
-  }
-}
-
-@media screen and (min-width: 1280px) {
-  .notification-container {
+@media screen and (max-width: 1920px) {
+  .scroll {
     width: 50%;
+  }
+}
+
+@media screen and (max-width: 1280px) {
+  .scroll {
+    width: 66%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .scroll {
+    width: 100%;
   }
 }
 </style>

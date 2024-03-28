@@ -3,7 +3,7 @@
     <div class="scroll mx-auto border w-full lg:w-2/3 xl:w-1/2 h-auto lg:h-100">
       <hr class="mt-5">
       <div class="sorter w-full lg:w-1/2 h-auto my-5 flex flex-col lg:flex-row items-center justify-between">
-        <div class="w-full lg:w-auto mb-5 lg:mb-0 text-center lg:text-left">
+        <div class="sort-buttons w-full lg:w-auto mb-5 lg:mb-0 text-center lg:text-left">
           Отображать:
           <v-btn-toggle v-model="showToggle" color="#ff6347" class="ml-5" mandatory>
             <v-btn @click="showContent = 'articles'">Статьи</v-btn>
@@ -180,6 +180,10 @@ onBeforeMount(async () => {
 </script>
 
 <style scoped>
+.scroll {
+  width: 50%;
+}
+
 .pagination {
 
   margin-top: 20px;
@@ -223,25 +227,21 @@ onBeforeMount(async () => {
   width: 50%
 }
 
-@media screen and (max-width: 767px) {
-  .sorter {
-    flex-direction: column;
-  }
-  .sorter div {
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-  .sorter div:last-child {
-    margin-bottom: 0;
-  }
-}
-
-@media screen and (min-width: 768px) {
-
+@media screen and (max-width: 1920px) {
   .scroll {
     width: 50%;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   }
 }
 
+@media screen and (max-width: 1280px) {
+  .scroll {
+    width: 66%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .scroll {
+    width: 100%;
+  }
+}
 </style>

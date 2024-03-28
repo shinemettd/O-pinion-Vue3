@@ -87,7 +87,7 @@ watch(() => props.userId, () => {
 
 <template>
   <main class = "container mx-auto">
-    <div class = "scroll mx-auto border w-50 h-100 px-3 py-3">
+    <div class = "scroll mx-auto border h-100 px-3 py-3">
       <hr class = "mb-5 mt-3">
       <div class = "header border-collapse" style = "display: flex">
         <div class = "avatar mr-5">
@@ -158,5 +158,21 @@ watch(() => props.userId, () => {
 </template>
 
 <style scoped>
+@media screen and (max-width: 1920px) {
+  .scroll {
+    width: 50%;
+  }
+}
 
+@media screen and (max-width: 1280px) {
+  .scroll {
+    width: 66%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .scroll {
+    width: 100%;
+  }
+}
 </style>

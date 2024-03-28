@@ -52,7 +52,7 @@ export default {
     const articleMenuOpen = ref(false);
     const store = useStore();
     const showModal = ref(false);
-    
+
 
 
     const toggleArticleMenu = () => {
@@ -65,7 +65,7 @@ export default {
       await deleteArticleRequest();
     };
 
-    const deleteArticleRequest = async() => {  
+    const deleteArticleRequest = async() => {
       try {
         const response = await axios.delete(`${store.state.API_URL}/api/articles/${props.articleId}`, store.state.config);
         alert('Ваша статья успешно удалена ');
@@ -97,9 +97,9 @@ export default {
               const serverErrors = error.response.data.errors;
               alert(serverErrors);
             }
-            
+
         }
-        
+
     }
 
     return {
@@ -116,7 +116,7 @@ export default {
 
 <style scoped>
 .inactive {
-    color: gray; 
+    color: gray;
     cursor: not-allowed;
 }
 
@@ -180,13 +180,13 @@ export default {
 
 .modal {
   display: block;
-  position: fixed; 
+  position: fixed;
   left: 0;
   top: 0;
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; 
-  background-color: rgb(0, 0, 0); 
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
 }
 
@@ -196,7 +196,25 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   width: 30%;
-  height: 22%;
+  height: 13em;
+}
+
+@media screen and (max-width: 1405px) {
+  .modal-content {
+    height: 15em;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .modal-content {
+    width: 50%;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .modal-content {
+    width: 80%;
+  }
 }
 
 .modal-content p {
@@ -205,20 +223,22 @@ export default {
   margin-bottom: 30px;
   margin-top: 15px;
 }
+
 .modal-btn {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
 }
+
 .delete-btn {
   display: block;
-  background-color: brown; 
-  color: aliceblue; 
+  background-color: brown;
+  color: aliceblue;
   border-radius: 10px;
-  padding: 10px;
+  padding: 0.75em;
   margin: 20px;
 }
 .cancel-btn {
-  background-color: gray; 
+  background-color: gray;
 }
 </style>

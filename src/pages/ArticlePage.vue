@@ -4,6 +4,8 @@ import {onBeforeMount, ref} from "vue";
 import { useRoute } from 'vue-router';
 import ArticlePageComponent from "@/components/ArticlePageComponent.vue";
 import store from "@/store/store";
+import router from "@/plugins/router";
+import PageNotFound from "@/pages/PageNotFound.vue";
 
 const currentArticle = ref('');
 const currentArticleComments = ref('');
@@ -11,14 +13,20 @@ const dataFetched = ref(false);
 
 const route = useRoute();
 const articleId = route.params.articleId;
+const isNotFound = ref(false);
 
 const getArticle = async () => {
-  if (store.state.isAuthorized) {
-    currentArticle.value = await axios.get(`${store.state.API_URL}/api/articles/${articleId}`, store.state.config);
-  } else {
-    currentArticle.value = await axios.get(`${store.state.API_URL}/api/articles/${articleId}`);
+  try {
+    if (store.state.isAuthorized) {
+      currentArticle.value = await axios.get(`${store.state.API_URL}/api/articles/${articleId}`, store.state.config);
+    } else {
+      currentArticle.value = await axios.get(`${store.state.API_URL}/api/articles/${articleId}`);
+    }
+    dataFetched.value = true;
+  } catch (e) {
+    isNotFound.value = true;
   }
-  dataFetched.value = true;
+
 }
 
 const getComments = async () => {
@@ -48,25 +56,25 @@ onBeforeMount(async () => {
 });
 </script>
 
-
-
 <template>
-  <ArticlePageComponent
-    :authors-avatar-url = "currentArticle.data.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
-    :authors-nickname = "currentArticle.data.author.nickname"
-    :posted-time-ago = "currentArticle.data.date_time"
-    :article-id = "currentArticle.data.id"
-    :article-title = "currentArticle.data.title"
-    :article-content = "currentArticle.data.content"
-    :article-rating = "currentArticle.data.rating"
-    :article-in-favourites = "currentArticle.data.in_favourites"
-    :article-total-favourites = "currentArticle.data.total_favourites"
-    :article-total-comments = "currentArticle.data.total_comments"
-    :article-total-views = "currentArticle.data.total_views"
-    :article-comments = "currentArticleComments.data"
-    :article-status="currentArticle.data.status"
-    :load-comments="getComments"
-  />
+    <ArticlePageComponent v-if="!isNotFound"
+                    :authors-avatar-url = "currentArticle.data.author.avatar || 'https://cdn-icons-png.flaticon.com/512/10/10938.png'"
+                    :authors-nickname = "currentArticle.data.author.nickname"
+                    :posted-time-ago = "currentArticle.data.date_time"
+                    :article-id = "currentArticle.data.id"
+                    :article-title = "currentArticle.data.title"
+                    :article-content = "currentArticle.data.content"
+                    :article-rating = "currentArticle.data.rating"
+                    :article-in-favourites = "currentArticle.data.in_favourites"
+                    :article-total-favourites = "currentArticle.data.total_favourites"
+                    :article-total-comments = "currentArticle.data.total_comments"
+                    :article-total-views = "currentArticle.data.total_views"
+                    :article-comments = "currentArticleComments.data"
+                    :article-status="currentArticle.data.status"
+                    :load-comments="getComments"
+    />
+  <PageNotFound v-if="isNotFound"
+                    secondary-message="Статья, которую вы пытаетесь открыть, была скрыта или удалена"/>
 
 </template>
 
