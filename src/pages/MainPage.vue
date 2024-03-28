@@ -35,19 +35,6 @@
           :article-total-views="article.total_views"
         />
       </div>
-      <!-- <div v-if="announcements.length > 0" v-for="announcement in announcements" :key="announcement.id" class="scroll-content my-7">
-        <AnnouncementPreviewComponent
-          :postedTimeAgo="announcement.date_time"
-          :announcement-id="announcement.id"
-          :announcement-title="announcement.title"
-          :announcement-content = "announcement.content"
-          :announcement-main-picture-url="announcement.cover_image"
-          :announcement-total-favourites="announcement.total_favourites"
-          :announcement-in-favourites="announcement.in_favourites"
-          :announcement-total-comments="announcement.total_comments"
-          :announcement-total-views="announcement.total_views"
-        />
-      </div> -->
       <div v-if="loading" class="loading-spinner">
         <div class="loading-content">
           <img src="/icons/loading.gif" alt="Loading...">
@@ -182,6 +169,7 @@ onBeforeMount(async () => {
 <style scoped>
 .scroll {
   width: 50%;
+  box-shadow: 0px 100px 100px rgba(0, 0, 0, 0.1);
 }
 
 .pagination {

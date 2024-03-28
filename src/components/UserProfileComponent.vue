@@ -158,6 +158,10 @@ watch(() => props.userId, () => {
 </template>
 
 <style scoped>
+.scroll {
+  box-shadow: 0px 100px 100px rgba(0, 0, 0, 0.1);
+}
+
 @media screen and (max-width: 1920px) {
   .scroll {
     width: 50%;
