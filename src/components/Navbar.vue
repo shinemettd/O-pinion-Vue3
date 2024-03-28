@@ -248,9 +248,9 @@ export default {
 }
 .search-results {
     position: absolute;
-    top: 8vh; 
+    top: 9vh; 
     left: 50%;
-    transform: translateX(-54%); 
+    transform: translateX(-50%); 
     z-index: 1001;
     background-color: #fff;
     border: 2px solid #ccc;
