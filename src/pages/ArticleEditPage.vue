@@ -31,7 +31,7 @@ const articleValid = ref(false);
 const getArticle = async () => {
   try {
     let response;
-    response = await axios.get(`${store.state.API_URL}/api/articles/${articleId}`, store.state.config);
+    response = await axios.get(`${store.state.API_URL}/api/articles/cache/${articleId}`, store.state.config);
     article.value = response.data;
     articleValid.value = true;
   } catch (e) {
