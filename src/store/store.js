@@ -11,7 +11,7 @@ export default createStore({
       email: null,
       id: null,
       config: null,
-
+      notificationCount: null
     }
   },
   mutations: {
@@ -37,6 +37,9 @@ export default createStore({
     setConfig(state, config) {
       state.config = config;
     },
+    setNotificationCount(state, notificationCount) {
+      state.notificationCount = notificationCount;
+    },
     logout(state) {
       state.userToken = null;
       state.isAuthorized = false;
@@ -44,6 +47,7 @@ export default createStore({
       state.id = null;
       state.email = null;
       state.config = null;
+      state.notificationCount = null;
     },
   },
 

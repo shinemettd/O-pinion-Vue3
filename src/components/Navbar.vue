@@ -4,14 +4,12 @@
       <div class="container">
         <div class="navbar-menu">
           <router-link to="/" class="navbar-brand" style="font-size: 25px ">O!pinion</router-link>
-          <div class="navbar-tabs">
-          </div>
         </div>
-        <div class="search-container">
+        <div v-if = "width > 768" class="search-container">
           <input type="text" placeholder="Поиск..." class="search-input" v-model="searchQuery" @input="search">
           <button @click.prevent="search" class="search-button"><i class="fas fa-search elevation-24"></i></button>
         </div>
-        <div class="search-results" v-if="searchQuery.trim().length > 0">
+        <div class="search-results" v-if="searchQuery.trim().length > 0 && width > 768">
             <ul v-if="searchResults.length > 0">
                 <li v-for="result in searchResults" :key="result.id">
                     <img :src="result.cover_image" alt="img" v-if="result.cover_image" style="max-width: 50px; max-height: 50px; margin: 0 5px 5px 0">
@@ -25,9 +23,9 @@
         </div>
         <div>
           <div v-if="store.state.isAuthorized">
-            <router-link v-if="store.state.isAuthorized" to="/saved-content" class="burger-button"><i class="fas fa-heart"></i></router-link>
-            <router-link v-if="store.state.isAuthorized" to="/notification" class="burger-button"><i class="fas fa-bell"></i></router-link>
-            <router-link v-if="store.state.isAuthorized" to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
+            <router-link v-if="store.state.isAuthorized && width > 768" to="/saved-content" class="burger-button"><i class="fas fa-heart"></i></router-link>
+            <router-link v-if="store.state.isAuthorized && width > 768" to="/notifications" :class="store.state.notificationCount > 0 ? 'burger-button new-notification' : 'burger-button'"><i class="fas fa-bell"></i></router-link>
+            <router-link v-if="store.state.isAuthorized && width > 768" to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
             <button v-if="store.state.isAuthorized" @click="toggleMenu" class="burger-button1">☰</button>
           </div>
           <div v-else>
@@ -47,8 +45,10 @@
             <router-link v-if="!store.state.isAuthorized" to="/auth" class="menu-item" @click="isMenuOpen = false"><i
               class="fas fa-sign-in-alt"></i>Войти
             </router-link>
-            <router-link to="/notification" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомления
-            </router-link>
+            <div class="notification-icon">
+              <router-link to="/notifications" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомления</router-link>
+              <div class="badge">5</div>
+            </div>
             <router-link to="/create-article" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-plus"></i>Создать
               статью
             </router-link>
@@ -66,11 +66,15 @@
 
 <script setup>
 import router from "@/plugins/router";
+import { useDisplay } from 'vuetify'
+import store from "@/store/store";
+const { width } = useDisplay()
 </script>
 
 <script>
 import store from "@/store/store";
 import axios from 'axios'
+import router from "@/plugins/router";
 
 export default {
   name: 'Navbar',
@@ -104,7 +108,7 @@ export default {
     async search() {
       try {
         if (this.searchQuery.trim() === '') {
-          return; 
+          return;
         }
 
         const response = await axios.get(`${store.state.API_URL}/api/articles/search`, {
@@ -129,7 +133,9 @@ export default {
     }
   }
 }
+
 </script>
+
 
 <style scoped>
 .navbar {
@@ -140,6 +146,7 @@ export default {
   padding: 13px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   align-content: center;
+  position: fixed;
 }
 
 .sticky {
@@ -152,11 +159,15 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.new-notification {
+  color: #ef0557;
+}
+
 .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position:relative;
+  position: relative;
 }
 
 .navbar-brand {
@@ -185,11 +196,11 @@ export default {
 }
 
 .menu {
-  margin-top: 25px;
+  margin-top: 15px;
   border-radius: 3px;
   position: fixed;
   padding: 10px;
-  right: -250px;
+  right: -270px;
   width: 250px;
   background: linear-gradient(21deg, #6b1e6e, #5611ec);
   transition: right 0.3s;
@@ -197,7 +208,7 @@ export default {
 }
 
 .menu.is-open {
-  right: 20px;
+  right: -13px;
 }
 
 .menu-item {
@@ -225,13 +236,13 @@ export default {
 .search-container {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%); 
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
     border: 1px solid #ccc;
     border-radius: 20px;
     padding: 5px 10px;
-    width: 400px; 
+    width: 24em;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     max-height: 20vh;
 }
@@ -252,15 +263,15 @@ export default {
 }
 .search-results {
     position: absolute;
-    top: 6vh; 
+    top: 3em;
     left: 50%;
-    transform: translateX(-50%); 
+    transform: translateX(-50%);
     z-index: 2000;
     background-color: #fff;
     border: 2px solid #ccc;
     border-top: none;
     border-radius: 0 0 5px 5px;
-    width: 50vh; 
+    width: 24em;
     max-height: 200px;
     min-height: 200px;
     overflow-y: auto;
@@ -284,44 +295,44 @@ export default {
 }
 
 
-@media (max-width: 368px) {
+@media (max-width: 600px) {
   .menu.is-open{
-    width: 40%; 
-    right: 10%; 
-    padding: 20px; 
+    width: 100%;
+    padding: 20px;
+  }
+
+  .menu{
+    width: 90%;
+    padding: 20px;
   }
 }
 
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
 @media (max-width: 768px) {
-  .container {
-    flex-direction: column;
+
+  .menu {
+    margin-top: 0.5em;
+    border-radius: 3px;
+    position: fixed;
+    right: -350px;
+    background: linear-gradient(21deg, #6b1e6e, #5611ec);
+    transition: right 0.3s;
+    z-index: 1000;
+    width: 50%;
+    text-align: center;
+    font-size: 1.5em;
   }
 
   .search-container {
     margin-top: 10px;
+    width: 17em;
+  }
+
+  .search-results {
+    width: 17em;
   }
 
   .navbar-brand {
     padding-bottom: 10px;
-  }
-
-  .navbar-tabs {
-    display: none;
   }
 
   .burger-button {
@@ -336,14 +347,9 @@ export default {
     font-size: 16px;
   }
 
-  .menu {
-    width: 50%;
-    right: -50%;
-    padding: 20px;
-  }
 
   .menu.is-open {
-    right: 5%;
+    right: 0%;
   }
 
   .menu-item {

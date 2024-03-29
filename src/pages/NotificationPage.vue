@@ -12,6 +12,7 @@ const snackMessageText = ref('');
 const showSnackMessage = ref(false);
 
 const isDataFetched = ref(false);
+const dialog = ref(false)
 
 const getNotifications = async () => {
   const config = {
@@ -50,6 +51,26 @@ const deleteNotification = async (notificationId) => {
   } catch (e) {
     console.log(e);
     showSnackbarMessage('Произошла ошибка при удалении уведомления');
+  }
+}
+
+const readAllNotifications = async () => {
+  try {
+    await axios.put(`${store.state.API_URL}/api/user-notifications/all/make-read`, '', store.state.config);
+    notifications.value = [];
+  } catch (e) {
+    console.log(e);
+    showSnackbarMessage('Произошла ошибка при удалении уведомлений');
+  }
+}
+
+const deleteAllNotifications = async () => {
+  try {
+    await axios.delete(`${store.state.API_URL}/api/user-notifications/all`, store.state.config);
+    notifications.value = [];
+  } catch (e) {
+    console.log(e);
+    showSnackbarMessage('Произошла ошибка при удалении уведомлений');
   }
 }
 
@@ -102,6 +123,36 @@ onBeforeMount(async () => {
   <div class="scroll mx-auto border">
     <div class = "my-3" @click="console.log(notifications)" style="text-align: center; font-size: 2em;">
       <strong>Ваши уведомления</strong>
+    </div>
+    <hr>
+    <div class = "notification-buttons my-3" v-if = "notifications.length > 0" >
+      <button class = "notification-button-read-all ml-5" @click="readAllNotifications"> Прочитать все </button>
+      <v-dialog
+        v-model="dialog"
+        max-width="600"
+        persistent
+      >
+        <template v-slot:activator="{ props: activatorProps }">
+          <button class = "notification-button-delete-all mr-5" v-bind="activatorProps"> Удалить все </button>
+        </template>
+
+        <v-card
+          text="В дальнейшем вы не сможете восстановить уведомления"
+          title="Удалить все уведомления?"
+        >
+          <template v-slot:actions>
+            <v-spacer></v-spacer>
+
+            <v-btn @click="dialog = false">
+              Нет
+            </v-btn>
+
+            <v-btn @click="async () => { dialog = false; await deleteAllNotifications(); }">
+              Да
+            </v-btn>
+          </template>
+        </v-card>
+      </v-dialog>
     </div>
     <hr class="mb-3">
     <div v-if = "notifications.length > 0" v-for="notification in notifications" :key="notification.id" class = "mx-3">
@@ -169,9 +220,22 @@ onBeforeMount(async () => {
   cursor: pointer;
 }
 
+.notification-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
 .notification-header {
   display: flex;
   justify-content: space-between;
+}
+
+.notification-button-read-all:hover {
+  color: mediumpurple;
+}
+
+.notification-button-delete-all:hover {
+  color: red;
 }
 
 .notification-delete-icon {
