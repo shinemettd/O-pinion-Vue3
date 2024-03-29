@@ -116,7 +116,7 @@ onBeforeMount(async () => {
             </div>
 
             <div class = "notification-delete-icon">
-              <router-link to="/notification">
+              <router-link to="/notifications">
                 <v-icon @click="async () => { await deleteNotification(notification.id)}" title="Удалить">mdi-close</v-icon>
               </router-link>
             </div>
