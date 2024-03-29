@@ -78,7 +78,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/notification',
+      path: '/notifications',
       name: 'Notifications',
       component: NotificationPage,
       meta: {
@@ -150,6 +150,8 @@ router.beforeEach((to, from, next) => {
 
   if (isAuthorized && (to.path === '/register' || to.path === '/auth' || to.path === '/forgot-password')) {
     next('/');
+  } else if (!isAuthorized && (to.path === '/notifications' || to.path === '/settings')) {
+    next('/auth');
   } else {
     next();
   }
