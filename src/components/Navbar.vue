@@ -23,9 +23,15 @@
         </div>
         <div>
           <div v-if="store.state.isAuthorized">
-            <router-link v-if="store.state.isAuthorized && width > 768" to="/saved-content" class="burger-button"><i class="fas fa-heart"></i></router-link>
-            <router-link v-if="store.state.isAuthorized && width > 768" to="/notifications" :class="store.state.notificationCount > 0 ? 'burger-button new-notification' : 'burger-button'"><i class="fas fa-bell"></i></router-link>
-            <router-link v-if="store.state.isAuthorized && width > 768" to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
+            <router-link v-if="store.state.isAuthorized && width > 768" to="/saved-content" class="burger-button" title="Избранное"><i class="fas fa-heart"></i></router-link>
+              <router-link v-if="store.state.isAuthorized && width > 768" to="/notifications" class="burger-button"><i class="fas fa-bell"
+                :title="(store.state.notificationCount === 0) ? 'Нет новых уведомлений'
+                : (store.state.notificationCount % 10 === 1 && ((store.state.notificationCount - 11) % 10 === 0))
+                ? store.state.notificationCount + ' новое уведомление'
+                : store.state.notificationCount + ' новых уведомлений'"></i>
+                <span :class="store.state.notificationCount > 0 ? 'new-notification' : ''"></span>
+              </router-link>
+            <router-link v-if="store.state.isAuthorized && width > 768" to="/create-article" class="burger-button" title="Создать статью"><i class="fas fa-plus"></i></router-link>
             <button v-if="store.state.isAuthorized" @click="toggleMenu" class="burger-button1">☰</button>
           </div>
           <div v-else>
@@ -45,14 +51,13 @@
             <router-link v-if="!store.state.isAuthorized" to="/auth" class="menu-item" @click="isMenuOpen = false"><i
               class="fas fa-sign-in-alt"></i>Войти
             </router-link>
-            <div class="notification-icon">
-              <router-link to="/notifications" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомления</router-link>
-              <div class="badge">5</div>
-            </div>
+            <router-link to="/notifications" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомления {{store.state.notificationCount > 0 ? `(${store.state.notificationCount})` : ''}}</router-link>
             <router-link to="/create-article" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-plus"></i>Создать
               статью
             </router-link>
             <router-link to="/settings" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-user-cog"></i>Настройки
+            </router-link>
+            <router-link to="/about" class="menu-item" @click="isMenuOpen = false"> <i class="fas fa-info-circle"></i>О нас
             </router-link>
             <router-link v-if="store.state.isAuthorized" to="/" class="menu-item"
                          @click="() => { isMenuOpen = false; store.commit('logout'); }"><i class="fas fa-sign-in-alt"></i>Выйти
@@ -160,7 +165,14 @@ export default {
 }
 
 .new-notification {
-  color: #ef0557;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  top: 0.45em;
+  right: 4.15em;
+  width: 0.55em;
+  height: 0.55em;
+  position: absolute;
 }
 
 .container {
@@ -301,7 +313,7 @@ export default {
     padding: 20px;
   }
 
-  .menu{
+  .menu {
     width: 90%;
     padding: 20px;
   }
@@ -313,7 +325,7 @@ export default {
     margin-top: 0.5em;
     border-radius: 3px;
     position: fixed;
-    right: -350px;
+    right: -400px;
     background: linear-gradient(21deg, #6b1e6e, #5611ec);
     transition: right 0.3s;
     z-index: 1000;

@@ -16,6 +16,7 @@ import SuccessRegisterPage from "@/pages/SuccessRegisterPage.vue";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
 import SavedContentPage from '@/pages/SavedContentPage.vue';
 import NotificationPage from "@/pages/NotificationPage.vue";
+import AboutUsPage from "@/pages/AboutUsPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -131,6 +132,14 @@ const router = createRouter({
       component: SettingsPage,
       meta: {
         title: 'Настройки'
+      }
+    },
+    {
+      name: 'About Us',
+      path: '/about',
+      component: AboutUsPage,
+      meta: {
+        title: 'О нас'
       }
     },
     {
