@@ -24,7 +24,7 @@
         <div>
           <div v-if="store.state.isAuthorized">
             <router-link v-if="store.state.isAuthorized && width > 768" to="/saved-content" class="burger-button"><i class="fas fa-heart"></i></router-link>
-            <router-link v-if="store.state.isAuthorized && width > 768" to="/notifications" class="burger-button"><i class="fas fa-bell"></i></router-link>
+            <router-link v-if="store.state.isAuthorized && width > 768" to="/notifications" :class="store.state.notificationCount > 0 ? 'burger-button new-notification' : 'burger-button'"><i class="fas fa-bell"></i></router-link>
             <router-link v-if="store.state.isAuthorized && width > 768" to="/create-article" class="burger-button"><i class="fas fa-plus"></i></router-link>
             <button v-if="store.state.isAuthorized" @click="toggleMenu" class="burger-button1">☰</button>
           </div>
@@ -45,8 +45,10 @@
             <router-link v-if="!store.state.isAuthorized" to="/auth" class="menu-item" @click="isMenuOpen = false"><i
               class="fas fa-sign-in-alt"></i>Войти
             </router-link>
-            <router-link to="/notifications" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомления
-            </router-link>
+            <div class="notification-icon">
+              <router-link to="/notifications" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-bell"></i>Уведомления</router-link>
+              <div class="badge">5</div>
+            </div>
             <router-link to="/create-article" class="menu-item" @click="isMenuOpen = false"><i class="fas fa-plus"></i>Создать
               статью
             </router-link>
@@ -65,12 +67,14 @@
 <script setup>
 import router from "@/plugins/router";
 import { useDisplay } from 'vuetify'
+import store from "@/store/store";
 const { width } = useDisplay()
 </script>
 
 <script>
 import store from "@/store/store";
 import axios from 'axios'
+import router from "@/plugins/router";
 
 export default {
   name: 'Navbar',
@@ -132,6 +136,7 @@ export default {
 
 </script>
 
+
 <style scoped>
 .navbar {
   width: 100%;
@@ -152,6 +157,10 @@ export default {
   color: white;
   z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.new-notification {
+  color: #ef0557;
 }
 
 .container {

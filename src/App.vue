@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <Navbar :isUserAthorized = 'store.state.isAuthorized' style="margin-bottom: 50px"/>
+      <Navbar :isUserAthorized = 'store.state.isAuthorized' style="margin-bottom: 60px"/>
       <router-view></router-view>
     </v-main>
   </v-app>
