@@ -104,7 +104,11 @@
                 density="comfortable"
                 label="Месяц"
                 :model-value="months[Number(userBirthdate.month) - 1]"
-                @update:model-value = "newMonth => { let validatedMonth = autoValidateDateNumber(months.indexOf(newMonth)); userData.birthDate = changeUserBirthMonth(validatedMonth); }"
+                @update:model-value = "newMonth => {
+                  let validatedMonth = autoValidateDateNumber(months.indexOf(newMonth));
+                  userData.birthDate = changeUserBirthMonth(validatedMonth);
+                  updateDaysInMonth(newMonth);
+                }"
                 variant="outlined"
               ></v-select>
             </v-col>
@@ -491,6 +495,8 @@ const userBirthdate = ref({
   year: null
 })
 
+const currentUserBirthYear = ref(0);
+
 const userPrivacySettings = ref({});
 
 const avatarUrl = ref('https://cdn-icons-png.flaticon.com/512/10/10938.png');
@@ -537,6 +543,33 @@ const handleFileChange = (event) => {
   }
 };
 
+const updateDaysInMonth = (month) => {
+  switch (month) {
+    case 'Янв':
+    case 'Мар':
+    case 'Май':
+    case 'Июл':
+    case 'Авг':
+    case 'Окт':
+    case 'Дек':
+      days.value = Array.from({ length: 32 }, (_, index) => index);
+      break;
+    case 'Апр':
+    case 'Июн':
+    case 'Сен':
+    case 'Ноя':
+      days.value = Array.from({ length: 31 }, (_, index) => index);
+      break;
+    case 'Фев':
+      days.value = Array.from({ length: 29 }, (_, index) => index);
+      break
+  }
+  const year = Number(currentUserBirthYear._rawValue);
+  if (((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) && month === 'Фев') {
+    days.value.push(29);
+  }
+};
+
 const showSnackbarMessage = (text) => {
   showSnackMessage.value = true;
   snackMessageText.value = text;
@@ -549,6 +582,7 @@ const distributeBirthdate = async (date) => {
     month: date[1],
     year: date[2]
   };
+  currentUserBirthYear.value = date[2];
 }
 
 const changeUserBirthDay = (day) => {
