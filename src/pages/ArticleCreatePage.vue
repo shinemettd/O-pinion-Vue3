@@ -290,7 +290,7 @@ export default {
           console.log('Width:', width);
           console.log('Height:', height);
 
-          if (width > 400 && height > 400 && width < 2000 && height < 2000) {
+          if (width > 400 && height > 400 && width < 5000 && height < 5000) {
             resolve(true);
           } else {
             resolve(false);
