@@ -34,7 +34,7 @@ const setNotificationAsRead = async (notificationId) => {
   try {
     await axios.put(`${store.state.API_URL}/api/user-notifications/${notificationId}/make-read`, '', store.state.config);
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 }
 
@@ -49,7 +49,7 @@ const deleteNotification = async (notificationId) => {
     });
     showSnackbarMessage('Уведомление удалено');
   } catch (e) {
-    console.log(e);
+    console.error(e);
     showSnackbarMessage('Произошла ошибка при удалении уведомления');
   }
 }
@@ -59,7 +59,7 @@ const readAllNotifications = async () => {
     await axios.put(`${store.state.API_URL}/api/user-notifications/all/make-read`, '', store.state.config);
     location.reload();
   } catch (e) {
-    console.log(e);
+    console.error(e);
     showSnackbarMessage('Произошла ошибка при удалении уведомлений');
   }
 }
@@ -69,7 +69,7 @@ const deleteAllNotifications = async () => {
     await axios.delete(`${store.state.API_URL}/api/user-notifications/all`, store.state.config);
     notifications.value = [];
   } catch (e) {
-    console.log(e);
+    console.error(e);
     showSnackbarMessage('Произошла ошибка при удалении уведомлений');
   }
 }
@@ -132,7 +132,7 @@ onBeforeMount(async () => {
 
 <template>
   <div class="scroll mx-auto border">
-    <div class = "my-3" @click="console.log(notifications)" style="text-align: center; font-size: 2em;">
+    <div class = "my-3" style="text-align: center; font-size: 2em;">
       <strong>Ваши уведомления</strong>
     </div>
     <hr>
