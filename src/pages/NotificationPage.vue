@@ -137,7 +137,7 @@ onBeforeMount(async () => {
     </div>
     <hr>
     <div class = "notification-buttons my-3" v-if = "notifications.length > 0">
-      <button class = "notification-button-read-all ml-5" @click="readAllNotifications"> Прочитать все </button>
+      <button class = "notification-button-read-all ml-5" @click="readAllNotifications"> {{store.state.notificationCount > 0 ? 'Прочитать все' : ''}} </button>
       <v-dialog
         v-model="dialog"
         max-width="600"
