@@ -76,7 +76,6 @@ const deleteAllNotifications = async () => {
 
 const handleScrolledToBottom = (isVisible) => {
   if (!isVisible) { return };
-  console.log(totalPages.value);
   if (currentPage.value >= totalPages.value) { return };
   currentPage.value += 1;
   getNotifications();
