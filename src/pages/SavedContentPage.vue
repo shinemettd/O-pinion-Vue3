@@ -78,6 +78,7 @@ import store from "@/store/store";
 import axios, {HttpStatusCode} from "axios";
 import ArticlePreviewComponent from "@/components/ArticlePreviewComponent.vue";
 import AnnouncementPreviewComponent from "@/components/AnnouncementPreviewComponent.vue";
+import router from "@/plugins/router";
 
 
 const showToggle = ref(0);
@@ -146,14 +147,13 @@ const handleScrolledToBottom = (isVisible) => {
     currentAnnouncementPage.value += 1;
     getAnnouncements();
   }
-
-
 }
-
 
 onBeforeMount(async () => {
   if (!(await isAuthorized())) {
     store.commit('logout');
+  } else {
+    await checkNotifications();
   }
   await getArticles();
   await getAnnouncements();
@@ -169,6 +169,15 @@ const isAuthorized = async () => {
     return response.status === HttpStatusCode.Ok;
   } catch (e) {
     return false;
+  }
+}
+
+const checkNotifications = async () => {
+  try {
+    const notificationCount = (await axios.get(`${store.state.API_URL}/api/user-notifications/not-read-count`, store.state.config)).data;
+    store.commit('setNotificationCount', notificationCount);
+  } catch (e) {
+    console.error(e);
   }
 }
 

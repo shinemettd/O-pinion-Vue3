@@ -31,7 +31,7 @@ const isAuthorized = async () => {
 
 const checkNotifications = async () => {
   try {
-    const notificationCount = (await axios.get(`${store.state.API_URL}/api/user-notifications/not-read`, store.state.config)).data.totalElements;
+    const notificationCount = (await axios.get(`${store.state.API_URL}/api/user-notifications/not-read-count`, store.state.config)).data;
     store.commit('setNotificationCount', notificationCount);
   } catch (e) {
     console.error(e);

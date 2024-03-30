@@ -113,7 +113,7 @@ function formatDateTime(timeString) {
 
 const checkNotifications = async () => {
   try {
-    const notificationCount = (await axios.get(`${store.state.API_URL}/api/user-notifications/not-read`, store.state.config)).data.totalElements;
+    const notificationCount = (await axios.get(`${store.state.API_URL}/api/user-notifications/not-read-count`, store.state.config)).data;
     store.commit('setNotificationCount', notificationCount);
   } catch (e) {
     console.error(e);
@@ -136,7 +136,7 @@ onBeforeMount(async () => {
       <strong>Ваши уведомления</strong>
     </div>
     <hr>
-    <div class = "notification-buttons my-3" v-if = "notifications.length > 0" >
+    <div class = "notification-buttons my-3" v-if = "notifications.length > 0">
       <button class = "notification-button-read-all ml-5" @click="readAllNotifications"> Прочитать все </button>
       <v-dialog
         v-model="dialog"
@@ -196,7 +196,7 @@ onBeforeMount(async () => {
       <hr class="my-2">
     </div>
     <div v-if = "notifications.length" v-observe-visibility="handleScrolledToBottom"> </div>
-    <div v-if="notifications.length === 0 && isDataFetched" class = "my-10" style="text-align: center"> У вас пока нет уведомлений :( </div>
+    <div v-if="notifications.length === 0" class = "my-10" style="text-align: center; font-size: 1.5em;"> Уведомлений пока не видно... </div>
     <v-snackbar
       v-model="showSnackMessage"
       :timeout="3000"
