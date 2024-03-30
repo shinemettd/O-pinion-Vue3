@@ -33,6 +33,7 @@ import 'katex/dist/katex.min.css'
 import History from '@tiptap/extension-history'
 import Highlight from '@tiptap/extension-highlight'
 import CharacterCount from '@tiptap/extension-character-count'
+import Youtube from '@tiptap/extension-youtube'
 
 import { ref , onMounted, onUpdated } from 'vue';
 import axios from "axios";
@@ -78,7 +79,10 @@ export default {
                     depth: 10,
                 }),
                 Highlight.configure({ multicolor: true }),
-                CharacterCount
+                CharacterCount,
+                Youtube.configure({
+                controls: false,
+            }),
             ],
             content: props.content,
         });
