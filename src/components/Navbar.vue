@@ -25,10 +25,10 @@
           <div v-if="store.state.isAuthorized">
             <router-link v-if="store.state.isAuthorized && width > 768" to="/saved-content" class="burger-button" title="Избранное"><i class="fas fa-heart"></i></router-link>
               <router-link v-if="store.state.isAuthorized && width > 768" to="/notifications" class="burger-button"><i class="fas fa-bell"
-                :title="(store.state.notificationCount === 0) ? 'Нет новых уведомлений'
+                :title="((store.state.notificationCount === 0) ? 'Нет новых уведомлений'
                 : (store.state.notificationCount % 10 === 1 && ((store.state.notificationCount - 11) % 10 === 0))
                 ? store.state.notificationCount + ' новое уведомление'
-                : store.state.notificationCount + ' новых уведомлений'"></i>
+                : store.state.notificationCount + ' новых уведомлений')"></i>
                 <span :class="store.state.notificationCount > 0 ? 'new-notification' : ''"></span>
               </router-link>
             <router-link v-if="store.state.isAuthorized && width > 768" to="/create-article" class="burger-button" title="Создать статью"><i class="fas fa-plus"></i></router-link>
