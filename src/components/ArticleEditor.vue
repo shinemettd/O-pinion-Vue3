@@ -134,7 +134,7 @@ export default {
         const lowlight = createLowlight(common);
         const contentLimit = ref(40000);
         const contentCharacterCountNumber = ref(0);
-        const maxAcceptableImgNum = ref(3);
+        const maxAcceptableImgNum = ref(10);
 
         const imageInput = ref(null);
 
