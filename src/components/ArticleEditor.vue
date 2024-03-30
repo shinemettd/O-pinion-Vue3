@@ -40,6 +40,7 @@
                   <img src="/icons/upload_img.svg" class="btn-toolbar icon" alt="icon"  @click="openFileInput">
 
                   <img src="/icons/rm-image.svg" class="btn-toolbar icon" alt="icon"  @click="deleteSelection">
+                  <img src="/icons/you-tube.png" class="btn-toolbar icon" alt="icon" @click="insertYoutube">
 
 
                   <div class="dropdown">
@@ -118,6 +119,7 @@ import CharacterCount from '@tiptap/extension-character-count'
 import { ref , onMounted, onUpdated } from 'vue';
 import axios from "axios";
 import store from "@/store/store";
+import Youtube from '@tiptap/extension-youtube'
 
 export default {
     props: {
@@ -143,6 +145,8 @@ export default {
         const showHeadingMenu = ref(false);
         const showColorMenu = ref(false);
         const colors = ['#DBA945','#FC8282','#9ADEFF','#9AFFC3'];
+        const width = ref(640);
+        const height = ref(480);
 
         const headings = [
                     { name: 'H1', value: 1 },
@@ -205,6 +209,9 @@ export default {
             }),
             Highlight.configure({ multicolor: true }),
             CharacterCount,
+            Youtube.configure({
+                controls: false,
+            }),
         ],
         content: `
         <p>Введите текст ...</p>
@@ -263,6 +270,15 @@ export default {
             }
         }
 
+        const insertYoutube = () => {
+            const url = prompt('Enter YouTube URL')
+
+            contentEditor.commands.setYoutubeVideo({
+                src: url,
+                width: Math.max(320, parseInt(width.value, 10)) || 640,
+                height: Math.max(180, parseInt(height.value, 10)) || 480,
+            })
+        }
         function countImagesInEditor() {
             var editor = document.querySelector('.custom-editor');
             if (!editor) {
@@ -541,6 +557,7 @@ export default {
             toggleOrderedList,
             toggleBlockquote,
             setTextAlign,
+            insertYoutube
         };
     },
 

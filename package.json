@@ -29,6 +29,7 @@
     "@tiptap/extension-text-align": "^2.2.2",
     "@tiptap/extension-text-style": "^2.2.2",
     "@tiptap/extension-underline": "^2.2.2",
+    "@tiptap/extension-youtube": "^2.2.4",
     "@tiptap/pm": "^2.2.1",
     "@tiptap/starter-kit": "^2.2.1",
     "@tiptap/vue-3": "^2.2.1",
