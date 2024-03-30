@@ -196,7 +196,7 @@ onBeforeMount(async () => {
       </div>
       <hr class="my-2">
     </div>
-    <div v-if = "notifications.length" v-observe-visibility="handleScrolledToBottom"> ААЫАЫФА </div>
+    <div v-if = "notifications.length" v-observe-visibility="handleScrolledToBottom"> </div>
     <div v-if="notifications.length === 0" class = "my-10" style="text-align: center; font-size: 1.5em;"> Уведомлений пока не видно... </div>
     <v-snackbar
       v-model="showSnackMessage"
