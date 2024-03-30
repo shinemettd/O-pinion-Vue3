@@ -33,7 +33,7 @@
                      style="display: none"
                      @change="handleFileChange"
               >
-              <p v-if="newAvatar" @click="newAvatar = null" class = "delete-avatar-text"> Очистить </p>
+              <p v-if="newAvatar" @click="newAvatar = undefined" class = "delete-avatar-text"> Очистить </p>
             </div>
             <div class = "user-data">
               <div class = "nickname-data">
@@ -157,6 +157,8 @@
                 } catch (e) {
                   showSnackbarMessage('Произошла ошибка при сохранении');
                 }
+
+                store.commit('setNickname', userData.nickname);
               }"
             >
               Сохранить
