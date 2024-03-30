@@ -186,9 +186,20 @@ const isAuthorized = async () => {
   }
 }
 
+const checkNotifications = async () => {
+  try {
+    const notificationCount = (await axios.get(`${store.state.API_URL}/api/user-notifications/not-read-count`, store.state.config)).data;
+    store.commit('setNotificationCount', notificationCount);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 onBeforeMount(async () => {
   if (!(await isAuthorized())) {
     store.commit('logout');
+  } else {
+    await checkNotifications();
   }
   await getAnnouncements();
   await getArticles();

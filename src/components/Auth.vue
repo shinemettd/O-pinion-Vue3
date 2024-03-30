@@ -24,7 +24,6 @@ export default {
           isDataRight.value = true;
           const accessToken = response.data.access_token;
           localStorage.setItem('accessToken', accessToken);
-          console.log(accessToken);
           const config = {
             headers: {
               'Authorization': `Bearer ${accessToken}`

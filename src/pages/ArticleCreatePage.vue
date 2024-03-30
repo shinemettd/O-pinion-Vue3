@@ -38,11 +38,11 @@
       </div>
 
       <label for="short-description">Краткое описание:</label>
-      <Editor ref="EditorComponentRef" 
-        :showModal="showModal" 
-        :isForArticleShortDescription="true" 
+      <Editor ref="EditorComponentRef"
+        :showModal="showModal"
+        :isForArticleShortDescription="true"
         :editedArticleShortDescription="editedArticleShortDescription"
-        
+
       />
 
       <div id="myModal" class="modal">
@@ -64,7 +64,7 @@
         />
       <TagZone v-if="!article" ref="ArticleCreateTagZoneRef" />
       <TagZone v-if="article" ref="EditArticleTagZoneRef" :editedArticleTags="article.tags"/>
-      
+
        <div class="btn-options">
         <button class="btn btn-create-article" @click="submitArticle">Опубликовать</button>
         <button class="btn btn-create-draft" @click="saveAsDraft">Сохранить как черновик</button>
@@ -131,7 +131,7 @@ export default {
         coverImageSrc.value = props.editedArticleCoverImage;
         isCoverImageValid.value = true;
       }
-      
+
       coverImageinput.value = document.getElementById('addCoverImage');
 
       // Закрыть всплывающее окно при нажатии на "X"
@@ -154,11 +154,11 @@ export default {
         clearInterval(intervalId.value);
       }
     });
-  
+
 
 
     const loadTitleFromLocalStorage = () => {
-      
+
       if(props.editedArticleId) {
         title.value = props.article.title;
         return;
@@ -194,7 +194,7 @@ export default {
     };
 
     const removeImage = async() => {
-      // если мы удаляем картинку которую изначально передавали 
+      // если мы удаляем картинку которую изначально передавали
       if(props.editedArticleCoverImage && props.editedArticleCoverImage === coverImageSrc.value) {
         await deleteArticleCoverImage(props.editedArticleId);
       }
@@ -205,7 +205,7 @@ export default {
     };
 
     const deleteArticleCoverImage = async(articleId) => {
-      
+
       try {
         const response = await axios.delete(`${store.state.API_URL}/api/images/${articleId}`, store.state.config);
         console.log('Главное изображение  успешно удалено :');
@@ -221,7 +221,7 @@ export default {
       }
     }
 
-   
+
     const handleFile = async (event) => {
       const files = event.target.files;
       handleCoverImage(files);
@@ -231,7 +231,7 @@ export default {
       event.preventDefault();
       const files = event.dataTransfer.files;
       handleCoverImage(files);
-      
+
     };
 
     const handleCoverImage = async(files) => {
@@ -319,7 +319,7 @@ export default {
               'Authorization': `Bearer ${accessToken}`,
               'Content-Type': 'multipart/form-data'
             }
-        }; 
+        };
 
         const response = await axios.put(`${store.state.API_URL}/api/images/${articleId}`, formData, config);
         console.log('Изображение успешно загружено:');
@@ -396,7 +396,7 @@ export default {
           loading.value = false;
           alert('Ваши изменения сохранены успешно !');
           router.push(`/user/${store.state.nickname}`);
-          return;    
+          return;
         }
         loading.value = false;
         alert("Произошла ошибка = (");
@@ -435,9 +435,9 @@ export default {
             }
             return false;
         }
-        
+
     }
-    
+
 
     async function updateArticleOnServer() {
         try {
@@ -449,7 +449,7 @@ export default {
           };
           const response = await axios.put(`${store.state.API_URL}/api/articles/${props.editedArticleId}`, data, store.state.config);
           return true;
-        
+
 
         } catch (error) {
           if (error.response && error.response.data && error.response.data.errors) {
@@ -491,7 +491,7 @@ export default {
           loading.value = false;
           showModal(null, serverErrors);
           return;
-        } 
+        }
         loading.value = false;
         console.log("Error submiting article " + error);
       }
@@ -532,6 +532,8 @@ export default {
     onBeforeMount(async () => {
       if (!(await isAuthorized())) {
         store.commit('logout');
+      } else {
+        await checkNotifications();
       }
     });
 
@@ -544,6 +546,15 @@ export default {
         return response.status === HttpStatusCode.Ok;
       } catch (e) {
         return false;
+      }
+    }
+
+    const checkNotifications = async () => {
+      try {
+        const notificationCount = (await axios.get(`${store.state.API_URL}/api/user-notifications/not-read-count`, store.state.config)).data;
+        store.commit('setNotificationCount', notificationCount);
+      } catch (e) {
+        console.error(e);
       }
     }
 
@@ -609,7 +620,7 @@ label {
   min-width: 100%;
   max-width: 100%;
   height: 2em;
-  font-size: 2em; 
+  font-size: 2em;
   border: #333 solid 1px;
   padding: 10px;
   border-radius: 10px;
@@ -679,29 +690,29 @@ label {
 }
 
 .modal {
-  display: none; 
-  position: fixed; 
-  z-index: 1; 
+  display: none;
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; 
-  background-color: rgb(0, 0, 0); 
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
 }
 .loading-spinner {
-  position: fixed; 
-  z-index: 1; 
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
-  width: 100%; 
-  height: 100%; 
-  background-color: rgb(0, 0, 0);  
-  background-color: rgba(0, 0, 0, 0.4); 
+  width: 100%;
+  height: 100%;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal-content { 
+.modal-content {
   background-color: #fefefe;
   margin: 15% auto;
   padding: 20px;

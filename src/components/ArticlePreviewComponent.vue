@@ -142,8 +142,8 @@ async function setStatus() {
         const serverErrors = error.response.data.errors;
         alert(serverErrors);
       }
-      
-  } 
+
+  }
 }
 
 </script>
@@ -474,7 +474,7 @@ export default {
               </div>
               <b>{{ articleTotalComments }}</b>
             </div>
-            <div class = "article-views-count">
+            <div class = "article-views-count" v-if="status !== 'DRAFT'">
               <div class = "article-views-icon">
                 <img src ="/icons/eye_icon.svg" alt="Image Icon">
               </div>

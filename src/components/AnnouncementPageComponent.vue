@@ -206,7 +206,7 @@ onMounted(async () => {
 
 <template>
   <main class = "container mx-auto">
-    <div class = "scroll mx-auto border scroll-container w-66 h-100 px-4 py-3">
+    <div class = "scroll mx-auto border scroll-container h-100 px-4 py-3">
       <hr>
       <div class = "article-header mt-3">
         <p style = "font-size: 2em; word-wrap: break-word;"> {{ announcementTitle }} </p>
@@ -628,6 +628,10 @@ onMounted(async () => {
 }
 
 @media screen and (max-width: 720px) {
+  .scroll {
+    width: 100%;
+  }
+
   .scroll-container {
     width: 100%;
   }
@@ -644,8 +648,17 @@ onMounted(async () => {
   .article-footer-bar {
     flex-direction: column;
   }
-  .comment-user-data p {
-    text-align: center;
+
+}
+
+@media screen and (min-width: 1280px) {
+  .scroll {
+    width: 66%;
+  }
+}
+@media screen and (max-width: 360px) {
+  .article-views-count {
+    float: none;
   }
 }
 

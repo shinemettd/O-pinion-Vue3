@@ -225,7 +225,7 @@ const shareArticle = async (articleId, shareType) => {
       shareLink.value = undefined;
     }
   } else {
-    try { 
+    try {
       window.location.href = (await axios.get(`${store.state.API_URL}/api/articles/${articleId}/share?share-type=${shareType}`)).data;
     } catch (e) {
       shareLink.value = undefined;
@@ -1021,6 +1021,10 @@ onMounted(async () => {
     width: 66%;
   }
 }
-
+@media screen and (max-width: 360px) {
+  .article-views-count {
+    float: none;
+  }
+}
 
 </style>

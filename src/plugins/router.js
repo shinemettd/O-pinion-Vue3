@@ -16,6 +16,7 @@ import SuccessRegisterPage from "@/pages/SuccessRegisterPage.vue";
 import ResetPasswordPage from "@/pages/ResetPasswordPage.vue";
 import SavedContentPage from '@/pages/SavedContentPage.vue';
 import NotificationPage from "@/pages/NotificationPage.vue";
+import AboutUsPage from "@/pages/AboutUsPage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -78,7 +79,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/notification',
+      path: '/notifications',
       name: 'Notifications',
       component: NotificationPage,
       meta: {
@@ -134,6 +135,14 @@ const router = createRouter({
       }
     },
     {
+      name: 'About Us',
+      path: '/about',
+      component: AboutUsPage,
+      meta: {
+        title: 'О нас'
+      }
+    },
+    {
       path: '/:catchAll(.*)',
       component: PageNotFound,
       meta: {
@@ -150,6 +159,8 @@ router.beforeEach((to, from, next) => {
 
   if (isAuthorized && (to.path === '/register' || to.path === '/auth' || to.path === '/forgot-password')) {
     next('/');
+  } else if (!isAuthorized && (to.path === '/notifications' || to.path === '/settings')) {
+    next('/auth');
   } else {
     next();
   }

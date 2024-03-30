@@ -12,6 +12,7 @@ const snackMessageText = ref('');
 const showSnackMessage = ref(false);
 
 const isDataFetched = ref(false);
+const dialog = ref(false)
 
 const getNotifications = async () => {
   const config = {
@@ -53,6 +54,26 @@ const deleteNotification = async (notificationId) => {
   }
 }
 
+const readAllNotifications = async () => {
+  try {
+    await axios.put(`${store.state.API_URL}/api/user-notifications/all/make-read`, '', store.state.config);
+    location.reload();
+  } catch (e) {
+    console.log(e);
+    showSnackbarMessage('Произошла ошибка при удалении уведомлений');
+  }
+}
+
+const deleteAllNotifications = async () => {
+  try {
+    await axios.delete(`${store.state.API_URL}/api/user-notifications/all`, store.state.config);
+    notifications.value = [];
+  } catch (e) {
+    console.log(e);
+    showSnackbarMessage('Произошла ошибка при удалении уведомлений');
+  }
+}
+
 const handleScrolledToBottom = (isVisible) => {
   if (!isVisible) { return };
   if (currentPage.value >= totalPages.value) { return };
@@ -90,9 +111,20 @@ function formatDateTime(timeString) {
   return formattedDateTime;
 }
 
+const checkNotifications = async () => {
+  try {
+    const notificationCount = (await axios.get(`${store.state.API_URL}/api/user-notifications/not-read-count`, store.state.config)).data;
+    store.commit('setNotificationCount', notificationCount);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 onBeforeMount(async () => {
   if (!(await isAuthorized())) {
     store.commit('logout');
+  } else {
+    await checkNotifications();
   }
   await getNotifications();
 })
@@ -102,6 +134,36 @@ onBeforeMount(async () => {
   <div class="scroll mx-auto border">
     <div class = "my-3" @click="console.log(notifications)" style="text-align: center; font-size: 2em;">
       <strong>Ваши уведомления</strong>
+    </div>
+    <hr>
+    <div class = "notification-buttons my-3" v-if = "notifications.length > 0">
+      <button class = "notification-button-read-all ml-5" @click="readAllNotifications"> {{store.state.notificationCount > 0 ? 'Прочитать все' : ''}} </button>
+      <v-dialog
+        v-model="dialog"
+        max-width="600"
+        persistent
+      >
+        <template v-slot:activator="{ props: activatorProps }">
+          <button class = "notification-button-delete-all mr-5" v-bind="activatorProps"> Удалить все </button>
+        </template>
+
+        <v-card
+          text="В дальнейшем вы не сможете восстановить уведомления"
+          title="Удалить все уведомления?"
+        >
+          <template v-slot:actions>
+            <v-spacer></v-spacer>
+
+            <v-btn @click="dialog = false">
+              Нет
+            </v-btn>
+
+            <v-btn @click="async () => { dialog = false; await deleteAllNotifications(); }">
+              Да
+            </v-btn>
+          </template>
+        </v-card>
+      </v-dialog>
     </div>
     <hr class="mb-3">
     <div v-if = "notifications.length > 0" v-for="notification in notifications" :key="notification.id" class = "mx-3">
@@ -116,7 +178,7 @@ onBeforeMount(async () => {
             </div>
 
             <div class = "notification-delete-icon">
-              <router-link to="/notification">
+              <router-link to="/notifications">
                 <v-icon @click="async () => { await deleteNotification(notification.id)}" title="Удалить">mdi-close</v-icon>
               </router-link>
             </div>
@@ -134,7 +196,7 @@ onBeforeMount(async () => {
       <hr class="my-2">
     </div>
     <div v-if = "notifications.length" v-observe-visibility="handleScrolledToBottom"> </div>
-    <div v-if="notifications.length === 0 && isDataFetched" class = "my-10" style="text-align: center"> У вас пока нет уведомлений :( </div>
+    <div v-if="notifications.length === 0" class = "my-10" style="text-align: center; font-size: 1.5em;"> Уведомлений пока не видно... </div>
     <v-snackbar
       v-model="showSnackMessage"
       :timeout="3000"
@@ -169,9 +231,22 @@ onBeforeMount(async () => {
   cursor: pointer;
 }
 
+.notification-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
 .notification-header {
   display: flex;
   justify-content: space-between;
+}
+
+.notification-button-read-all:hover {
+  color: mediumpurple;
+}
+
+.notification-button-delete-all:hover {
+  color: red;
 }
 
 .notification-delete-icon {
