@@ -14,7 +14,7 @@
                 <li v-for="result in searchResults" :key="result.id">
                     <img :src="result.cover_image" alt="img" v-if="result.cover_image" style="max-width: 50px; max-height: 50px; margin: 0 5px 5px 0">
                     <img v-if="!result.cover_image" src="/icons/search-icon.png" alt="img" style="margin: 0 5px 5px 23px;">
-                    <a :href="'http://143.110.182.202/article/' + result.id">{{ result.title }}</a>
+                    <a :href="'http://opinion.home.kg/article/' + result.id">{{ result.title }}</a>
                 </li>
             </ul>
           <div class="no-results" v-if="searchResults.length === 0">
