@@ -259,9 +259,9 @@ export default {
         showModal("/icons/mem.jpg", 'Пожалуйста, выберите изображение');
         return false;
       }
-      const maxSize = 2 * 1024 * 1024;
+      const maxSize = 5 * 1024 * 1024;
       if (file._value.size > maxSize) {
-        showModal("/icons/too_much.jpg", 'Размер файла превышает 2МБ ');
+        showModal("/icons/too_much.jpg", 'Размер файла превышает 5МБ ');
         return false;
       }
 
