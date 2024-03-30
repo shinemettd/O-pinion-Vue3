@@ -57,7 +57,7 @@ const deleteNotification = async (notificationId) => {
 const readAllNotifications = async () => {
   try {
     await axios.put(`${store.state.API_URL}/api/user-notifications/all/make-read`, '', store.state.config);
-    notifications.value = [];
+    location.reload();
   } catch (e) {
     console.log(e);
     showSnackbarMessage('Произошла ошибка при удалении уведомлений');
@@ -111,9 +111,20 @@ function formatDateTime(timeString) {
   return formattedDateTime;
 }
 
+const checkNotifications = async () => {
+  try {
+    const notificationCount = (await axios.get(`${store.state.API_URL}/api/user-notifications/not-read`, store.state.config)).data.totalElements;
+    store.commit('setNotificationCount', notificationCount);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 onBeforeMount(async () => {
   if (!(await isAuthorized())) {
     store.commit('logout');
+  } else {
+    await checkNotifications();
   }
   await getNotifications();
 })
