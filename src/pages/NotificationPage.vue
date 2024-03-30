@@ -24,9 +24,9 @@ const getNotifications = async () => {
     }
   };
 
-  const response = (await axios.get(`${store.state.API_URL}/api/user-notifications`, config)).data.content;
-  notifications.value.push(...response);
-  totalPages.value = response.data.totalPages;
+  const response = (await axios.get(`${store.state.API_URL}/api/user-notifications?page=${currentPage.value}`, config)).data;
+  notifications.value.push(...response.content);
+  totalPages.value = response.totalPages;
   isDataFetched.value = true;
 }
 
@@ -76,6 +76,7 @@ const deleteAllNotifications = async () => {
 
 const handleScrolledToBottom = (isVisible) => {
   if (!isVisible) { return };
+  console.log(totalPages.value);
   if (currentPage.value >= totalPages.value) { return };
   currentPage.value += 1;
   getNotifications();
@@ -195,7 +196,7 @@ onBeforeMount(async () => {
       </div>
       <hr class="my-2">
     </div>
-    <div v-if = "notifications.length" v-observe-visibility="handleScrolledToBottom"> </div>
+    <div v-if = "notifications.length" v-observe-visibility="handleScrolledToBottom"> ААЫАЫФА </div>
     <div v-if="notifications.length === 0" class = "my-10" style="text-align: center; font-size: 1.5em;"> Уведомлений пока не видно... </div>
     <v-snackbar
       v-model="showSnackMessage"
